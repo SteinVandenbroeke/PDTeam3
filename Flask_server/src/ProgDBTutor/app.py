@@ -6,9 +6,10 @@ from flask import request, session, jsonify
 
 from config import config_data
 from quote_data_access import Quote, DBConnection, QuoteDataAccess
+import os
 
 # INITIALIZE SINGLETON SERVICES
-app = Flask('Tutorial ', static_url_path="/", static_folder="react_build/")
+app = Flask('Tutorial ', static_url_path="/stop/", static_folder="react_build/")
 app.secret_key = '*^*(*&)(*)(*afafafaSDD47j\3yX R~X@H!jmM]Lwf/,?KT'
 app_data = dict()
 app_data['app_name'] = config_data['app_name']
@@ -28,8 +29,9 @@ def helloWorld():
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def reactApp(path):
-    if path == "":
+    if not os.path.exists("react_build/" + path) or path == "":
         path = "index.html"
+
     return app.send_static_file(path)
 
 
