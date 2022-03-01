@@ -45,3 +45,4 @@ the build will automatically copy itself to the flask server in the folder "reac
 change port and redirections
 
 ### React frontend ###
+```src/pages``` style for different pages
