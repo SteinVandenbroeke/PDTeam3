@@ -23,6 +23,11 @@ We use a Flask server
 ## Front end ##
 We use react
 
+### Install react package for react project ###
+Can be used to design the front end
+1) open "React_front_end" in terminal
+2) Run in the terminal npm install
+
 ### Run a react dev server ###
 Can be used to design the front end
 1) open "React_front_end" in Webstorm
