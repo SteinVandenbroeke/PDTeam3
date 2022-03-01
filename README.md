@@ -38,4 +38,10 @@ the build will automatically copy itself to the flask server in the folder "reac
 1) run following command in the "React_front_end" folder: npm run build
 2) Test if react is corectly build with the python flask server
 
+## Code ##
 
+### Flask server ###
+```src/ProgDBTutor/app.py```
+change port and redirections
+
+### React frontend ###
