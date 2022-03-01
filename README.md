@@ -22,9 +22,9 @@ We use a Flask server
 
 ## Front end ##
 We use react
+!!! Don't upload node_modules to github !!!
 
 ### Install react package for react project ###
-Can be used to design the front end
 1) open "React_front_end" in terminal
 2) Run in the terminal npm install
 
