@@ -16,11 +16,7 @@ const NavbarComp = () => {
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
-            <Container style={{paddingTop: 20, paddingBottom: 30}}>
-                <Card className={"shadow"} style={{padding: 10}}>
-                    <Outlet/>
-                </Card>
-            </Container>
+            <Outlet/>
         </>
     )
 };
