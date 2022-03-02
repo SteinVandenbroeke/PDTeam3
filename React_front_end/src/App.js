@@ -6,13 +6,14 @@ import Home from "./pages/Home"
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Page2 from "./pages/Page2";
 import Login from "./pages/Login"
+import Page404 from "./pages/Page404";
 import User from "./logic/User"
 import {Container, Card} from "react-bootstrap";
 
 let userSession = createContext();
 function App() {
     let [user , setUser] = useState(new User());
-    if(!false){
+    if(false){
         return(
             <Container style={{paddingTop: 20, paddingBottom: 30}}>
                 <Card className={"shadow"} style={{padding: 30}}>
@@ -29,6 +30,7 @@ function App() {
                       <Route index element={<Home />} />
                       <Route path="login" element={<Login />} />
                       <Route path="page2" element={<Page2 />} />
+                       <Route path="page404" element={<Page404 />} />
                   </Route>
               </Routes>
           </BrowserRouter>
