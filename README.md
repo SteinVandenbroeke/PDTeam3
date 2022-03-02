@@ -48,8 +48,8 @@ change port and redirections
 ```src/pages``` style for different pages
 
 ## config.py ##
-config_data = dict()
-config_data['app_name'] = 'appname' (ProgDB Tutor)
-config_data['dbname'] = 'dbname' (dbtutor)
-config_data['dbuser'] = 'user' (app)
-config_data['uri'] = 'postgresql://username:password@localhost:5432/dbname'
+config_data = dict()  
+config_data['app_name'] = 'appname' (ProgDB Tutor)  
+config_data['dbname'] = 'dbname' (dbtutor)  
+config_data['dbuser'] = 'user' (app)  
+config_data['uri'] = 'postgresql://username:password@localhost:5432/dbname'  
