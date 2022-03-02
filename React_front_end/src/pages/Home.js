@@ -62,13 +62,13 @@ export const data = {
 };
 
 const Home = () => {
-
+/*
     useEffect(() => {
+
         fetch("/api/helloWorld")
-            .then(res => res.json())
             .then(
                 (result) => {
-                    //alert(result)
+                    alert(result)
                 },
                 // Note: it's important to handle errors here
                 // instead of a catch() block so that we don't swallow
@@ -78,7 +78,7 @@ const Home = () => {
                 }
             )
     });
-
+*/
     return (
         <div className="App">
             <header>
