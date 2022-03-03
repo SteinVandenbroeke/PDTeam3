@@ -9,17 +9,24 @@ import Login from "./pages/Login"
 import Page404 from "./pages/Page404";
 import User from "./logic/User"
 import {Container, Card} from "react-bootstrap";
+import Dashboard from "./pages/Dashboard";
+import Users from "./pages/Users";
+import ABTests from "./pages/DashboardInnerPages/ABTests/ABTests";
+import Datasets from "./pages/DashboardInnerPages/Datasets/Datasets";
+import HomeDashboardPage from "./pages/DashboardInnerPages/homeDashboardPage";
 
 let userSession = createContext();
 function App() {
     let [user , setUser] = useState(new User());
-    if(false){
+    if(!user.isLoggedIn()){
         return(
-            <Container style={{paddingTop: 20, paddingBottom: 30}}>
-                <Card className={"shadow"} style={{padding: 30}}>
-                    <Login/>
-                </Card>
-            </Container>
+            <userSession.Provider value={ {user , setUser } }>
+                <Container style={{paddingTop: 20, paddingBottom: 30}}>
+                    <Card className={"shadow"} style={{padding: 30}}>
+                        <Login/>
+                    </Card>
+                </Container>
+            </userSession.Provider>
         );
     }
   return (
@@ -27,10 +34,16 @@ function App() {
           <BrowserRouter>
               <Routes>
                   <Route path="/" element={<NavbarComp />}>
-                      <Route index element={<Home />} />
-                      <Route path="login" element={<Login />} />
-                      <Route path="page2" element={<Page2 />} />
-                       <Route path="page404" element={<Page404 />} />
+                      <Route index element={<Page2 />} />
+
+                      <Route path="dashboard" element={<Dashboard />}>
+                        <Route index element={<HomeDashboardPage />} />
+                        <Route path="abTests" element={<ABTests />} />
+                        <Route path="dataSets" element={<Datasets />} />
+                      </Route>
+
+                      <Route path="users" element={<Users />} />
+                      <Route path="page404" element={<Page404 />} />
                   </Route>
               </Routes>
           </BrowserRouter>
