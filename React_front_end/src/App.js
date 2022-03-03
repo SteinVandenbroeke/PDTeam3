@@ -37,9 +37,10 @@ function App() {
                       <Route index element={<Page2 />} />
 
                       <Route path="dashboard" element={<Dashboard />}>
-                        <Route index element={<HomeDashboardPage />} />
-                        <Route path="abTests" element={<ABTests />} />
-                        <Route path="dataSets" element={<Datasets />} />
+                          <Route index element={<HomeDashboardPage />} />
+                          <Route path="abTests" element={<ABTests />} />
+                          <Route path="dataSets" element={<Datasets />} />
+                          <Route path="vbPagina" element={<Home />} />
                       </Route>
 
                       <Route path="users" element={<Users />} />

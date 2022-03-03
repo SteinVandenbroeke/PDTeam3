@@ -15,16 +15,17 @@ const Dashboard = () => {
                   <Row>
                     <Col md="auto">
                         <Container style={{paddingTop: 20, paddingBottom: 30}}>
-                            <Card className={"shadow"} style={{padding: 30}}>
+                            <Card className={"shadow-lg"} style={{padding: 30}}>
                                 <ListGroup variant="flush">
                                   <ListGroup.Item action ><Link to="/dashboard/abTests" class={"btn"}>A/B tests</Link></ListGroup.Item>
                                   <ListGroup.Item action ><Link to="/dashboard/dataSets" class={"btn"}>Mijn datasets</Link></ListGroup.Item>
+                                    <ListGroup.Item action ><Link to="/dashboard/vbPagina" class={"btn"}>Vp pagina</Link></ListGroup.Item>
                                 </ListGroup>
                             </Card>
                         </Container>
                     </Col>
                     <Col style={{paddingTop: 10, paddingRight: 30}}>
-                        <Card style={{padding: 30}}>
+                        <Card className={"shadow"} style={{padding: 30}}>
                             <Outlet/>
                         </Card>
                     </Col>
