@@ -34,7 +34,7 @@ const Login = () => {
                                     <Form.Control type="password" placeholder="Password" />
                                 </Form.Group>
                                 <Button variant="primary" onClick={() => {userLogin()}}>
-                                    Submit
+                                    Login
                                 </Button>
                             </Form>
                         </Col>
