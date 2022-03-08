@@ -12,7 +12,7 @@ import {Container, Card} from "react-bootstrap";
 import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
 import ABTests from "./pages/DashboardInnerPages/ABTests/ABTests";
-import Datasets from "./pages/DashboardInnerPages/Datasets/Datasets";
+import DatasetsIndex from "./pages/DashboardInnerPages/Datasets/DatasetsIndex";
 import HomeDashboardPage from "./pages/DashboardInnerPages/homeDashboardPage";
 
 let userSession = createContext();
@@ -39,7 +39,7 @@ function App() {
                       <Route path="dashboard" element={<Dashboard />}>
                           <Route index element={<HomeDashboardPage />} />
                           <Route path="abTests" element={<ABTests />} />
-                          <Route path="dataSets" element={<Datasets />} />
+                          <Route path="dataSets" element={<DatasetsIndex />} />
                           <Route path="vbPagina" element={<Home />} />
                       </Route>
 

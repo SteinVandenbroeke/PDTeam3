@@ -176,4 +176,13 @@ def reactApp(path):
 
 # RUN DEV SERVER
 if __name__ == "__main__":
-    app.run(HOST, debug=DEBUG, port=80)
+    user = User(
+        public_id=str(uuid.uuid4()),
+        name="Stein",
+        email="steinvandenbroeke@gmail.com",
+        password=generate_password_hash("Wachtwoord")
+    )
+    # insert user
+    db.session.add(user)
+    db.session.commit()
+    app.run(HOST, debug=DEBUG, port=8000)
