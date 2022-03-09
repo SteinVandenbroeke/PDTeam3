@@ -12,9 +12,7 @@ const AddUsers = () => {
         <div className="App">
             <Container>
               <Row>
-                <Col>
-                </Col>
-                <Col xs={5}>
+                <Col xs={12} md={6}>
                     <h1>Add new user</h1>
                     <Form style={{textAlign:"left"}}>
                         <Container>
@@ -54,7 +52,7 @@ const AddUsers = () => {
                         </Container>
                     </Form>
                 </Col>
-                <Col xs={5} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                <Col xs={12} md={6} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                     <img src={"/svg/NewUser.svg"} style={{width: "90%"}} xs={0}/>
                 </Col>
               </Row>

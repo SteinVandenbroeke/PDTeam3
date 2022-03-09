@@ -13,7 +13,7 @@ const DataSetsList = () => {
                     <Button variant="primary">Add new <Icon name="plus-circle-outline"/></Button>
                 </Link>
             </div>
-            <LogicTable data={[["id", "Dataset name", "Created by", "Creation date"], ["test data", "lalal", "jsdjksd", "kkhkljk"],["test data 1", "lalal", "jsdjksd", "kkhkljk"]]}/>
+            <LogicTable data={[["id", "Dataset name", "Created by", "Creation date"], ["1", "H&M test dataset 1", "Stein Vandenbroeke", "09/03/2022"],["2", "H&M test dataset 2", "Stein Vandenbroeke", "09/03/2022"]]}/>
         </div>
     );
 };

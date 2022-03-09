@@ -11,9 +11,9 @@ const homeDashboardPage = () => {
             <header>
                 <h1>Home dashboardpage</h1>
                 <Link to="/dashboard/abTests" class={"btn"}>
-                    <Button className={"shadow"} style={{padding: 20, margin: 20, fontSize: "2em"}} bg="primary">
+                    <Button className={"shadow"} style={{padding: 20, margin: 20, fontSize: "2em"}} variant="white">
                         <Icon
-                            fill="#fff"
+                            fill="#000"
                             name="pie-chart-outline"
                             size="xlarge"
                             />
