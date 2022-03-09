@@ -10,12 +10,14 @@ import Page404 from "./pages/Page404";
 import User from "./logic/User"
 import {Container, Card} from "react-bootstrap";
 import Dashboard from "./pages/Dashboard";
-import Users from "./pages/Users";
+import Users from "./pages/Users/Users";
 import ABTests from "./pages/DashboardInnerPages/ABTests/ABTests";
 import DatasetsIndex from "./pages/DashboardInnerPages/Datasets/DatasetsIndex";
 import HomeDashboardPage from "./pages/DashboardInnerPages/homeDashboardPage";
 import AddDataset from "./pages/DashboardInnerPages/Datasets/AddDataset"
 import DataSetsList from "./pages/DashboardInnerPages/Datasets/DatasetsList"
+import AddUsers from "./pages/Users/AddUser";
+import UserList from "./pages/Users/UserList";
 
 let userSession = createContext();
 function App() {
@@ -48,7 +50,10 @@ function App() {
                           <Route path="vbPagina" element={<Home />} />
                       </Route>
 
-                      <Route path="users" element={<Users />} />
+                      <Route path="users" element={<Users />} >
+                          <Route index element={<UserList />}/>
+                          <Route path="add" element={<AddUsers />}/>
+                      </Route>
                       <Route path="page404" element={<Page404 />} />
                   </Route>
               </Routes>
