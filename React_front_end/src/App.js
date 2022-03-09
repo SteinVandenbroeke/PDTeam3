@@ -14,6 +14,8 @@ import Users from "./pages/Users";
 import ABTests from "./pages/DashboardInnerPages/ABTests/ABTests";
 import DatasetsIndex from "./pages/DashboardInnerPages/Datasets/DatasetsIndex";
 import HomeDashboardPage from "./pages/DashboardInnerPages/homeDashboardPage";
+import AddDataset from "./pages/DashboardInnerPages/Datasets/AddDataset"
+import DataSetsList from "./pages/DashboardInnerPages/Datasets/DatasetsList"
 
 let userSession = createContext();
 function App() {
@@ -39,7 +41,10 @@ function App() {
                       <Route path="dashboard" element={<Dashboard />}>
                           <Route index element={<HomeDashboardPage />} />
                           <Route path="abTests" element={<ABTests />} />
-                          <Route path="dataSets" element={<DatasetsIndex />} />
+                          <Route path="dataSets" element={<DatasetsIndex />}>
+                              <Route index element={<DataSetsList />}/>
+                              <Route path="add" element={<AddDataset />}/>
+                          </Route>
                           <Route path="vbPagina" element={<Home />} />
                       </Route>
 

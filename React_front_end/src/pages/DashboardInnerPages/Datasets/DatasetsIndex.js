@@ -1,8 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
-import {Col, Row, Table} from "react-bootstrap";
-import {Button} from "react-bootstrap";
-import DataSetsList from "./DatasetsList"
+import {Link, Outlet, Route, Router} from "react-router-dom";
 import BackButton from "../../../components/backButton"
 
 const DatasetsIndex = () => {
@@ -12,7 +10,7 @@ const DatasetsIndex = () => {
             <header>
                 <h1>Datasets</h1>
             </header>
-            <DataSetsList/>
+            <Outlet/>
         </div>
     );
 };
