@@ -62,13 +62,13 @@ export const data = {
 };
 
 const Home = () => {
-
+/*
     useEffect(() => {
+
         fetch("/api/helloWorld")
-            .then(res => res.json())
             .then(
                 (result) => {
-                    //alert(result)
+                    alert(result)
                 },
                 // Note: it's important to handle errors here
                 // instead of a catch() block so that we don't swallow
@@ -78,18 +78,20 @@ const Home = () => {
                 }
             )
     });
-
+*/
     return (
-        <div className="App">
+        <div>
             <header>
-                <h1>Hallo dit is een test</h1>
+                <h1>vb pagina</h1>
                 <Row className="mx-0">
                     <Button as={Col} variant="primary">Button #1</Button>
                     <Button as={Col} variant="secondary" className="mx-2">Button #2</Button>
                     <Button as={Col} variant="success">Button #3</Button>
                 </Row>
+                <div style={{width: 400}}>
+                    <Bar options={options} data={data}  />
+                </div>
 
-                <Bar options={options} data={data} />
             </header>
         </div>
     );
