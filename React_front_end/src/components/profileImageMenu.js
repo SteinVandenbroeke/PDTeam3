@@ -3,6 +3,7 @@ import {Navbar, Container, Nav, Card, Image, ListGroup} from "react-bootstrap";
 import {useContext, React, useState} from "react";
 import {userSession} from "../App";
 import User from "../logic/User";
+import Icon from "react-eva-icons";
 
 const ProfileImageMenu = () => {
 
@@ -24,8 +25,20 @@ const ProfileImageMenu = () => {
                     <Card className={"shadow-lg"} style={{ width: '18rem', position: "absolute", top: 60}}>
                       <Card.Body>
                         <ListGroup variant="flush">
-                          <ListGroup.Item action >Settings</ListGroup.Item>
-                          <ListGroup.Item action  onClick={()=>{logout();}}>Logout</ListGroup.Item>
+                          <ListGroup.Item action >
+                              <Icon
+                                    fill="#000000"
+                                    name="settings-outline"
+                              />
+                              Settings
+                          </ListGroup.Item>
+                          <ListGroup.Item action  onClick={()=>{logout();}}>
+                              <Icon
+                                fill="#000000"
+                                name="log-out-outline"
+                              />
+                              Logout
+                          </ListGroup.Item>
                         </ListGroup>
                       </Card.Body>
                     </Card>
