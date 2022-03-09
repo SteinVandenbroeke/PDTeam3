@@ -18,7 +18,6 @@ const LogicTable = (props) => {
                 </tr>
             </thead>
           <tbody>
-
             {tableData.map((valueRow) => {
                 return (
                     <tr>

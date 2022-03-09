@@ -9,7 +9,7 @@ import Page2 from "./Page2";
 import Icon from 'react-eva-icons';
 
 const Dashboard = () => {
-    let [showMenu , setShowMenu] = useState(false);
+    let [showMenu , setShowMenu] = useState(true);
 
     return (
         <div className="App">
