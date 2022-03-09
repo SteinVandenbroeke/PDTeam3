@@ -5,23 +5,25 @@ import {userSession} from "../App";
 import User from "../logic/User";
 
 const LogicTable = (props) => {
-
+    let tableData = Array.from(props.data);
+    tableData.shift();
+    let header = props.data[0];
     return (
         <Table hover>
           <thead>
                 <tr>
-                  {props.data[0].map((value, index) => {
+                  {header.map((value, index) => {
                     return <th key={index}>{value}</th>
                   })}
                 </tr>
             </thead>
           <tbody>
 
-            {props.data.map((valueRow) => {
-                return (<tr>
+            {tableData.map((valueRow) => {
+                return (
+                    <tr>
                     {valueRow.map((value, index) => {
-                        return (
-                          <td>{value}</td>)
+                        return <td>{value}</td>
                     })}
                     </tr>)
             })}
