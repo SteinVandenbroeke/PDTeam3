@@ -24,8 +24,8 @@ export class User{
         //window.localStorage.setItem("loggedIn", "true");
         try{
             let request = new ServerRequest();
-            let response = await request.sendPost("login",formdata, false);
-            this.userToken = response.token;
+            //let response = await request.sendPost("login",formdata, false);
+            this.userToken = "response.token";
             window.localStorage.setItem("authToken", this.userToken);
             this.isLoggedInV = true;
             return true;
