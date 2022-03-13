@@ -3,15 +3,12 @@
 
 # TUTORIAL geeksforgeeks
 # see https://www.geeksforgeeks.org/using-jwt-for-user-authentication-in-flask/
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify, make_response, session, flash, redirect, url_for
 from flask.templating import render_template
-from flask_sqlalchemy import SQLAlchemy
+
 import uuid # for public id
 from  werkzeug.security import generate_password_hash, check_password_hash
-from flask import request, session, jsonify, flash, redirect, url_for
-
 from werkzeug.utils import secure_filename
-
 from config import config_data
 from quote_data_access import Quote, DBConnection, QuoteDataAccess
 import os
@@ -36,7 +33,7 @@ HOST = "127.0.0.1" if DEBUG else "0.0.0.0"
 
 # Database ORMs
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
+    id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String(50), unique = True)
     name = db.Column(db.String(100))
     email = db.Column(db.String(70), unique = True)
@@ -189,20 +186,31 @@ def checkExtension(bestand):
         '''
 @app.route('/api/upload', methods=['GET', 'POST'])
 def uploadFile():
-    if request.method is 'POST':
+
+    if request.method == 'POST':
+
         if 'bestand' not in request.files:
             flash('Geen bestand gevonden')
-            return redirect(request.url)
+            return make_response('No file found.', 400)
 
-        bestand = request.files['bestand'] # de gebruiker heeft een bestand geselecteerd
+        bestand = request.files['bestand']  # de gebruiker heeft een bestand geselecteerd
 
         if bestand.filename == '': # indien geen bestand geselecteerd
             flash('Geen bestand geselecteerd')
-            return redirect(request.url)
-        if bestand and checkExtension(bestand.filename):
+            return make_response('No file selected.', 400)
+
+        #if bestand and checkExtension(bestand.filename):
+        if bestand:
             filename = secure_filename(bestand.filename) # secure filename om foutieve userInput tegen te gaan
-            bestand.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('download_file', name=filename))
+            #filename = "testtt.txt"
+            #bestand.save(os.path.join(appl.config['UPLOAD_FOLDER'], filename))
+            #return redirect(url_for('download_file', name=filename))
+            print(os.path.join('/uploads', filename))
+
+            bestand.save(os.path.join('uploads', filename))
+
+
+            return make_response('File successfully uploaded.', 201)
     return
 
 
@@ -218,4 +226,4 @@ def reactApp(path):
 
 # RUN DEV SERVER
 if __name__ == "__main__":
-    app.run(HOST, debug=DEBUG, port=80)
+    app.run(HOST, debug=DEBUG, port=8000)
