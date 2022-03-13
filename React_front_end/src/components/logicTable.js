@@ -9,7 +9,7 @@ const LogicTable = (props) => {
     tableData.shift();
     let header = props.data[0];
     return (
-        <Table hover>
+        <Table hover responsive>
           <thead>
                 <tr>
                   {header.map((value, index) => {

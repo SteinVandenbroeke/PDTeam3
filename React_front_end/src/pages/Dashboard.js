@@ -17,7 +17,7 @@ const Dashboard = () => {
                 <Container fluid>
                   <Row>
                     <Col md="auto">
-                        <Container style={{paddingTop: 20, paddingBottom: 30}}>
+                        <Container style={{paddingTop:10, paddingBottom: 30}}>
                             <Card className={"shadow-lg"} style={{padding: 30}}>
                                 <Button style={{position: "absolute", left: 5, top: 5}} variant="" onClick={()=>setShowMenu(!showMenu)}>
                                     <Icon

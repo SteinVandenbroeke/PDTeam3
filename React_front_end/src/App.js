@@ -7,7 +7,7 @@ import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Page2 from "./pages/Page2";
 import Login from "./pages/Login"
 import Page404 from "./pages/Page404";
-import User from "./logic/User"
+import {User} from "./logic/User"
 import {Container, Card} from "react-bootstrap";
 import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users/Users";
@@ -18,6 +18,8 @@ import AddDataset from "./pages/DashboardInnerPages/Datasets/AddDataset"
 import DataSetsList from "./pages/DashboardInnerPages/Datasets/DatasetsList"
 import AddUsers from "./pages/Users/AddUser";
 import UserList from "./pages/Users/UserList";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 let userSession = createContext();
 function App() {
@@ -25,6 +27,7 @@ function App() {
     if(!user.isLoggedIn()){
         return(
             <userSession.Provider value={ {user , setUser } }>
+                <ToastContainer />
                 <Container style={{paddingTop: 20, paddingBottom: 30}}>
                     <Card className={"shadow"} style={{padding: 30}}>
                         <Login/>
@@ -35,6 +38,7 @@ function App() {
     }
   return (
       <userSession.Provider value={ {user , setUser } }>
+          <ToastContainer />
           <BrowserRouter>
               <Routes>
                   <Route path="/" element={<NavbarComp />}>
