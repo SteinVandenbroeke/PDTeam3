@@ -21,7 +21,7 @@ const NavbarComp = () => {
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="responsive-navbar-nav" className="justify-content-end">
                         <Nav>
-                            <Nav.Link to="/"><Link to="/dashboard" class={"btn"}>Dashboard</Link></Nav.Link>
+                            <Nav.Link to="/dashboard"><Link to="/dashboard" class={"btn"}>Dashboard</Link></Nav.Link>
                             <Nav.Link to="/page2"><Link to="/users" class={"btn"}>Users</Link></Nav.Link>
                             <div className={"d-none d-lg-block"} style={{paddingLeft: 10, zIndex: 99}}>
                                 <ProfileImageMenu/>

@@ -19,12 +19,13 @@ export class User{
      * @param formdata (formdata of the loginForm ("email" and "password" as keys))
      * @returns if user is succesfully loggedin {Promise<boolean>}
      */
-    async login(formdata){
+    async login(formdata, skipLogin = false){
         //this.isLoggedInV = true;
         //window.localStorage.setItem("loggedIn", "true");
         try{
             let request = new ServerRequest();
-            if(true){
+            console.log(formdata["email"])
+            if(skipLogin){
                 this.userToken = "";
                 window.localStorage.setItem("authToken", this.userToken);
                 this.isLoggedInV = true;
