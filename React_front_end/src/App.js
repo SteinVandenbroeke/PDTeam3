@@ -11,11 +11,17 @@ import {User} from "./logic/User"
 import {Container, Card} from "react-bootstrap";
 import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users/Users";
-import ABTests from "./pages/DashboardInnerPages/ABTests/ABTests";
+
+import ABTestsIndex from "./pages/DashboardInnerPages/ABTests/ABTestsIndex";
+import ABTestsList from "./pages/DashboardInnerPages/ABTests/ABTestsList";
+import ABTestOverview from "./pages/DashboardInnerPages/ABTests/ABTestOverview"
+
 import DatasetsIndex from "./pages/DashboardInnerPages/Datasets/DatasetsIndex";
-import HomeDashboardPage from "./pages/DashboardInnerPages/homeDashboardPage";
-import AddDataset from "./pages/DashboardInnerPages/Datasets/AddDataset"
 import DataSetsList from "./pages/DashboardInnerPages/Datasets/DatasetsList"
+import DataSetOverview from "./pages/DashboardInnerPages/Datasets/DatasetOverview"
+import AddDataset from "./pages/DashboardInnerPages/Datasets/AddDataset"
+
+import HomeDashboardPage from "./pages/DashboardInnerPages/homeDashboardPage";
 import AddUsers from "./pages/Users/AddUser";
 import UserList from "./pages/Users/UserList";
 import { ToastContainer } from 'react-toastify';
@@ -46,10 +52,16 @@ function App() {
 
                       <Route path="dashboard" element={<Dashboard />}>
                           <Route index element={<HomeDashboardPage />} />
-                          <Route path="abTests" element={<ABTests />} />
+
+                          <Route path="abTests" element={<ABTestsIndex />}>
+                              <Route index element={<ABTestsList />}/>
+                              <Route path="overview" element={<ABTestOverview />}/>
+                          </Route>
+
                           <Route path="dataSets" element={<DatasetsIndex />}>
                               <Route index element={<DataSetsList />}/>
                               <Route path="add" element={<AddDataset />}/>
+                              <Route path="overview" element={<DataSetOverview />}/>
                           </Route>
                           <Route path="vbPagina" element={<Home />} />
                       </Route>

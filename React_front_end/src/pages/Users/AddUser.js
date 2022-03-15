@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Card, Container, ListGroup, Form, Button, Col, Row, Image} from "react-bootstrap";
 import LogicTable from "../../components/logicTable";
 import {Link} from "react-router-dom";
@@ -10,11 +10,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 const AddUsers = () => {
+
+    const [formData, setFormData] = useState({firstName: "", image: null});
+
     let date = new Date();
     const maxDateValue = date.toISOString().split("T")[0];
-    function setImage(path) {
-        console.log(path)
-    }
     return (
         <div className="App">
             <Container>
@@ -46,7 +46,7 @@ const AddUsers = () => {
                                    <Form.Control style={{ textAlign:"center"}} max={maxDateValue} type="date" name="dob" placeholder="Date of Birth"/>
                                 </Col>
                                 <Col>
-                                    <Form.Label onClick={setImage(date)}>Admin Permission</Form.Label>
+                                    <Form.Label>Admin Permission</Form.Label>
                                     <Form.Check/>
                                 </Col>
                             </Row>
@@ -54,11 +54,11 @@ const AddUsers = () => {
                                 <Col>
                                     <Form.Group controlId="ProfilePic" className="mb-3">
                                         <Form.Label >Add profile picture</Form.Label>
-                                        <Form.Control  type="file" accept=".png,.jpg"/>
+                                        <Form.Control onChange={(e)=> setFormData({image: e.target.files[0]})} type="file" accept=".png,.jpg"/>
                                      </Form.Group>
                                 </Col>
                                 <Col xs={2}>
-                                    <Image roundedCircle={true} height={50} src={"https://scontent.fbru1-1.fna.fbcdn.net/v/t1.6435-9/78431746_2293299950961562_7867165954851995648_n.jpg?_nc_cat=106&ccb=1-5&_nc_sid=09cbfe&_nc_ohc=UpMJOOQDA7EAX-FFLhh&_nc_ht=scontent.fbru1-1.fna&oh=00_AT--woVzrD7i2DiqMtz8n0KS3O0dvV2-8lG7QUWQde11eQ&oe=624621AC"}></Image>
+                                    <Image roundedCircle={true} height={50} src={formData.image == null? "https://cdn.pixabay.com/photo/2017/11/10/05/24/select-2935439_960_720.png" : URL.createObjectURL(formData.image)}></Image>
                                 </Col>
                             </Row>
                             <Row style={{padding:10}}>

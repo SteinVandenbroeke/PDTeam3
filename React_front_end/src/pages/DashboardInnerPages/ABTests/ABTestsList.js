@@ -5,10 +5,10 @@ import Icon from 'react-eva-icons';
 import LogicTable from "../../../components/logicTable"
 import {Link, useNavigate} from "react-router-dom";
 
-const DataSetsList = () => {
+const ABTestsList = () => {
     const navigation = useNavigate();
-    function openDataSet(id){
-        navigation("/dashboard/dataSets/overview");
+    function openAbTest(id){
+        navigation("/dashboard/abTests/overview");
     }
 
     return (
@@ -18,9 +18,9 @@ const DataSetsList = () => {
                     <Button variant="primary">Add new <Icon name="plus-circle-outline"/></Button>
                 </Link>
             </div>
-            <LogicTable action={openDataSet} data={[["id", "Dataset name", "Created by", "Creation date"], ["1", "H&M test dataset 1", "Stein Vandenbroeke", "09/03/2022"],["2", "H&M test dataset 2", "Stein Vandenbroeke", "09/03/2022"]]}/>
+            <LogicTable action={openAbTest} data={[["id", "name", "algoritme A", "algoritme B"], ["1", "H&M AB test 1", "Popularity", "Recency"]]}/>
         </div>
     );
 };
 
-export default DataSetsList;
+export default ABTestsList;

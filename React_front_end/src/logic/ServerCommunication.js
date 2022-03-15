@@ -31,7 +31,7 @@ export class ServerRequest{
 			myHeaders.append("x-access-token", this.authToken);
 		}
 
-		let response = await fetch("http://localhost:8000/api/" + page, {
+		let response = await fetch("/api/" + page, {
 			method: "POST",
 			body: data
 		});

@@ -8,7 +8,7 @@ import {Link} from "react-router-dom";
 const AddDataset = () => {
     return (
         <div>
-            test
+            Add new dataset
         </div>
     );
 };
