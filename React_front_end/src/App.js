@@ -29,6 +29,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 let userSession = createContext();
 function App() {
+    document.title = "AvsA"
     let [user , setUser] = useState(new User());
     if(!user.isLoggedIn()){
         return(
