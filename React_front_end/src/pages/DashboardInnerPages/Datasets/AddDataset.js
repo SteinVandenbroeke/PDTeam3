@@ -1,28 +1,23 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React from 'react';
+import React, {useState} from 'react';
+import UploadFromToIds from "../../../components/uploadDataSet/uploadFromToIds"
+import UploadCVS from "../../../components/uploadDataSet/uploadCVS"
 import {Col, Row, Table, Button, Form, ProgressBar, Card} from "react-bootstrap";
-import Icon from 'react-eva-icons';
-import LogicTable from "../../../components/logicTable"
-import {Link} from "react-router-dom";
-import ConnectComponent from "../../../components/ConnectComponent"
 
 const AddDataset = () => {
+    let [currentStep , setCurrentStep] = useState(0);
+    let [interactionCSV , setInteractionCSV] = useState(null);
+
+
     return (
         <div style={{textAlign: "left"}}>
-            <ProgressBar now={0} />
-            <Row style={{paddingTop: 20}}>
-                <Col>
-                    <Form.Group controlId="formFile" className="mb-3">
-                        <Form.Label>Upload interactie cvs</Form.Label>
-                        <Form.Control type="file" />
-                    </Form.Group>
-                </Col>
-                <Col>
-                    <Card className={"shadow-lg"} style={{height: 500}} >
-                      <Card.Body><ConnectComponent></ConnectComponent></Card.Body>
-                    </Card>
-                </Col>
-            </Row>
+            <ProgressBar now={currentStep * 10} />
+            {
+                currentStep == 0 && (<UploadCVS setInteractionCSV={setInteractionCSV} setCurrentStep={setCurrentStep}/>)
+            }
+            {
+                currentStep == 1 && (<UploadFromToIds interactionCSV={interactionCSV} setCurrentStep={setCurrentStep} />)
+            }
         </div>
     );
 };

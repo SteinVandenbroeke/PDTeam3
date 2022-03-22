@@ -30,7 +30,6 @@ const LogicTable = (props) => {
                 return (
                     <tr onClick={()=>action(idForFunction)} style={{cursor: "pointer"}}>
                     {valueRow.map((value, index) => {
-                        console.log(value)
                         return <td>{value}</td>
                     })}
                     </tr>)

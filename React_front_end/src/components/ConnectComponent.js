@@ -1,38 +1,61 @@
 import { useCallback } from 'react';
-import ReactFlow, { MiniMap, Controls } from 'react-flow-renderer';
+import ReactFlow, { MiniMap, Controls, Position } from 'react-flow-renderer';
+import {Col, Row, Table, Button, Form, ProgressBar, Card} from "react-bootstrap";
 
 import '../styles/connectComponent.css';
 
 
-const ConnectComponent = () => {
-  let defaultNodes = [
-    {
-      id: '1',
-      type: 'input',
-      data: {label: 'Input Node'},
-      position: {x: 250, y: 25},
-    },
-
-    {
-      id: '2',
-      // you can also pass a React component as a label
-      data: {label: <div>Default Node</div>},
-      position: {x: 100, y: 125},
-    },
-    {
-      id: '3',
+const ConnectComponent = (props) => {
+  function fromNode(id, title, possitionY){
+    return {
+      id: id.toString(),
       type: 'output',
-      data: {label: 'Output Node'},
-      position: {x: 250, y: 250},
-    },
-  ];
+      data: {label: title},
+      position: {x: 0, y: possitionY},
+      sourcePosition: Position.Left,
+      targetPosition: Position.Right,
+    };
+  }
 
+  function toNode(id, title, possitionY){
+    return {
+      id: id.toString(),
+      type: 'input',
+      data: {label: title},
+      position: {x: 200, y: possitionY},
+      sourcePosition: Position.Left,
+      targetPosition: Position.Right,
+    };
+  }
+
+  function generateNodes(nodeData){
+    let allNodes = [];
+    let heigtCounter = 0;
+    let indexCounter = 0;
+    nodeData.database.map((value, index) => {
+        allNodes.push(fromNode(indexCounter, value,heigtCounter));
+        heigtCounter += 50;
+        indexCounter += 1;
+    });
+
+    heigtCounter = 0;
+    nodeData.cvs.map((value, index) => {
+        allNodes.push(toNode(indexCounter, value,heigtCounter));
+        heigtCounter += 50;
+        indexCounter += 1;
+    })
+
+    return allNodes;
+  }
+
+
+
+  let defaultNodes = generateNodes(props.data);
   let initialEdges = [
-    {id: 'e1-2', source: '1', target: '2'},
-    {id: 'e2-3', source: '2', target: '3', animated: true},
+
   ];
   return (
-      <ReactFlow defaultNodes={defaultNodes} defaultEdges={initialEdges} fitView>
+      <ReactFlow style={{height: 500}}  nodes={defaultNodes} defaultEdges={initialEdges} className="touchdevice-flow" fitView>
         <Controls/>
       </ReactFlow>
   );
