@@ -10,7 +10,7 @@ import { UploadDataSet } from '../../logic/UploadDataSet';
 const UploadFromToIds = (props) => {
 
     let [tabelPreview , setTabelPreview] = useState([["Upload a csv"]]);
-    let [csvDbConnections, setCsvDbConnections] = useState({"database": [], "cvs": []})
+    let [csvDbConnections, setCsvDbConnections] = useState({"database": [], "csv": [], "connections": {"testItem": "1"}})
 
     useEffect(() => {
         fileUpload(props.interactionCSV);

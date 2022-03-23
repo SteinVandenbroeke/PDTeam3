@@ -47,7 +47,7 @@ export class UploadDataSet{
     }
 
     loadConnections(headers, setConnectionHeaders){
-        setConnectionHeaders({"database": ["timestamp", "user_id", "item_id", "parameter"], "cvs": headers})
+        setConnectionHeaders({"database": ["timestamp", "user_id", "item_id", "parameter"], "csv": headers, "connections": {}})
     }
 
     getUploadFile(){

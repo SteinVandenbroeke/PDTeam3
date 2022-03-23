@@ -8,10 +8,6 @@ import LogicTable from "../logicTable"
 import { UploadDataSet } from '../../logic/UploadDataSet';
 
 const UploadCVS = (props) => {
-
-    let [tabelPreview , setTabelPreview] = useState([["Upload a csv"]]);
-    let [csvDbConnections, setCsvDbConnections] = useState({"database": [], "cvs": []})
-
     function fileUpload(e){
         props.setCurrentStep(1);
         props.setInteractionCSV(e.target.files[0]);

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import {useCallback, useState} from 'react';
 import ReactFlow, { MiniMap, Controls, Position } from 'react-flow-renderer';
 import {Col, Row, Table, Button, Form, ProgressBar, Card} from "react-bootstrap";
 
@@ -9,22 +9,22 @@ const ConnectComponent = (props) => {
   function fromNode(id, title, possitionY){
     return {
       id: id.toString(),
-      type: 'output',
+      type: 'input',
       data: {label: title},
       position: {x: 0, y: possitionY},
-      sourcePosition: Position.Left,
-      targetPosition: Position.Right,
+      sourcePosition: Position.Right,
+      targetPosition: Position.Left,
     };
   }
 
   function toNode(id, title, possitionY){
     return {
       id: id.toString(),
-      type: 'input',
+      type: 'output',
       data: {label: title},
       position: {x: 200, y: possitionY},
-      sourcePosition: Position.Left,
-      targetPosition: Position.Right,
+      sourcePosition: Position.Right,
+      targetPosition: Position.Left,
     };
   }
 
@@ -39,7 +39,7 @@ const ConnectComponent = (props) => {
     });
 
     heigtCounter = 0;
-    nodeData.cvs.map((value, index) => {
+    nodeData.csv.map((value, index) => {
         allNodes.push(toNode(indexCounter, value,heigtCounter));
         heigtCounter += 50;
         indexCounter += 1;
@@ -49,13 +49,20 @@ const ConnectComponent = (props) => {
   }
 
 
+  let [edges , setEdges] = useState([]);
+
+  function onConnect(e){
+    console.log(e);
+    alert("test", e);
+    let currentData = props.data;
+    currentData.connections[currentData.database[parseInt(e.source)]] = currentData.csv[parseInt(e.target) - currentData.database.length];
+    console.log(currentData);
+    props.dataSetFunction(currentData);
+  }
 
   let defaultNodes = generateNodes(props.data);
-  let initialEdges = [
-
-  ];
   return (
-      <ReactFlow style={{height: 500}}  nodes={defaultNodes} defaultEdges={initialEdges} className="touchdevice-flow" fitView>
+      <ReactFlow style={{height: 500}}  nodes={defaultNodes} onConnect={onConnect} defaultEdges={edges} className="touchdevice-flow" fitView>
         <Controls/>
       </ReactFlow>
   );
