@@ -8,8 +8,8 @@ from .config import *
 class TestQuoteDataAccess(unittest.TestCase):
 
     def _connect(self):
-        connection = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'])
-        return connection
+        connection = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'],port=5433)
+        return connection1
     
     def test_connection(self):
         connection = self._connect()

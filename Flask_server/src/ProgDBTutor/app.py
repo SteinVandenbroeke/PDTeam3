@@ -67,7 +67,7 @@ def token_required(f):
 
 # User Database Route
 # this route sends back list of users users
-@app.route('/user', methods =['GET'])
+@app.route('/api/user', methods =['GET'])
 @token_required
 def get_all_users(current_user):
     # querying the database
@@ -88,7 +88,7 @@ def get_all_users(current_user):
     return jsonify({'users': output})
 
 # route for logging user in
-@app.route('/login', methods =['POST'])
+@app.route('/api/login', methods =['POST'])
 def login():
     # creates dictionary of form data
     auth = request.form
@@ -129,7 +129,7 @@ def login():
     )
 
 # signup route
-@app.route('/signup', methods =['POST'])
+@app.route('/api/signup', methods =['POST'])
 def signup():
     # creates a dictionary of the form data
     data = request.form

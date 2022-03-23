@@ -1,14 +1,23 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React from 'react';
-import {Col, Row, Table, Button} from "react-bootstrap";
-import Icon from 'react-eva-icons';
-import LogicTable from "../../../components/logicTable"
-import {Link} from "react-router-dom";
+import React, {useState} from 'react';
+import UploadFromToIds from "../../../components/uploadDataSet/uploadFromToIds"
+import UploadCVS from "../../../components/uploadDataSet/uploadCVS"
+import {Col, Row, Table, Button, Form, ProgressBar, Card} from "react-bootstrap";
 
 const AddDataset = () => {
+    let [currentStep , setCurrentStep] = useState(0);
+    let [interactionCSV , setInteractionCSV] = useState(null);
+
+
     return (
-        <div>
-            test
+        <div style={{textAlign: "left"}}>
+            <ProgressBar now={currentStep * 10} />
+            {
+                currentStep == 0 && (<UploadCVS setInteractionCSV={setInteractionCSV} setCurrentStep={setCurrentStep}/>)
+            }
+            {
+                currentStep == 1 && (<UploadFromToIds interactionCSV={interactionCSV} setCurrentStep={setCurrentStep} />)
+            }
         </div>
     );
 };
