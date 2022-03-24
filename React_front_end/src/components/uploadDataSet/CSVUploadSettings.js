@@ -7,17 +7,17 @@ import ConnectComponent from "../ConnectComponent"
 import LogicTable from "../logicTable"
 import { UploadDataSet } from '../../logic/UploadDataSet';
 
-const UploadFromToIds = (props) => {
+const CSVUploadSettings = (props) => {
 
     let [tabelPreview , setTabelPreview] = useState([["Upload a csv"]]);
-    let [csvDbConnections, setCsvDbConnections] = useState({"database": [], "csv": [], "connections": {"testItem": "1"}})
 
     useEffect(() => {
-        fileUpload(props.interactionCSV);
-    });
+        fileUpload(props.csv);
+    }, []);
 
     function fileUpload(csv){
-        let request = new UploadDataSet(csv, setTabelPreview, setCsvDbConnections);
+        console.log(props.csvDbConnections);
+        let request = new UploadDataSet(csv, setTabelPreview, props.setCsvDbConnections, props.csvDbConnections);
         request.readFileText();
     }
 
@@ -28,9 +28,9 @@ const UploadFromToIds = (props) => {
                     <Card className={"shadow-lg"}>
                       <Card.Body>
                           <h5>CSV to db conversion</h5>
-                          <ConnectComponent data={csvDbConnections} dataSetFunction={setCsvDbConnections}></ConnectComponent>
-                          <Button variant="secondary" onClick={()=>props.setCurrentStep(0)}>Vorige</Button>{' '}
-                          <Button variant="primary" onClick={()=>props.setCurrentStep(2)}>Volgende</Button>
+                          <ConnectComponent data={props.csvDbConnections} dataSetFunction={props.setCsvDbConnections}></ConnectComponent>
+                          <Button variant="secondary" onClick={()=>props.setCurrentStep(props.currentStep - 1)}>Vorige</Button>{' '}
+                          <Button variant="primary" onClick={()=>props.setCurrentStep(props.currentStep + 1)}>Volgende</Button>
                       </Card.Body>
                     </Card>
                 </Col>
@@ -47,4 +47,4 @@ const UploadFromToIds = (props) => {
         )
 };
 
-export default UploadFromToIds;
+export default CSVUploadSettings;

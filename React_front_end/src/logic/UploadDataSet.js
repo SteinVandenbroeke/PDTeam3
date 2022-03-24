@@ -5,10 +5,11 @@ export class UploadDataSet{
     file = null;
     previewFileText = null;
     setPreviewTableFunction = () => {}
-    constructor(file, setPreviewTableFunction = () => {}, setConnectionHeadersFunction = ()=>{}){
+    constructor(file, setPreviewTableFunction = () => {}, setConnectionHeadersFunction = ()=>{}, connectionHeaders = {}){
         this.file = file;
         this.setPreviewTableFunction = setPreviewTableFunction;
         this.setConnectionHeadersFunction = setConnectionHeadersFunction;
+        this.connectionHeaders = connectionHeaders;
     }
 
     setPreviewTabel = () =>{
@@ -19,21 +20,22 @@ export class UploadDataSet{
         if(this.file){
             this.fileReader.onload = async function (event) {
                 let previewFileText = event.target.result;
-                this.loadMatrix(previewFileText, this.setTable, this.loadConnections, this.setConnectionHeaders);
+                this.loadMatrix(previewFileText, this.setTable, this.loadConnections, this.setConnectionHeaders, this.connectionHeaders);
             }
             this.fileReader.loadMatrix = this.loadMatrix;
             this.fileReader.setTable = this.setPreviewTableFunction;
              this.fileReader.loadConnections = this.loadConnections;
             this.fileReader.setConnectionHeaders = this.setConnectionHeadersFunction;
+            this.fileReader.connectionHeaders = this.connectionHeaders;
             this.fileReader.readAsText(this.file.slice(0,500));
         }
     }
 
-    loadMatrix(csvFileText, setTable, loadConnections, setConnectionHeaders){
+    loadMatrix(csvFileText, setTable, loadConnections, setConnectionHeaders, connectionHeaders){
         let matrix = [];
         let rows = csvFileText.split("\n")
 
-        loadConnections(rows[0].split(","), setConnectionHeaders)
+        loadConnections(rows[0].split(","), setConnectionHeaders, connectionHeaders)
         rows.map((row) => {
             let column = row.split(",")
             let rowArray = [];
@@ -46,8 +48,11 @@ export class UploadDataSet{
         setTable(matrix);
     }
 
-    loadConnections(headers, setConnectionHeaders){
-        setConnectionHeaders({"database": ["timestamp", "user_id", "item_id", "parameter"], "csv": headers, "connections": {}})
+    loadConnections(headers, setConnectionHeaders, connectionHeaders){
+        let tempConnectionHeaders = connectionHeaders;
+        tempConnectionHeaders.csv = headers;
+        setConnectionHeaders(tempConnectionHeaders);
+       // setConnectionHeaders({"database": ["timestamp", "user_id", "item_id", "parameter"], "csv": headers, "connections": {}})
     }
 
     getUploadFile(){
