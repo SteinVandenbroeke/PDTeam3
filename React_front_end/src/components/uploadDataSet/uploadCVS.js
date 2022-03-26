@@ -8,13 +8,9 @@ import LogicTable from "../logicTable"
 import { UploadDataSet } from '../../logic/UploadDataSet';
 
 const UploadCVS = (props) => {
-
-    let [tabelPreview , setTabelPreview] = useState([["Upload a csv"]]);
-    let [csvDbConnections, setCsvDbConnections] = useState({"database": [], "cvs": []})
-
     function fileUpload(e){
-        props.setCurrentStep(1);
-        props.setInteractionCSV(e.target.files[0]);
+        props.setCurrentStep(props.currentStep + 1);
+        props.setCSV(e.target.files[0]);
         /*
         let request = new UploadDataSet(e.target.files[0], setTabelPreview, setCsvDbConnections);
         request.readFileText();*/
@@ -26,7 +22,7 @@ const UploadCVS = (props) => {
                 <Row style={{paddingTop: 20}}>
                     <Col xs={12} sm={12} md={5} style={{padding: 40}}>
                         <Form.Group controlId="formFile" className="mb-3">
-                            <Form.Label>Upload interactie cvs</Form.Label>
+                            <Form.Label>{props.title}</Form.Label>
                             <Form.Control type="file" onChange={fileUpload} />
                         </Form.Group>
                     </Col>
