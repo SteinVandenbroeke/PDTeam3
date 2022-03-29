@@ -24,7 +24,6 @@ export class User{
         //window.localStorage.setItem("loggedIn", "true");
         try{
             let request = new ServerRequest();
-            console.log(formdata["email"])
             if(skipLogin){
                 this.userToken = "";
                 window.localStorage.setItem("authToken", this.userToken);
