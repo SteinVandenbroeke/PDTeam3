@@ -90,7 +90,7 @@ const ConnectComponent = (props) => {
   }
 
   return (
-      <Tabs defaultActiveKey="profile" id="uncontrolled-tab-example" style={{width: "100%"}}>
+      <Tabs defaultActiveKey="graph" id="uncontrolled-tab-example" style={{width: "100%"}}>
           <Tab eventKey="graph" title="Graphical">
              <ReactFlow style={{height: 500}}  nodes={nodes} onConnect={onConnect} edges={edges} className="touchdevice-flow" fitView>
                 <Controls/>
