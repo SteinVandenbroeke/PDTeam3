@@ -40,7 +40,7 @@ const AddUsers = () => {
                             <Row style={{padding:10}}>
                                 <Form.Control type="password" placeholder="Password" />
                             </Row>
-                            <Row style={{padding:10}}>
+                            <Row style={{paddingBottom:10}}>
                                 <Col>
                                    <Form.Label>Date of Birth</Form.Label>
                                    <Form.Control style={{ textAlign:"center"}} max={maxDateValue} type="date" name="dob" placeholder="Date of Birth"/>
@@ -50,7 +50,7 @@ const AddUsers = () => {
                                     <Form.Check/>
                                 </Col>
                             </Row>
-                            <Row style={{padding:10}}>
+                            <Row>
                                 <Col>
                                     <Form.Group controlId="ProfilePic" className="mb-3">
                                         <Form.Label >Add profile picture</Form.Label>

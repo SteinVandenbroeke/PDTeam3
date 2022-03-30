@@ -33,6 +33,18 @@ const ABTestOverview = () => {
                     <Col>
                         <SmallInformationCard title={"Average Revenue Per User"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
                     </Col>
+                    <Col>
+                        <SmallInformationCard title={"Most recomended items"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
+                    </Col>
+                    <Col>
+                        <SmallInformationCard title={"Most buyed items"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
+                    </Col>
+                    <Col>
+                        <SmallInformationCard title={"Most active users"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
+                    </Col>
+                    <Col>
+                        <SmallInformationCard title={"Total revenu"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
+                    </Col>
                 </Row>
 
                 Meterieken overzicht
