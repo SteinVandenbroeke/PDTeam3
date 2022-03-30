@@ -8,10 +8,31 @@ import LargeInformationCard from "../../../components/largeInformationCard"
 import Slider from "../../../components/slider"
 import {Link} from "react-router-dom";
 import { Line } from 'react-chartjs-2';
+import {
+Chart as ChartJS,
+CategoryScale,
+LinearScale,
+PointElement,
+LineElement,
+Title,
+Tooltip,
+Legend,
+} from 'chart.js';
+
+ChartJS.register(
+CategoryScale,
+LinearScale,
+PointElement,
+LineElement,
+Title,
+Tooltip,
+Legend
+);
 
 const ABTestOverview = () => {
     const [values, setValues] = React.useState([20, 40]);
-
+    const labels = ['Dag 1', 'Dag 2', 'Dag 3', 'Dag 4', 'Dag 5', 'Dag 6', 'Dag 7'];
+    console.log(labels.map(() => Math.floor(Math.random() * 1000)));
     return (
         <div>
             <div style={{paddingTop: 20}}>
@@ -46,31 +67,35 @@ const ABTestOverview = () => {
                     </Col>
                     <Col>
                         <LargeInformationCard title={"Revenue"} value={20} tooltip={"Purchases from day x to day y"}>
-                            <h5>Total: 20</h5>
-                            {/*
+                            <h5>Total from X to Y: 20</h5>
+
                             <Line options={{
-                              responsive: true,
-                              plugins: {
-                                legend: {
-                                  position: 'top',
-                                },
-                                title: {
-                                  display: true,
-                                  text: 'Chart.js Line Chart',
-                                },
-                              },
-                            }}
+                                  responsive: true,
+                                  plugins: {
+                                    legend: {
+                                      position: 'top',
+                                    },
+                                    title: {
+                                      display: false,
+                                    },
+                                  },
+                                }}
 
                             data={{
+                              labels,
                                 datasets: [
                                 {
-                                  label: 'Dataset 1',
-                                  data: [0,1,2,3,4,5,6,7],
-                                  borderColor: 'rgb(255, 99, 132)',
-                                  backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                                }
+                                  label: 'Algoritme A',
+                                  data: [94, 530, 476, 789, 986, 389, 451],
+                                }, {
+                                  label: 'Algoritme B',
+                                  data: [60, 400, 300, 200, 70, 100, 351],
+                                }, {
+                                  label: 'Algoritme C',
+                                  data: [20, 50, 400, 80, 300, 300, 150],
+                                },
                               ],
-                            }} />*/}
+                            }} />
                         </LargeInformationCard>
                     </Col>
                 </Row>
