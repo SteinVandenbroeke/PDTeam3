@@ -5,7 +5,7 @@ import Icon from 'react-eva-icons';
 import LogicTable from "../../../components/logicTable"
 import SmallInformationCard from "../../../components/smallInformationCard"
 import LargeInformationCard from "../../../components/largeInformationCard"
-import DoubleSlider from "../../../components/doubleSlider"
+import Slider from "../../../components/slider"
 import {Link} from "react-router-dom";
 
 const ABTestOverview = () => {
@@ -13,7 +13,7 @@ const ABTestOverview = () => {
     return (
         <div>
             <div style={{paddingTop: 20}}>
-                <DoubleSlider max={500} min={0} step={1} values={values} setValues={setValues} />
+                <Slider max={500} min={0} step={1} values={values} setValues={setValues} />
                 <Row>
                     <Col>
                         <SmallInformationCard title={"AB test information"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>

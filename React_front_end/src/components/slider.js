@@ -12,12 +12,12 @@ const Slider = (props) => {
     let endProcent = 0;
 
     if(values.length > 1){
-        let startProcent = (values[0] / props.max) * 100;
-        let endProcent = (values[1] / props.max) * 100;
+        startProcent = (values[0] / props.max) * 100;
+        endProcent = (values[1] / props.max) * 100;
     }
     else {
-        let startProcent = 0;
-        let endProcent = (values[0] / props.max) * 100;
+        startProcent = 0;
+        endProcent = (values[0] / props.max) * 100;
     }
 
     return (
