@@ -7,6 +7,12 @@ import { Range } from 'react-range';
 const DoubleSlider = (props) => {
     let values = props.values;
     let setValues = props.setValues;
+
+    let startProcent = (values[0] / props.max) * 100;
+    let endProcent = (values[1] / props.max) * 100;
+    console.log(Math.floor(startProcent.toString()));
+    console.log(Math.floor(endProcent.toString()));
+
     return (
             <Range
         values={values}
@@ -31,7 +37,7 @@ const DoubleSlider = (props) => {
                 height: '5px',
                 width: '100%',
                 borderRadius: '4px',
-                backgroundColor: '#ccc',
+                background: 'linear-gradient(90deg, rgba(204,204,204,1) 0%, rgba(204,204,204,1) ' + Math.floor(startProcent.toString()) + '%, rgba(84,139,244,1) ' + Math.floor(startProcent.toString()) + '%, rgba(84,139,244,1) ' + Math.floor(endProcent.toString()) + '%, rgba(204,204,204,1) ' + Math.floor(endProcent.toString()) + '%, rgba(204,204,204,1) 100%)',
                   alignSelf: 'center'
               }}
             >
