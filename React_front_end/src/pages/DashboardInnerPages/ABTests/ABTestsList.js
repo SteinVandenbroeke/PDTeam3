@@ -14,11 +14,11 @@ const ABTestsList = () => {
     return (
         <div>
             <div style={{width: "100%", textAlign: "right", paddingBottom: "10px"}}>
-                <Link to="/dashboard/dataSets/add" class={"btn"}>
+                <Link to="/dashboard/abTests/add" class={"btn"}>
                     <Button variant="primary">Add new <Icon name="plus-circle-outline"/></Button>
                 </Link>
             </div>
-            <LogicTable action={openAbTest} data={[["id", "name", "algoritme A", "algoritme B"], ["1", "H&M AB test 1", "Popularity", "Recency"]]}/>
+            <LogicTable action={openAbTest} data={[["id", "name","time interval", "algoritme A", "algoritme B"], ["1", "H&M AB test 1",7+" days", "Popularity", "Recency"]]}/>
         </div>
     );
 };

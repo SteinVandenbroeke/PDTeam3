@@ -15,6 +15,7 @@ import Users from "./pages/Users/Users";
 import ABTestsIndex from "./pages/DashboardInnerPages/ABTests/ABTestsIndex";
 import ABTestsList from "./pages/DashboardInnerPages/ABTests/ABTestsList";
 import ABTestOverview from "./pages/DashboardInnerPages/ABTests/ABTestOverview"
+import AddABTest from "./pages/DashboardInnerPages/ABTests/AddABTest";
 
 import DatasetsIndex from "./pages/DashboardInnerPages/Datasets/DatasetsIndex";
 import DataSetsList from "./pages/DashboardInnerPages/Datasets/DatasetsList"
@@ -26,6 +27,7 @@ import AddUsers from "./pages/Users/AddUser";
 import UserList from "./pages/Users/UserList";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 
 let userSession = createContext();
 function App() {
@@ -56,6 +58,7 @@ function App() {
 
                           <Route path="abTests" element={<ABTestsIndex />}>
                               <Route index element={<ABTestsList />}/>
+                              <Route path="add" element={<AddABTest />}/>
                               <Route path="overview" element={<ABTestOverview />}/>
                           </Route>
 
