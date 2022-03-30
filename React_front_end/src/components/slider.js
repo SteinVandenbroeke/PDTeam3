@@ -11,6 +11,7 @@ const Slider = (props) => {
     let startProcent = 0;
     let endProcent = 0;
 
+    console.log(values.length);
     if(values.length > 1){
         startProcent = (values[0] / props.max) * 100;
         endProcent = (values[1] / props.max) * 100;
