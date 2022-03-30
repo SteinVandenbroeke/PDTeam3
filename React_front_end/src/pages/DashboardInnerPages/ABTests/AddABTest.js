@@ -3,24 +3,31 @@ import React, {useState} from 'react';
 import {Link, Outlet, Route, Router} from "react-router-dom";
 import {Form, ProgressBar} from "react-bootstrap";
 import ChooseDataset from "../../../components/uploadABTest/chooseDataset";
-import ChooseDayInterval from "../../../components/uploadABTest/chooseDayInterval";
+import SelectABSettings from "../../../components/uploadABTest/SelectABSettings";
+import AddAlgoritms from "../../../components/uploadABTest/addAlgoritms";
+
 
 
 
 
 const AddABTest = () => {
     let [currentStep , setCurrentStep] = useState(0);
-    let [dataSetId , setDatasetId] = useState(null);
-    let [dayInterval , setDayInterval] = useState(null);
+    let [dataSetId , setDatasetId] = useState([]);
+    let [periodValues , setPeriodValues] = useState([]);
+    let [topKValue , setTopKValue] = useState([]);
+    let [stepSizeValue , setStepSizeValue] = useState([]);
     return (
         <div style={{textAlign: "left"}}>
             <chooseDataset title={"Choose the required database"}  currentStep={currentStep} setCurrentStep={setCurrentStep} />
-            <ProgressBar now={currentStep * 50} />
+            <ProgressBar now={currentStep * 33.3333} />
             {
                 currentStep === 0 && (<ChooseDataset title={"Choose the required database."} setDataset={setDatasetId}  currentStep={currentStep} setCurrentStep={setCurrentStep} />)
             }
             {
-                currentStep === 1 && (<ChooseDayInterval title={"Choose your day-interval."} setDayInterval={setDayInterval}  currentStep={currentStep} setCurrentStep={setCurrentStep} />)
+                currentStep === 1 && (<SelectABSettings title={"Choose your day-interval."} setPeriodValues={setPeriodValues} setTopKValue={setTopKValue} setStepSizeValue={setStepSizeValue} currentStep={currentStep} setCurrentStep={setCurrentStep} />)
+            }
+            {
+                currentStep === 2 && (<AddAlgoritms title={"voegt goddekke die algoritmekes toe, kusjes."} currentStep={currentStep} setCurrentStep={setCurrentStep} />)
             }
 
         </div>

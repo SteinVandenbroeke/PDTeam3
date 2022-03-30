@@ -8,7 +8,6 @@ const ChooseDataset = (props) => {
         props.setCurrentStep(props.currentStep + 1);
         props.setDataset(id);
     }
-
     return (
         <div>
            <Form.Label>{props.title}</Form.Label>
@@ -16,6 +15,5 @@ const ChooseDataset = (props) => {
         </div>
     )
 }
-
 
 export default ChooseDataset;

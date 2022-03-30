@@ -69,7 +69,7 @@ const AddUsers = () => {
                         </Container>
                     </Form>
                 </Col>
-                <Col xs={12} md={6} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                <Col xs={12} md={6} style={{display: 'flex', alignItems: 'left', justifyContent: 'center'}}>
                     <img src={"/svg/NewUser.svg"} style={{width: "90%"}} xs={0}/>
                 </Col>
               </Row>
