@@ -11,7 +11,6 @@ const Slider = (props) => {
     let startProcent = 0;
     let endProcent = 0;
 
-    console.log(values.length);
     if(values.length > 1){
         startProcent = (values[0] / props.max) * 100;
         endProcent = (values[1] / props.max) * 100;
@@ -45,7 +44,7 @@ const Slider = (props) => {
                 height: '5px',
                 width: '100%',
                 borderRadius: '4px',
-                background: 'linear-gradient(90deg, rgba(204,204,204,1) 0%, rgba(204,204,204,1) ' + Math.floor(startProcent.toString()) + '%, rgba(84,139,244,1) ' + Math.floor(startProcent.toString()) + '%, rgba(84,139,244,1) ' + Math.floor(endProcent.toString()) + '%, rgba(204,204,204,1) ' + Math.floor(endProcent.toString()) + '%, rgba(204,204,204,1) 100%)',
+                background: 'linear-gradient(90deg, rgba(204,204,204,1) 0%, rgba(204,204,204,1) ' + startProcent.toString() + '%, rgba(84,139,244,1) ' + startProcent.toString() + '%, rgba(84,139,244,1) ' + endProcent.toString() + '%, rgba(204,204,204,1) ' + endProcent.toString()+ '%, rgba(204,204,204,1) 100%)',
                   alignSelf: 'center'
               }}
             >

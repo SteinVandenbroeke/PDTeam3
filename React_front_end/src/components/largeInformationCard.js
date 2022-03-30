@@ -16,7 +16,7 @@ const LargeInformationCard = (props) => {
                   >
                       <h3>{props.title}</h3>
                   </OverlayTrigger>
-                <h1 style={{textAlign: "right"}}>{props.value}</h1>
+                  {props.children}
               </Card.Body>
             </Card>
         </div>
