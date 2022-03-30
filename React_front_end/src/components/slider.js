@@ -4,14 +4,21 @@ import {useNavigate } from "react-router-dom";
 import React from "react";
 import { Range } from 'react-range';
 
-const DoubleSlider = (props) => {
+const Slider = (props) => {
     let values = props.values;
     let setValues = props.setValues;
 
-    let startProcent = (values[0] / props.max) * 100;
-    let endProcent = (values[1] / props.max) * 100;
-    console.log(Math.floor(startProcent.toString()));
-    console.log(Math.floor(endProcent.toString()));
+    let startProcent = 0;
+    let endProcent = 0;
+
+    if(values.length > 1){
+        let startProcent = (values[0] / props.max) * 100;
+        let endProcent = (values[1] / props.max) * 100;
+    }
+    else {
+        let startProcent = 0;
+        let endProcent = (values[0] / props.max) * 100;
+    }
 
     return (
             <Range
@@ -89,4 +96,4 @@ const DoubleSlider = (props) => {
     )
 };
 
-export default DoubleSlider;
+export default Slider;

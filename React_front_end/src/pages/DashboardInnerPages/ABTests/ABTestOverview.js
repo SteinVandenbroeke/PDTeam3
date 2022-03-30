@@ -16,13 +16,22 @@ const ABTestOverview = () => {
                 <DoubleSlider max={500} min={0} step={1} values={values} setValues={setValues} />
                 <Row>
                     <Col>
+                        <SmallInformationCard title={"AB test information"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
+                    </Col>
+                    <Col>
                         <SmallInformationCard title={"Purchases"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
                     </Col>
                      <Col>
-                        <SmallInformationCard title={"Purchases"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
+                        <SmallInformationCard title={"Active Users"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
                     </Col>
                      <Col>
-                        <SmallInformationCard title={"Purchases"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
+                        <SmallInformationCard title={"Click Through Rate"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
+                    </Col>
+                    <Col>
+                        <SmallInformationCard title={"Attribution Rate"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
+                    </Col>
+                    <Col>
+                        <SmallInformationCard title={"Average Revenue Per User"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
                     </Col>
                 </Row>
 
