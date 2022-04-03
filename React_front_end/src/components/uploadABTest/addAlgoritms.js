@@ -15,11 +15,7 @@ const AddAlgoritms = (props) => {
          props.setCurrentStep(props.currentStep + 1)
     }
     function addAlgorithm(){
-        /*
-        let tempAlg = algorithms
-        tempAlg.push(trainingIntervalvalue[0])*/
-        setAlgorithms(algorithms => [...algorithms, trainingIntervalvalue[0]])
-        //alert("a")
+        setAlgorithms(algorithms => [...algorithms, trainingIntervalvalue[0]]);
     }
 
     return (
