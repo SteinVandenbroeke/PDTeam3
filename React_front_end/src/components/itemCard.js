@@ -1,5 +1,6 @@
 import {Card, Button} from "react-bootstrap";
 import React from "react";
+import {Link} from "react-router-dom";
 
 const ItemCard = (props) => {
     return (
@@ -14,7 +15,9 @@ const ItemCard = (props) => {
                         {props.desc}
                     </Card.Text>
                 </Card.Body>
-                <Button>Info</Button>
+                <Link to="/dashboard/dataSets/item" class={"btn"}>
+                    <Button>Info</Button>
+                </Link>
             </Card>
         </div>
     )
