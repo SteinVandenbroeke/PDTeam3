@@ -9,21 +9,17 @@ import {valueOrDefault} from "chart.js/helpers";
 
 const AddAlgoritms = (props) => {
     const [trainingIntervalvalue, setTrainingIntervalvalue] = React.useState([1]);
-
     const [algorithms,setAlgorithms] = React.useState([1]);
-
-    useEffect(() => {
-        console.log("test")
-    }, [algorithms]);
 
     function finish(){
          props.setCurrentStep(props.currentStep + 1)
     }
     function addAlgorithm(){
+        /*
         let tempAlg = algorithms
-        tempAlg.push(trainingIntervalvalue[0])
-        setAlgorithms(tempAlg)
-        alert("a")
+        tempAlg.push(trainingIntervalvalue[0])*/
+        setAlgorithms(algorithms => [...algorithms, trainingIntervalvalue[0]])
+        //alert("a")
     }
 
     return (
