@@ -76,7 +76,7 @@ const UploadToServer = (props) => {
                                   <h5>Upload to server</h5>
                                   <div style={{paddingRight: "50%", paddingTop: 20, paddingBottom: 20}}>
                                       <h1>Er ging iets fout bij het uploaden</h1>
-                                      <Button variant="primary" onClick={() => upload(props.interactionCSV, props.usersCSV, props.itemsCSV, props.interactionConnections, props.UsersConnections, props.itemsConnections)}>Probeer opnieuw</Button>{' '}
+                                      <Button variant="primary" onClick={() => upload(props.interactionCSV, props.usersCSV, props.itemsCSV, props.interactionConnections, props.UsersConnections, props.itemsConnections)}>Try Again</Button>{' '}
                                   </div>
                               </Card.Body>
                             }

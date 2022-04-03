@@ -27,7 +27,7 @@ const AddABTest = () => {
                 currentStep === 1 && (<SelectABSettings title={"Choose your day-interval."} setPeriodValues={setPeriodValues} setTopKValue={setTopKValue} setStepSizeValue={setStepSizeValue} currentStep={currentStep} setCurrentStep={setCurrentStep} />)
             }
             {
-                currentStep === 2 && (<AddAlgoritms title={"voegt goddekke die algoritmekes toe, kusjes."} currentStep={currentStep} setCurrentStep={setCurrentStep} />)
+                currentStep === 2 && (<AddAlgoritms title={"Choose your algorithms to run."} currentStep={currentStep} setCurrentStep={setCurrentStep} />)
             }
 
         </div>
