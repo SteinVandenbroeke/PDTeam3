@@ -1,21 +1,54 @@
-import {Button, Card, Col, Form, ListGroup, Row} from "react-bootstrap";
+import {Button, Card, Col, Container, Form, ListGroup, Row} from "react-bootstrap";
 import LogicTable from "../logicTable";
 import React, {useEffect, useState} from "react";
 import Slider from "../slider";
 import Icon from "react-eva-icons";
 import ConnectComponent from "../ConnectComponent";
 import {valueOrDefault} from "chart.js/helpers";
-
+import {ToastContainer} from "react-toastify";
+import Login from "../../pages/Login";
+import { toast } from 'react-toastify';
 
 const AddAlgoritms = (props) => {
     const [trainingIntervalvalue, setTrainingIntervalvalue] = React.useState([1]);
-    const [algorithms,setAlgorithms] = React.useState([1]);
+    const [valueSelect, setValueSelect] = React.useState("0");
+    const [algorithms,setAlgorithms] = React.useState([[]]);
+    let addedAlgs= [["Algoriths","Training interval"]]
+
 
     function finish(){
-         props.setCurrentStep(props.currentStep + 1)
+        if(algorithms.length === 1){
+            toast.error("You need to add at least one algorithm.");
+            return
+        }
+        props.setCurrentStep(props.currentStep + 1)
+        props.setAlgorithms(algorithms)
     }
+    function checkExistingCombination(){
+        for (var i = 1; i < algorithms.length; i++) {
+            if(algorithms[i][0] === valueSelect && parseInt(algorithms[i][1]) === parseInt(trainingIntervalvalue)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     function addAlgorithm(){
-        setAlgorithms(algorithms => [...algorithms, trainingIntervalvalue[0]]);
+        if(valueSelect === "0"){
+            toast.error("You need to select an algorithm.");
+            return
+        }
+        if(checkExistingCombination()){
+            toast.error("You cannot add an algorithm with the same parameters twice.");
+            return
+        }
+        setAlgorithms(algorithms => [...algorithms, [valueSelect,trainingIntervalvalue]]);
+        setValueSelect("0")
+        setTrainingIntervalvalue([1])
+    }
+    function setAlgo(id){
+        setValueSelect(id)
+        console.log({id})
     }
 
     return (
@@ -26,11 +59,11 @@ const AddAlgoritms = (props) => {
             <Row  style={{paddingTop: 20, paddingBottom: 20}}>
                 <Col xs lg="3">
                     <Form.Label style={{paddingBottom:10}}>Algorithms:</Form.Label>
-                    <Form.Select>
-                      <option>empty Alogithm</option>
-                      <option value="1">Popularity</option>
-                      <option value="2">Recency</option>
-                      <option value="3">ItemKNN</option>
+                    <Form.Select onChange={(e)=>setAlgo(e.target.value)} value={valueSelect}>
+                      <option className={"disabled"}> empty Alogithm</option>
+                      <option value="Popularity">Popularity</option>
+                      <option value="Recency">Recency</option>
+                      <option value="ItemKNN">ItemKNN</option>
                     </Form.Select>
                 </Col>
                 <Col xs lg="3">
@@ -44,13 +77,13 @@ const AddAlgoritms = (props) => {
                     <Form.Label style={{paddingBottom:10}}>Added algorithms:</Form.Label>
                     <Card className={"shadow-lg"}>
                       <Card.Body>
-                          {algorithms}
+                          <LogicTable data={addedAlgs.concat(algorithms)}/>
                       </Card.Body>
                     </Card>
                 </Col>
             </Row >
                 <Button variant="secondary" onClick={()=>props.setCurrentStep(props.currentStep - 1)}>Previous</Button>{' '}
-                <Button variant="primary" onClick={()=>finish()}>Finish</Button>
+                <Button variant="primary" onClick={()=>finish()}>Next</Button>
         </div>
     )
 }
