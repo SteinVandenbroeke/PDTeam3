@@ -61,7 +61,7 @@ const RevenueCard = (props) => {
 
     return (
         <LargeInformationCard title={"Revenue"} value={20} tooltip={"Purchases from day x to day y"}>
-            <h5>Total from {props.startDate} to {props.endDate}: € {totalRevenue}</h5>
+            <h5>Total from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: € {totalRevenue}</h5>
             {labels.length < 500 &&
             <Line options={{
                   responsive: true,

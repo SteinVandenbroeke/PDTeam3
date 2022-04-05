@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, {useEffect} from 'react';
-import {Col, Row, Table, Button, Text, Card} from "react-bootstrap";
+import {Col, Row, Table, Button, Text, Card, Form} from "react-bootstrap";
 import Icon from 'react-eva-icons';
 import LogicTable from "../../../components/logicTable"
 import SmallInformationCard from "../../../components/smallInformationCard"
@@ -20,6 +20,7 @@ Legend,
 } from 'chart.js';
 import RevenueCard from "../../../components/overviewABTestCards/revenueCard";
 import ABTestInformation from "../../../components/overviewABTestCards/ABTestInformation";
+import ActiveUserCard from "../../../components/overviewABTestCards/activeUserCard";
 
 ChartJS.register(
 CategoryScale,
@@ -147,7 +148,7 @@ const ABTestOverview = () => {
                     "activeUsersAmount": Math.floor(Math.random() * 100)
                 }
             )
-            dates.push(currentDate.getDay() + "/" + currentDate.getMonth() + "/" + currentDate.getFullYear());
+            dates.push((currentDate.getDay() + 1) + "/" + (currentDate.getMonth() + 1) + "/" + currentDate.getFullYear());
             currentDate.setDate(currentDate.getDate() + 1);
         }
         alert("making done");
@@ -180,18 +181,19 @@ const ABTestOverview = () => {
     useEffect(() => {
     }, [abTestData]);
 
+
     return (
         <div>
             <div style={{paddingTop: 20}}>
                 <Row>
                     <Col sm={1}>
-                        <h6>Start date</h6>
+                        <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={abTestData.points[values[0]]} onChange={(e)=>{setValues([abTestData.points.indexOf(e.target.value), values[1]])}} />
                     </Col>
                     <Col sm={10}>
                         <Slider labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />
                     </Col>
                     <Col sm={1}>
-                        <h6>End date</h6>
+                        <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={abTestData.points[values[1]]} onChange={(e)=>{setValues([values[0], abTestData.points.indexOf(e.target.value)])}} />
                     </Col>
                 </Row>
                 <Row>
@@ -201,9 +203,9 @@ const ABTestOverview = () => {
                     <Col>
                         <SmallInformationCard title={"Purchases"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
                     </Col>
-                     <Col>
-                        <SmallInformationCard title={"Active Users"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
-                    </Col>
+                     <Col xs={12} md={6}>
+                         <ActiveUserCard abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
+                     </Col>
                      <Col>
                         <SmallInformationCard title={"Click Through Rate"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
                     </Col>
@@ -222,7 +224,7 @@ const ABTestOverview = () => {
                     <Col>
                         <SmallInformationCard title={"Most active users"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
                     </Col>
-                    <Col>
+                    <Col xs={12} md={6}>
                         <RevenueCard abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
                     </Col>
                 </Row>
