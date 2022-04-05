@@ -10,7 +10,6 @@ const ConnectComponent = (props) => {
 
   useEffect(() => {
       if(nodes.length !== props.data.database.length + props.data.csv.length){
-          console.log("test", props.data);
           let nodeSet = generateNodes(props.data);
           setNodes(nodeSet);
       }
@@ -67,7 +66,6 @@ const ConnectComponent = (props) => {
   }
 
   function newConnectionText(value){
-      console.log(value);
       let source = value.split("-")[0];
       let target = value.split("-")[1];
       newConnection(source, target)
@@ -78,7 +76,6 @@ const ConnectComponent = (props) => {
     currentData.connections[currentData.csv[parseInt(to) - currentData.database.length]] = currentData.database[parseInt(from)];
 
     let tempEdges = []
-    console.log(currentData.connections);
     Object.entries(currentData.connections).map(([key,value]) => {
         let to =  currentData.csv.findIndex(item => item === key)  + currentData.database.length;
         let from = currentData.database.findIndex(item => item === value);

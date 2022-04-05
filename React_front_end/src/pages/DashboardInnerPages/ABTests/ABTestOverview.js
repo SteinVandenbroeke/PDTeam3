@@ -22,6 +22,7 @@ import RevenueCard from "../../../components/overviewABTestCards/revenueCard";
 import ABTestInformation from "../../../components/overviewABTestCards/ABTestInformation";
 import ActiveUserCard from "../../../components/overviewABTestCards/activeUserCard";
 import Purchases from "../../../components/overviewABTestCards/Purchases";
+import ClickTroughRate from "../../../components/overviewABTestCards/ClickTroughRate";
 
 ChartJS.register(
 CategoryScale,
@@ -200,14 +201,14 @@ const ABTestOverview = () => {
                     <Col sm={4}>
                         <ABTestInformation algorithms={abTestData.algorithms} parameters={abTestData.parameters}/>
                     </Col>
-                    <Col>
+                    <Col xs={12} md={4}>
                         <Purchases purchases={abTestData.NotAlgDependent.Purchases}  abTestData={abTestData} startDate={values[0]} endDate={values[1]}></Purchases>
                     </Col>
-                     <Col xs={12} md={6}>
-                         <ActiveUserCard abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
-                     </Col>
-                     <Col>
-                        <SmallInformationCard title={"Click Through Rate"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
+                    <Col xs={12} md={4}>
+                        <ActiveUserCard abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
+                    </Col>
+                    <Col xs={12} md={4}>
+                        <ClickTroughRate abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
                     </Col>
                     <Col>
                         <SmallInformationCard title={"Attribution Rate"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
@@ -224,7 +225,7 @@ const ABTestOverview = () => {
                     <Col>
                         <SmallInformationCard title={"Most active users"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
                     </Col>
-                    <Col xs={12} md={6}>
+                    <Col xs={12} md={4}>
                         <RevenueCard abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
                     </Col>
                 </Row>

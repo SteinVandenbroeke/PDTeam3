@@ -47,7 +47,6 @@ const AddAlgoritms = (props) => {
     }
     function setAlgo(id){
         setValueSelect(id)
-        console.log({id})
     }
 
     return (

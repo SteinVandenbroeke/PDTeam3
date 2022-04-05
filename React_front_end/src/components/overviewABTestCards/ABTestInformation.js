@@ -7,7 +7,6 @@ import LogicTable from "../logicTable";
 
 const ABTestInformation = (props) => {
     const navigation = useNavigate();
-    console.log(props.algorithms)
 
     let data = [["Algorithms","Training interval"]].concat(getAlgorithms())
 

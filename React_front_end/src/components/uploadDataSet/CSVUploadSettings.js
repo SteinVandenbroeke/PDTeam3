@@ -16,7 +16,6 @@ const CSVUploadSettings = (props) => {
     }, []);
 
     function fileUpload(csv){
-        console.log(props.csvDbConnections);
         let request = new UploadDataSet(csv, setTabelPreview, props.setCsvDbConnections, props.csvDbConnections);
         request.readFileText();
     }
