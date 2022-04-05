@@ -27,7 +27,7 @@ export class UploadDataSet{
              this.fileReader.loadConnections = this.loadConnections;
             this.fileReader.setConnectionHeaders = this.setConnectionHeadersFunction;
             this.fileReader.connectionHeaders = this.connectionHeaders;
-            this.fileReader.readAsText(this.file.slice(0,500));
+            this.fileReader.readAsText(this.file);
         }
     }
 

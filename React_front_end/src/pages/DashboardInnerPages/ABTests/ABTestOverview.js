@@ -44,6 +44,38 @@ const ABTestOverview = () => {
         });
 
     function loadData(){
+
+        let points1 = [];
+        let points2 = [];
+        let points3 = [];
+        let dates = [];
+        let currentDate = new Date("05/01/2021");
+        for(let i = 0; i < 10000; i++){
+            points1.push({
+                        "ctr": Math.floor(Math.random() * 100),
+                        "ard": Math.floor(Math.random() * 100),
+                        "arpu": Math.floor(Math.random() * 100),
+                        "mostRecomendedItems": ["T-shirt", "Schoen", "Trui"],
+                    });
+
+            points2.push({
+                        "ctr": Math.floor(Math.random() * 100),
+                        "ard": Math.floor(Math.random() * 100),
+                        "arpu": Math.floor(Math.random() * 100),
+                        "mostRecomendedItems": ["T-shirt", "Schoen", "Trui"],
+                    })
+
+            points3.push(
+                {
+                    "Purchases": Math.floor(Math.random() * 100),
+                    "Revenue": Math.floor(Math.random() * 100),
+                    "activeUsersAmount": Math.floor(Math.random() * 100)
+                }
+            )
+            dates.push(currentDate.getDay() + "/" + currentDate.getMonth() + "/" + currentDate.getFullYear());
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+        alert("making done");
         setAbTestData({
             "algoritms": ["Popularity","Recency"],
             "parameters": {
@@ -52,67 +84,14 @@ const ABTestOverview = () => {
                 "dataset": "H&M dataset",
                 "eventuele extra parameters":"?"
             },
-            "points": ["01/01/2022", "02/01/2022", "03/01/2022"],
+            "points": dates,
             "Popularity":{
-                "points": [
-                    {
-                        "ctr": 10,
-                        "ard": 15,
-                        "arpu": 40,
-                        "mostRecomendedItems": ["T-shirt", "Schoen", "Trui"],
-                    },
-                    {
-                        "ctr": 8,
-                        "ard": 16,
-                        "arpu": 30,
-                        "mostRecomendedItems": ["Schoen", "Broek", "Trui"],
-                    },
-                    {
-                        "ctr": 15,
-                        "ard": 20,
-                        "arpu": 30,
-                        "mostRecomendedItems": ["BH", "Trui", "Broek"],
-                    }]
+                "points": points1
             },
             "Recency":{
-                "points":[
-                    {
-                        "ctr": 5,
-                        "ard": 8,
-                        "arpu": 15,
-                        "mostRecomendedItems": ["T-shirt", "Schoen", "Trui"],
-                    },
-                    {
-                        "ctr": 7,
-                        "ard": 14,
-                        "arpu": 15,
-                        "mostRecomendedItems": ["Schoen", "Broek", "Trui"],
-                    },
-                    {
-                        "ctr": 10,
-                        "ard": 15,
-                        "arpu": 25,
-                        "mostRecomendedItems": ["BH", "Trui", "Broek"],
-                    }
-                ]
+                "points":points2
             },
-            "NotAlgDependent":[
-                {
-                    "Purchases": 80,
-                    "Revenue": 100,
-                    "activeUsersAmount": 150
-                },
-                {
-                    "Purchases": 70,
-                    "Revenue": 120,
-                    "activeUsersAmount": 153
-                },
-                {
-                    "Purchases": 76,
-                    "Revenue": 110,
-                    "activeUsersAmount": 158
-                }
-            ]
+            "NotAlgDependent":points3
         });
     }
 
