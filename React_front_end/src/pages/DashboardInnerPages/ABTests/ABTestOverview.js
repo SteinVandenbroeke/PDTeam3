@@ -19,6 +19,7 @@ Tooltip,
 Legend,
 } from 'chart.js';
 import RevenueCard from "../../../components/overviewABTestCards/revenueCard";
+import ABTestInformation from "../../../components/overviewABTestCards/ABTestInformation";
 
 ChartJS.register(
 CategoryScale,
@@ -33,12 +34,12 @@ Legend
 const ABTestOverview = () => {
     const [values, setValues] = React.useState([0, 1]);
     const [abTestData, setAbTestData] = React.useState({
-            "algoritms": [],
+            "algorithms": [],
             "points": [0,0],
             "parameters": {
-                "windowSize": null,
-                "learingPeriod": null,
-                "dataset": null
+                "topK": null,
+                "stepSize": null,
+                "datasetId": null
             },
             "NotAlgDependent":[]
         });
@@ -151,19 +152,21 @@ const ABTestOverview = () => {
         }
         alert("making done");
         setAbTestData({
-            "algoritms": ["Popularity","Recency"],
+            "algorithms": ["Popularity","Recency"],
             "parameters": {
-                "windowSize": 1,
-                "learingPeriod": 20,
-                "dataset": "H&M dataset",
+                "stepSize": 1,
+                "topK": 10,
+                "datasetId": "1",
                 "eventuele extra parameters":"?"
             },
             "points": dates,
             "Popularity":{
-                "points": points1
+                "points": points1,
+                "trainingIntervam": 4
             },
             "Recency":{
-                "points":points2
+                "points":points2,
+                "trainingIntervam": 2
             },
             "NotAlgDependent":points3
         });
@@ -180,10 +183,20 @@ const ABTestOverview = () => {
     return (
         <div>
             <div style={{paddingTop: 20}}>
-                <Slider max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />
+                <Row>
+                    <Col sm={1}>
+                        <h6>Start date</h6>
+                    </Col>
+                    <Col sm={10}>
+                        <Slider max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />
+                    </Col>
+                    <Col sm={1}>
+                        <h6>End date</h6>
+                    </Col>
+                </Row>
                 <Row>
                     <Col>
-                        <SmallInformationCard title={"AB test information"} value={20} tooltip={"Purchases from day x to day y"}/>
+                        <ABTestInformation algorithms={abTestData.algorithms} parameters={abTestData.parameters}/>
                     </Col>
                     <Col>
                         <SmallInformationCard title={"Purchases"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
