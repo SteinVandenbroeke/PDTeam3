@@ -19,7 +19,7 @@ const SelectABSettings = (props) => {
 
     return (
         <div>
-            <Form.Label>{props.title}</Form.Label>
+            <Form.Label>Choose your day-interval.</Form.Label>
             <Row style={{paddingTop: 20}}>
                 <Col xs={12} sm={12} md={5} style={{padding: 40}}>
                     <Form.Label style={{paddingBottom:20}}>Select the amount of top-K items. These items will be shown to the users as recommended items.</Form.Label>

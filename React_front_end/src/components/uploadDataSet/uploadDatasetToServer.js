@@ -4,7 +4,7 @@ import {Col, Row, Table, Button, Form, Card, Container, Badge, Tabs, Tab, Spinne
 import { ServerRequest } from '../../logic/ServerCommunication';
 import { toast } from 'react-toastify';
 
-const UploadToServer = (props) => {
+const UploadDatasetToServer = (props) => {
     let [uploading , setUploading] = useState(0);
 
     function upload(csvInteractions, csvUsers, csvItems, interactionConnections, usersConnections, itemConnections){
@@ -91,4 +91,4 @@ const UploadToServer = (props) => {
         )
 };
 
-export default UploadToServer;
+export default UploadDatasetToServer;

@@ -10,7 +10,7 @@ const ChooseDataset = (props) => {
     }
     return (
         <div>
-           <Form.Label>{props.title}</Form.Label>
+           <Form.Label>Choose the required database.</Form.Label>
             <LogicTable action={clickDataset} data={[["id", "Dataset name", "Created by", "Creation date"], ["1", "H&M test dataset 1", "Stein Vandenbroeke", "09/03/2022"],["2", "H&M test dataset 2", "Stein Vandenbroeke", "09/03/2022"]]}/>
         </div>
     )
