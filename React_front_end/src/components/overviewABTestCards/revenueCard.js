@@ -14,6 +14,7 @@ Title,
 Tooltip,
 Legend,
 } from 'chart.js';
+import SmallInformationCard from "../smallInformationCard";
 
 const RevenueCard = (props) => {
     const navigation = useNavigate();
@@ -61,7 +62,7 @@ const RevenueCard = (props) => {
     return (
         <LargeInformationCard title={"Revenue"} value={20} tooltip={"Purchases from day x to day y"}>
             <h5>Total from {props.startDate} to {props.endDate}: € {totalRevenue}</h5>
-            {}
+            {labels.length < 500 &&
             <Line options={{
                   responsive: true,
                   plugins: {
@@ -76,7 +77,9 @@ const RevenueCard = (props) => {
 
             data={{
               labels, datasets: datasets
-            }} />
+            }} />}
+            {labels.length >= 500 &&
+                <p style={{color: "red"}}>To many datapoints to show in a graph</p>}
         </LargeInformationCard>
         )
 };

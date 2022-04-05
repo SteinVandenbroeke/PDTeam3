@@ -188,7 +188,7 @@ const ABTestOverview = () => {
                         <h6>Start date</h6>
                     </Col>
                     <Col sm={10}>
-                        <Slider max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />
+                        <Slider labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />
                     </Col>
                     <Col sm={1}>
                         <h6>End date</h6>
