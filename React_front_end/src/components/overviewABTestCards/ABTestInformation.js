@@ -9,6 +9,15 @@ const ABTestInformation = (props) => {
     const navigation = useNavigate();
     console.log(props.algorithms)
 
+    let data = [["Algorithms","Training interval"]].concat(getAlgorithms())
+
+    function getAlgorithms(){
+        let a = []
+        for(let key in props.algorithms){
+            a.push([key,props.algorithms[key].trainingInterval])
+        }
+        return a
+    }
 
     return (
         <LargeInformationCard title={"ABTest Information"}>
@@ -19,6 +28,7 @@ const ABTestInformation = (props) => {
                       <h6>Stepsize: {props.parameters.stepSize}</h6>
                   </Col>
                   <Col sm={8}>
+                      <LogicTable data={data}/>
                   </Col>
               </Row>
         </LargeInformationCard>

@@ -21,6 +21,7 @@ Legend,
 import RevenueCard from "../../../components/overviewABTestCards/revenueCard";
 import ABTestInformation from "../../../components/overviewABTestCards/ABTestInformation";
 import ActiveUserCard from "../../../components/overviewABTestCards/activeUserCard";
+import Purchases from "../../../components/overviewABTestCards/Purchases";
 
 ChartJS.register(
 CategoryScale,
@@ -181,7 +182,6 @@ const ABTestOverview = () => {
     useEffect(() => {
     }, [abTestData]);
 
-
     return (
         <div>
             <div style={{paddingTop: 20}}>
@@ -197,11 +197,11 @@ const ABTestOverview = () => {
                     </Col>
                 </Row>
                 <Row>
-                    <Col>
+                    <Col sm={4}>
                         <ABTestInformation algorithms={abTestData.algorithms} parameters={abTestData.parameters}/>
                     </Col>
                     <Col>
-                        <SmallInformationCard title={"Purchases"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
+                        <Purchases purchases={abTestData.NotAlgDependent.Purchases}  abTestData={abTestData} startDate={values[0]} endDate={values[1]}></Purchases>
                     </Col>
                      <Col xs={12} md={6}>
                          <ActiveUserCard abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
