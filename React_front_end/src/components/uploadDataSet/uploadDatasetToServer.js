@@ -4,7 +4,7 @@ import {Col, Row, Table, Button, Form, Card, Container, Badge, Tabs, Tab, Spinne
 import { ServerRequest } from '../../logic/ServerCommunication';
 import { toast } from 'react-toastify';
 
-const UploadToServer = (props) => {
+const UploadDatasetToServer = (props) => {
     let [uploading , setUploading] = useState(0);
 
     function upload(csvInteractions, csvUsers, csvItems, interactionConnections, usersConnections, itemConnections){
@@ -17,7 +17,7 @@ const UploadToServer = (props) => {
         formData.append('interactionCsv', csvInteractions);
         formData.append('userCsv', csvUsers);
         formData.append('itemCsv', csvItems);
-        request.sendPost("upload",formData, false).then(function(){}).catch(error => {toast.error(error.message); setUploading(3)});
+        request.sendPost("upload",formData).then(function(){}).catch(error => {toast.error(error.message); setUploading(3)});
 
     }
 
@@ -76,7 +76,7 @@ const UploadToServer = (props) => {
                                   <h5>Upload to server</h5>
                                   <div style={{paddingRight: "50%", paddingTop: 20, paddingBottom: 20}}>
                                       <h1>Er ging iets fout bij het uploaden</h1>
-                                      <Button variant="primary" onClick={() => upload(props.interactionCSV, props.usersCSV, props.itemsCSV, props.interactionConnections, props.UsersConnections, props.itemsConnections)}>Probeer opnieuw</Button>{' '}
+                                      <Button variant="primary" onClick={() => upload(props.interactionCSV, props.usersCSV, props.itemsCSV, props.interactionConnections, props.UsersConnections, props.itemsConnections)}>Try Again</Button>{' '}
                                   </div>
                               </Card.Body>
                             }
@@ -91,4 +91,4 @@ const UploadToServer = (props) => {
         )
 };
 
-export default UploadToServer;
+export default UploadDatasetToServer;

@@ -5,7 +5,7 @@ import React from "react";
 import {Link} from "react-router-dom";
 import {Card, OverlayTrigger, Tooltip} from "react-bootstrap"
 
-const SmallInformationCard = (props) => {
+const LargeInformationCard = (props) => {
     const navigation = useNavigate();
     return (
         <div style={{paddingTop: 20}}>
@@ -16,11 +16,11 @@ const SmallInformationCard = (props) => {
                   >
                       <h3>{props.title}</h3>
                   </OverlayTrigger>
-                <h1 style={{textAlign: "right"}}>{props.value}</h1>
+                  {props.children}
               </Card.Body>
             </Card>
         </div>
         )
 };
 
-export default SmallInformationCard;
+export default LargeInformationCard;

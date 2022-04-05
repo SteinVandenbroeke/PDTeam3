@@ -29,8 +29,8 @@ const CSVUploadSettings = (props) => {
                       <Card.Body>
                           <h5>CSV to db conversion</h5>
                           <ConnectComponent data={props.csvDbConnections} dataSetFunction={props.setCsvDbConnections}></ConnectComponent>
-                          <Button variant="secondary" onClick={()=>props.setCurrentStep(props.currentStep - 1)}>Vorige</Button>{' '}
-                          <Button variant="primary" onClick={()=>props.setCurrentStep(props.currentStep + 1)}>Volgende</Button>
+                          <Button variant="secondary" onClick={()=>props.setCurrentStep(props.currentStep - 1)}>Previous</Button>{' '}
+                          <Button variant="primary" onClick={()=>props.setCurrentStep(props.currentStep + 1)}>Next</Button>
                       </Card.Body>
                     </Card>
                 </Col>

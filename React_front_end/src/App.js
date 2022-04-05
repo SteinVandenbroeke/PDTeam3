@@ -14,18 +14,22 @@ import Users from "./pages/Users/Users";
 
 import ABTestsIndex from "./pages/DashboardInnerPages/ABTests/ABTestsIndex";
 import ABTestsList from "./pages/DashboardInnerPages/ABTests/ABTestsList";
-import ABTestOverview from "./pages/DashboardInnerPages/ABTests/ABTestOverview"
+import ABTestOverview from "./pages/DashboardInnerPages/ABTests/ABTestOverview";
+import AddABTest from "./pages/DashboardInnerPages/ABTests/AddABTest";
 
 import DatasetsIndex from "./pages/DashboardInnerPages/Datasets/DatasetsIndex";
-import DataSetsList from "./pages/DashboardInnerPages/Datasets/DatasetsList"
-import DataSetOverview from "./pages/DashboardInnerPages/Datasets/DatasetOverview"
-import AddDataset from "./pages/DashboardInnerPages/Datasets/AddDataset"
+import DataSetsList from "./pages/DashboardInnerPages/Datasets/DatasetsList";
+import DataSetOverview from "./pages/DashboardInnerPages/Datasets/DatasetOverview";
+import ItemOverview from "./pages/DashboardInnerPages/Datasets/ItemPage";
+import PersonOverview from "./pages/DashboardInnerPages/Datasets/PersonPage";
+import AddDataset from "./pages/DashboardInnerPages/Datasets/AddDataset";
 
 import HomeDashboardPage from "./pages/DashboardInnerPages/homeDashboardPage";
 import AddUsers from "./pages/Users/AddUser";
 import UserList from "./pages/Users/UserList";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 
 let userSession = createContext();
 function App() {
@@ -56,6 +60,7 @@ function App() {
 
                           <Route path="abTests" element={<ABTestsIndex />}>
                               <Route index element={<ABTestsList />}/>
+                              <Route path="add" element={<AddABTest />}/>
                               <Route path="overview" element={<ABTestOverview />}/>
                           </Route>
 
@@ -63,6 +68,8 @@ function App() {
                               <Route index element={<DataSetsList />}/>
                               <Route path="add" element={<AddDataset />}/>
                               <Route path="overview" element={<DataSetOverview />}/>
+                              <Route path="item" element={<ItemOverview/>}/>
+                              <Route path="person" element={<PersonOverview/>}/>
                           </Route>
                           <Route path="vbPagina" element={<Home />} />
                       </Route>

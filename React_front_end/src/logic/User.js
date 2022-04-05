@@ -52,17 +52,6 @@ export class User{
     }
 
     /***
-     * Register new user
-     * @param email
-     * @param password
-     * @param username
-     * @returns {Promise<void>}
-     */
-    async register(email, password, username){
-        //TODO
-    }
-
-    /***
      * Returns if user is loggedin
      * @returns {boolean|*}
      */

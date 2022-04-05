@@ -1,5 +1,6 @@
 import {Card, Button} from "react-bootstrap";
 import React from "react";
+import {Link} from "react-router-dom";
 
 const PersonCard = (props) => {
     return (
@@ -9,7 +10,9 @@ const PersonCard = (props) => {
                 <Card.Body style={{flex: 1, padding: 0, paddingLeft: 8}}>
                     <Card.Text>{props.id}</Card.Text>
                 </Card.Body>
-                <Button>Info</Button>
+                <Link to="/dashboard/dataSets/person" class={"btn"}>
+                    <Button>Info</Button>
+                </Link>
             </Card>
         </div>
     )
