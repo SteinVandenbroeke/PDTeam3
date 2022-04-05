@@ -7,6 +7,8 @@ import LogicTable from "../logicTable";
 
 const ABTestInformation = (props) => {
     const navigation = useNavigate();
+    console.log(props.algorithms)
+
 
     return (
         <LargeInformationCard title={"ABTest Information"}>
@@ -15,6 +17,8 @@ const ABTestInformation = (props) => {
                       <h6>Dataset ID: {props.parameters.datasetId}</h6>
                       <h6>TopK: {props.parameters.topK}</h6>
                       <h6>Stepsize: {props.parameters.stepSize}</h6>
+                  </Col>
+                  <Col sm={8}>
                   </Col>
               </Row>
         </LargeInformationCard>

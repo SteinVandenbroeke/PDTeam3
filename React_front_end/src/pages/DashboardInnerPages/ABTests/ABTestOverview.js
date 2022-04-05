@@ -152,7 +152,15 @@ const ABTestOverview = () => {
         }
         alert("making done");
         setAbTestData({
-            "algorithms": ["Popularity","Recency"],
+            "algorithms": {
+                "Popularity": {
+                    "points": points1,
+                    "trainingInterval": 4
+                }, "Recency": {
+                    "points": points2,
+                    "trainingInterval": 2
+                }
+            },
             "parameters": {
                 "stepSize": 1,
                 "topK": 10,
@@ -160,14 +168,6 @@ const ABTestOverview = () => {
                 "eventuele extra parameters":"?"
             },
             "points": dates,
-            "Popularity":{
-                "points": points1,
-                "trainingIntervam": 4
-            },
-            "Recency":{
-                "points":points2,
-                "trainingIntervam": 2
-            },
             "NotAlgDependent":points3
         });
     }
