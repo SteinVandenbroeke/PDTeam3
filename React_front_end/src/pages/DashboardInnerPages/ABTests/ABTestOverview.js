@@ -45,6 +45,80 @@ const ABTestOverview = () => {
 
     function loadData(){
 
+        /*
+        setAbTestData({
+            "algoritms": ["Popularity","Recency"],
+            "parameters": {
+                "windowSize": 1,
+                "learingPeriod": 20,
+                "dataset": "H&M dataset",
+                "eventuele extra parameters":"?"
+            },
+            "points": ["01/01/2022", "02/01/2022", "03/01/2022"],
+            "Popularity":{
+                "points": [
+                    {
+                        "ctr": 10,
+                        "ard": 15,
+                        "arpu": 40,
+                        "mostRecomendedItems": ["T-shirt", "Schoen", "Trui"],
+                    },
+                    {
+                        "ctr": 8,
+                        "ard": 16,
+                        "arpu": 30,
+                        "mostRecomendedItems": ["Schoen", "Broek", "Trui"],
+                    },
+                    {
+                        "ctr": 15,
+                        "ard": 20,
+                        "arpu": 30,
+                        "mostRecomendedItems": ["BH", "Trui", "Broek"],
+                    }]
+            },
+            "Recency":{
+                "points":[
+                    {
+                        "ctr": 5,
+                        "ard": 8,
+                        "arpu": 15,
+                        "mostRecomendedItems": ["T-shirt", "Schoen", "Trui"],
+                    },
+                    {
+                        "ctr": 7,
+                        "ard": 14,
+                        "arpu": 15,
+                        "mostRecomendedItems": ["Schoen", "Broek", "Trui"],
+                    },
+                    {
+                        "ctr": 10,
+                        "ard": 15,
+                        "arpu": 25,
+                        "mostRecomendedItems": ["BH", "Trui", "Broek"],
+                    }
+                ]
+            },
+            "NotAlgDependent":[
+                {
+                    "Purchases": 80,
+                    "Revenue": 100,
+                    "activeUsersAmount": 150
+                },
+                {
+                    "Purchases": 70,
+                    "Revenue": 120,
+                    "activeUsersAmount": 153
+                },
+                {
+                    "Purchases": 76,
+                    "Revenue": 110,
+                    "activeUsersAmount": 158
+                }
+            ]
+        });
+    }
+         */
+
         let points1 = [];
         let points2 = [];
         let points3 = [];

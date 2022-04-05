@@ -61,7 +61,7 @@ const RevenueCard = (props) => {
     return (
         <LargeInformationCard title={"Revenue"} value={20} tooltip={"Purchases from day x to day y"}>
             <h5>Total from {props.startDate} to {props.endDate}: € {totalRevenue}</h5>
-
+            {}
             <Line options={{
                   responsive: true,
                   plugins: {
