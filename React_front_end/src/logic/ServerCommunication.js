@@ -6,7 +6,7 @@ export class ServerRequest{
 	 */
 	constructor(){
 		if(window.localStorage.getItem("authToken") !== null){
-            this.authToken = window.localStorage.getItem("AuthToken");
+            this.authToken = window.localStorage.getItem("authToken");
         }
 		else{
 			this.authToken = null;

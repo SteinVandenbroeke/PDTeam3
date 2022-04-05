@@ -17,7 +17,7 @@ const UploadToServer = (props) => {
         formData.append('interactionCsv', csvInteractions);
         formData.append('userCsv', csvUsers);
         formData.append('itemCsv', csvItems);
-        request.sendPost("upload",formData, false).then(function(){}).catch(error => {toast.error(error.message); setUploading(3)});
+        request.sendPost("upload",formData).then(function(){}).catch(error => {toast.error(error.message); setUploading(3)});
 
     }
 

@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Col, Row, Table, Button, Text, Card} from "react-bootstrap";
 import Icon from 'react-eva-icons';
 import LogicTable from "../../../components/logicTable"
@@ -18,6 +18,7 @@ Title,
 Tooltip,
 Legend,
 } from 'chart.js';
+import RevenueCard from "../../../components/overviewABTestCards/revenueCard";
 
 ChartJS.register(
 CategoryScale,
@@ -30,13 +31,103 @@ Legend
 );
 
 const ABTestOverview = () => {
-    const [values, setValues] = React.useState([20, 40]);
-    const labels = ['Dag 1', 'Dag 2', 'Dag 3', 'Dag 4', 'Dag 5', 'Dag 6', 'Dag 7'];
-    console.log(labels.map(() => Math.floor(Math.random() * 1000)));
+    const [values, setValues] = React.useState([0, 1]);
+    const [abTestData, setAbTestData] = React.useState({
+            "algoritms": [],
+            "points": [0,0],
+            "parameters": {
+                "windowSize": null,
+                "learingPeriod": null,
+                "dataset": null
+            },
+            "NotAlgDependent":[]
+        });
+
+    function loadData(){
+        setAbTestData({
+            "algoritms": ["Popularity","Recency"],
+            "parameters": {
+                "windowSize": 1,
+                "learingPeriod": 20,
+                "dataset": "H&M dataset",
+                "eventuele extra parameters":"?"
+            },
+            "points": ["01/01/2022", "02/01/2022", "03/01/2022"],
+            "Popularity":{
+                "points": [
+                    {
+                        "ctr": 10,
+                        "ard": 15,
+                        "arpu": 40,
+                        "mostRecomendedItems": ["T-shirt", "Schoen", "Trui"],
+                    },
+                    {
+                        "ctr": 8,
+                        "ard": 16,
+                        "arpu": 30,
+                        "mostRecomendedItems": ["Schoen", "Broek", "Trui"],
+                    },
+                    {
+                        "ctr": 15,
+                        "ard": 20,
+                        "arpu": 30,
+                        "mostRecomendedItems": ["BH", "Trui", "Broek"],
+                    }]
+            },
+            "Recency":{
+                "points":[
+                    {
+                        "ctr": 5,
+                        "ard": 8,
+                        "arpu": 15,
+                        "mostRecomendedItems": ["T-shirt", "Schoen", "Trui"],
+                    },
+                    {
+                        "ctr": 7,
+                        "ard": 14,
+                        "arpu": 15,
+                        "mostRecomendedItems": ["Schoen", "Broek", "Trui"],
+                    },
+                    {
+                        "ctr": 10,
+                        "ard": 15,
+                        "arpu": 25,
+                        "mostRecomendedItems": ["BH", "Trui", "Broek"],
+                    }
+                ]
+            },
+            "NotAlgDependent":[
+                {
+                    "Purchases": 80,
+                    "Revenue": 100,
+                    "activeUsersAmount": 150
+                },
+                {
+                    "Purchases": 70,
+                    "Revenue": 120,
+                    "activeUsersAmount": 153
+                },
+                {
+                    "Purchases": 76,
+                    "Revenue": 110,
+                    "activeUsersAmount": 158
+                }
+            ]
+        });
+    }
+
+    useEffect(() => {
+        loadData();
+    }, []);
+
+
+    useEffect(() => {
+    }, [abTestData]);
+
     return (
         <div>
             <div style={{paddingTop: 20}}>
-                <Slider max={500} min={0} step={1} values={values} setValues={setValues} />
+                <Slider max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />
                 <Row>
                     <Col>
                         <SmallInformationCard title={"AB test information"} value={20} tooltip={"Purchases from day x to day y"}/>
@@ -66,37 +157,7 @@ const ABTestOverview = () => {
                         <SmallInformationCard title={"Most active users"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
                     </Col>
                     <Col>
-                        <LargeInformationCard title={"Revenue"} value={20} tooltip={"Purchases from day x to day y"}>
-                            <h5>Total from X to Y: 20</h5>
-
-                            <Line options={{
-                                  responsive: true,
-                                  plugins: {
-                                    legend: {
-                                      position: 'top',
-                                    },
-                                    title: {
-                                      display: false,
-                                    },
-                                  },
-                                }}
-
-                            data={{
-                              labels,
-                                datasets: [
-                                {
-                                  label: 'Algoritme A',
-                                  data: [94, 530, 476, 789, 986, 389, 451],
-                                }, {
-                                  label: 'Algoritme B',
-                                  data: [60, 400, 300, 200, 70, 100, 351],
-                                }, {
-                                  label: 'Algoritme C',
-                                  data: [20, 50, 400, 80, 300, 300, 150],
-                                },
-                              ],
-                            }} />
-                        </LargeInformationCard>
+                        <RevenueCard abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
                     </Col>
                 </Row>
 
