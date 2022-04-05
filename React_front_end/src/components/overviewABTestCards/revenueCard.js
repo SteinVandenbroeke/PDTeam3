@@ -21,8 +21,15 @@ const RevenueCard = (props) => {
     const [labels, Letlabels] = React.useState([]);
     const [datasets, setDatasets]  = React.useState([]);
     const [totalRevenue, setTotalRevenue]  = React.useState(0);
+    const [loading, setLoading] = React.useState(false);
 
-    function processData(begin, end){
+
+    function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function processData(begin, end){
+        setLoading(true);
         setDatasets([]);
         let allData = props.abTestData;
 
@@ -40,19 +47,7 @@ const RevenueCard = (props) => {
                   label: "Revenue",
                   data: data,
                 }]);
-
-        /*
-        allData.algoritms.map((value, index) => {
-            let data = [];
-            allData[value].points.map((value1, index) =>{
-                data.push(value1.Revenue);
-            });
-
-            setDatasets(datasets => [...datasets, {
-                  label: value,
-                  data: data,
-                }]);
-        });**/
+        setLoading(false);
     }
 
     useEffect(() => {
@@ -60,7 +55,7 @@ const RevenueCard = (props) => {
     }, [props.abTestData, props.startDate, props.endDate]);
 
     return (
-        <LargeInformationCard title={"Revenue"} tooltip={"Revenue from day x to day y"}>
+        <LargeInformationCard loading={loading} title={"Revenue"} tooltip={"Revenue from day x to day y"}>
             <h5>Total from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: € {totalRevenue}</h5>
             {labels.length < 500 &&
             <Line options={{

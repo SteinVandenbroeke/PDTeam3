@@ -128,7 +128,7 @@ const ABTestOverview = () => {
         let points3 = [];
         let dates = [];
         let currentDate = new Date("05/01/2021");
-        for(let i = 0; i < 10000; i++){
+        for(let i = 0; i < 1000; i++){
             points1.push({
                         "ctr": Math.floor(Math.random() * 100),
                         "ard": Math.floor(Math.random() * 100),

@@ -21,8 +21,10 @@ const RevenueCard = (props) => {
     const [labels, Letlabels] = React.useState([]);
     const [datasets, setDatasets]  = React.useState([]);
     const [totalUsers, setTotalUsers]  = React.useState(0);
+    const [loading, setLoading] = React.useState(false);
 
-    function processData(begin, end){
+    async function processData(begin, end){
+        setLoading(true);
         setDatasets([]);
         let allData = props.abTestData;
 
@@ -40,6 +42,7 @@ const RevenueCard = (props) => {
                   label: "Revenue",
                   data: data,
                 }]);
+        setLoading(false);
     }
 
     useEffect(() => {
@@ -47,7 +50,7 @@ const RevenueCard = (props) => {
     }, [props.abTestData, props.startDate, props.endDate]);
 
     return (
-        <LargeInformationCard title={"Users"} value={20} tooltip={"Purchases from day x to day y"}>
+        <LargeInformationCard loading={loading} title={"Users"} value={20} tooltip={"Purchases from day x to day y"}>
             <h5>Total from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: {totalUsers}</h5>
             {labels.length < 500 &&
             <Line options={{

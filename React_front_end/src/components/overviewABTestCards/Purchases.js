@@ -11,8 +11,10 @@ const Purchases = (props) => {
     const [labels, Letlabels] = React.useState([]);
     const [datasets, setDatasets]  = React.useState([]);
     const [totalPurchases, setTotalPurchases]  = React.useState(0);
+    const [loading, setLoading] = React.useState(false);
 
-    function processData(begin, end){
+    async function processData(begin, end){
+        setLoading(true);
         setDatasets([]);
         let allData = props.abTestData;
 
@@ -30,6 +32,7 @@ const Purchases = (props) => {
                   label: "Purchases",
                   data: data,
                 }]);
+        setLoading(false);
     }
 
     useEffect(() => {
@@ -37,7 +40,7 @@ const Purchases = (props) => {
     }, [props.abTestData, props.startDate, props.endDate]);
 
     return (
-        <LargeInformationCard title={"Purchases"} tooltip={"Purchases from day x to day y"}>
+        <LargeInformationCard  loading={loading} title={"Purchases"} tooltip={"Purchases from day x to day y"}>
             <h5>Total from {props.startDate} to {props.endDate}: {totalPurchases}</h5>
             {labels.length < 500 &&
             <Line options={{

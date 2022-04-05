@@ -11,8 +11,10 @@ const Purchases = (props) => {
     const [labels, Letlabels] = React.useState([]);
     const [datasets, setDatasets]  = React.useState([]);
     const [avargeCTR, setavargeCTR]  = React.useState([]);
+    const [loading, setLoading] = React.useState(false);
 
-    function processData(begin, end){
+    async function processData(begin, end){
+        setLoading(true);
         setDatasets([]);
         setavargeCTR([]);
         let allData = props.abTestData;
@@ -37,6 +39,7 @@ const Purchases = (props) => {
             setavargeCTR(avargeCTR => [...avargeCTR,
                   [algorithm, avarge]
                 ]);
+            setLoading(false);
         }
     }
 
@@ -45,13 +48,13 @@ const Purchases = (props) => {
     }, [props.abTestData, props.startDate, props.endDate]);
 
     return (
-        <LargeInformationCard title={"Click Through Rate"} tooltip={"Purchases from day x to day y"}>
+        <LargeInformationCard loading={loading} title={"Click Through Rate"} tooltip={"Purchases from day x to day y"}>
             {
                 avargeCTR.map((value, index) => {
                     {return <h5>Avarage CTR for {value[0]} from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: {value[1]}</h5>}
                 })
             }
-            {labels.length < 500 &&
+            {labels.length < 50 &&
             <Line options={{
                 backgroundColor: 'rgba(13,110,253,1)',
                 borderColor: 'rgba(13,110,253,0.5)',
@@ -69,7 +72,7 @@ const Purchases = (props) => {
             data={{
               labels, datasets: datasets
             }} />}
-            {labels.length >= 500 &&
+            {labels.length >= 50 &&
                 <p style={{color: "red"}}>To many datapoints to show in a graph</p>}
         </LargeInformationCard>
         )
