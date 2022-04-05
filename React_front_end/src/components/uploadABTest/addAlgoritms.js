@@ -13,7 +13,6 @@ const AddAlgoritms = (props) => {
     const [trainingIntervalvalue, setTrainingIntervalvalue] = React.useState([1]);
     const [valueSelect, setValueSelect] = React.useState("0");
     const [algorithms,setAlgorithms] = React.useState([[]]);
-    let addedAlgs= [["Algoriths","Training interval"]]
 
 
     function finish(){
@@ -54,7 +53,7 @@ const AddAlgoritms = (props) => {
     return (
         <div style={{textAlign: "left"}}>
             <Row>
-                 <Form.Label>{props.title}</Form.Label>
+                 <Form.Label>Choose your algorithms to run.</Form.Label>
             </Row>
             <Row  style={{paddingTop: 20, paddingBottom: 20}}>
                 <Col xs lg="3">
@@ -77,7 +76,7 @@ const AddAlgoritms = (props) => {
                     <Form.Label style={{paddingBottom:10}}>Added algorithms:</Form.Label>
                     <Card className={"shadow-lg"}>
                       <Card.Body>
-                          <LogicTable data={addedAlgs.concat(algorithms)}/>
+                          <LogicTable data={[["Algoriths","Training interval"]].concat(algorithms)}/>
                       </Card.Body>
                     </Card>
                 </Col>
