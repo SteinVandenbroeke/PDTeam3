@@ -1,0 +1,6 @@
+[submodule "PPDB-Recommendation-Algorithms-2022"]
+	path = PPDB-Recommendation-Algorithms-2022
+	url = https://github.com/frehml/PPDB-Recommendation-Algorithms-2022.git
+[submodule "Flask_server/src/ProgDBTutor/PPDB-Recommendation-Algorithms-2022"]
+	path = Flask_server/src/ProgDBTutor/PPDB-Recommendation-Algorithms-2022
+	url = https://github.com/frehml/PPDB-Recommendation-Algorithms-2022.git
