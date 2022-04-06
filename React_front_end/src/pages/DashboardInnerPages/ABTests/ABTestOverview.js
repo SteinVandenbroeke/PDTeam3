@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React from 'react';
-import {Col, Row, Table, Button, Text, Card} from "react-bootstrap";
+import React, {useEffect} from 'react';
+import {Col, Row, Table, Button, Text, Card, Form} from "react-bootstrap";
 import Icon from 'react-eva-icons';
 import LogicTable from "../../../components/logicTable"
 import SmallInformationCard from "../../../components/smallInformationCard"
@@ -18,6 +18,11 @@ Title,
 Tooltip,
 Legend,
 } from 'chart.js';
+import RevenueCard from "../../../components/overviewABTestCards/revenueCard";
+import ABTestInformation from "../../../components/overviewABTestCards/ABTestInformation";
+import ActiveUserCard from "../../../components/overviewABTestCards/activeUserCard";
+import Purchases from "../../../components/overviewABTestCards/Purchases";
+import ClickTroughRate from "../../../components/overviewABTestCards/ClickTroughRate";
 
 ChartJS.register(
 CategoryScale,
@@ -30,25 +35,180 @@ Legend
 );
 
 const ABTestOverview = () => {
-    const [values, setValues] = React.useState([20, 40]);
-    const labels = ['Dag 1', 'Dag 2', 'Dag 3', 'Dag 4', 'Dag 5', 'Dag 6', 'Dag 7'];
-    console.log(labels.map(() => Math.floor(Math.random() * 1000)));
+    const [values, setValues] = React.useState([0, 1]);
+    const [abTestData, setAbTestData] = React.useState({
+            "algorithms": [],
+            "points": [0,0],
+            "parameters": {
+                "topK": null,
+                "stepSize": null,
+                "datasetId": null
+            },
+            "NotAlgDependent":[]
+        });
+
+    function loadData(){
+
+        /*
+        setAbTestData({
+            "algoritms": ["Popularity","Recency"],
+            "parameters": {
+                "windowSize": 1,
+                "learingPeriod": 20,
+                "dataset": "H&M dataset",
+                "eventuele extra parameters":"?"
+            },
+            "points": ["01/01/2022", "02/01/2022", "03/01/2022"],
+            "Popularity":{
+                "points": [
+                    {
+                        "ctr": 10,
+                        "ard": 15,
+                        "arpu": 40,
+                        "mostRecomendedItems": ["T-shirt", "Schoen", "Trui"],
+                    },
+                    {
+                        "ctr": 8,
+                        "ard": 16,
+                        "arpu": 30,
+                        "mostRecomendedItems": ["Schoen", "Broek", "Trui"],
+                    },
+                    {
+                        "ctr": 15,
+                        "ard": 20,
+                        "arpu": 30,
+                        "mostRecomendedItems": ["BH", "Trui", "Broek"],
+                    }]
+            },
+            "Recency":{
+                "points":[
+                    {
+                        "ctr": 5,
+                        "ard": 8,
+                        "arpu": 15,
+                        "mostRecomendedItems": ["T-shirt", "Schoen", "Trui"],
+                    },
+                    {
+                        "ctr": 7,
+                        "ard": 14,
+                        "arpu": 15,
+                        "mostRecomendedItems": ["Schoen", "Broek", "Trui"],
+                    },
+                    {
+                        "ctr": 10,
+                        "ard": 15,
+                        "arpu": 25,
+                        "mostRecomendedItems": ["BH", "Trui", "Broek"],
+                    }
+                ]
+            },
+            "NotAlgDependent":[
+                {
+                    "Purchases": 80,
+                    "Revenue": 100,
+                    "activeUsersAmount": 150
+                },
+                {
+                    "Purchases": 70,
+                    "Revenue": 120,
+                    "activeUsersAmount": 153
+                },
+                {
+                    "Purchases": 76,
+                    "Revenue": 110,
+                    "activeUsersAmount": 158
+                }
+            ]
+        });
+    }
+         */
+
+        let points1 = [];
+        let points2 = [];
+        let points3 = [];
+        let dates = [];
+        let currentDate = new Date("05/01/2021");
+        for(let i = 0; i < 1000; i++){
+            points1.push({
+                        "ctr": Math.floor(Math.random() * 100),
+                        "ard": Math.floor(Math.random() * 100),
+                        "arpu": Math.floor(Math.random() * 100),
+                        "mostRecomendedItems": ["T-shirt", "Schoen", "Trui"],
+                    });
+
+            points2.push({
+                        "ctr": Math.floor(Math.random() * 100),
+                        "ard": Math.floor(Math.random() * 100),
+                        "arpu": Math.floor(Math.random() * 100),
+                        "mostRecomendedItems": ["T-shirt", "Schoen", "Trui"],
+                    })
+
+            points3.push(
+                {
+                    "Purchases": Math.floor(Math.random() * 100),
+                    "Revenue": Math.floor(Math.random() * 100),
+                    "activeUsersAmount": Math.floor(Math.random() * 100)
+                }
+            )
+            dates.push((currentDate.getDay() + 1) + "/" + (currentDate.getMonth() + 1) + "/" + currentDate.getFullYear());
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+        alert("making done");
+        setAbTestData({
+            "algorithms": {
+                "Popularity": {
+                    "points": points1,
+                    "trainingInterval": 4
+                }, "Recency": {
+                    "points": points2,
+                    "trainingInterval": 2
+                }
+            },
+            "parameters": {
+                "stepSize": 1,
+                "topK": 10,
+                "datasetId": "1",
+                "eventuele extra parameters":"?"
+            },
+            "points": dates,
+            "NotAlgDependent":points3
+        });
+    }
+
+    useEffect(() => {
+        loadData();
+    }, []);
+
+
+    useEffect(() => {
+    }, [abTestData]);
+
     return (
         <div>
             <div style={{paddingTop: 20}}>
-                <Slider max={500} min={0} step={1} values={values} setValues={setValues} />
                 <Row>
-                    <Col>
-                        <SmallInformationCard title={"AB test information"} value={20} tooltip={"Purchases from day x to day y"}/>
+                    <Col sm={1}>
+                        <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={abTestData.points[values[0]]} onChange={(e)=>{setValues([abTestData.points.indexOf(e.target.value), values[1]])}} />
                     </Col>
-                    <Col>
-                        <SmallInformationCard title={"Purchases"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
+                    <Col sm={10}>
+                        <Slider labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />
                     </Col>
-                     <Col>
-                        <SmallInformationCard title={"Active Users"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
+                    <Col sm={1}>
+                        <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={abTestData.points[values[1]]} onChange={(e)=>{setValues([values[0], abTestData.points.indexOf(e.target.value)])}} />
                     </Col>
-                     <Col>
-                        <SmallInformationCard title={"Click Through Rate"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
+                </Row>
+                <Row>
+                    <Col sm={4}>
+                        <ABTestInformation algorithms={abTestData.algorithms} parameters={abTestData.parameters}/>
+                    </Col>
+                    <Col xs={12} md={4}>
+                        <Purchases purchases={abTestData.NotAlgDependent.Purchases}  abTestData={abTestData} startDate={values[0]} endDate={values[1]}></Purchases>
+                    </Col>
+                    <Col xs={12} md={4}>
+                        <ActiveUserCard abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
+                    </Col>
+                    <Col xs={12} md={4}>
+                        <ClickTroughRate abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
                     </Col>
                     <Col>
                         <SmallInformationCard title={"Attribution Rate"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
@@ -65,38 +225,8 @@ const ABTestOverview = () => {
                     <Col>
                         <SmallInformationCard title={"Most active users"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
                     </Col>
-                    <Col>
-                        <LargeInformationCard title={"Revenue"} value={20} tooltip={"Purchases from day x to day y"}>
-                            <h5>Total from X to Y: 20</h5>
-
-                            <Line options={{
-                                  responsive: true,
-                                  plugins: {
-                                    legend: {
-                                      position: 'top',
-                                    },
-                                    title: {
-                                      display: false,
-                                    },
-                                  },
-                                }}
-
-                            data={{
-                              labels,
-                                datasets: [
-                                {
-                                  label: 'Algoritme A',
-                                  data: [94, 530, 476, 789, 986, 389, 451],
-                                }, {
-                                  label: 'Algoritme B',
-                                  data: [60, 400, 300, 200, 70, 100, 351],
-                                }, {
-                                  label: 'Algoritme C',
-                                  data: [20, 50, 400, 80, 300, 300, 150],
-                                },
-                              ],
-                            }} />
-                        </LargeInformationCard>
+                    <Col xs={12} md={4}>
+                        <RevenueCard abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
                     </Col>
                 </Row>
 

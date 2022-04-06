@@ -7,6 +7,7 @@ import { Range } from 'react-range';
 const Slider = (props) => {
     let values = props.values;
     let setValues = props.setValues;
+    let labels = props.labels;
 
     let startProcent = 0;
     let endProcent = 0;
@@ -80,7 +81,14 @@ const Slider = (props) => {
                 backgroundColor: '#fff',
               }}
             >
-              {values[index].toFixed(1)}
+              {
+                  labels == null && values[index].toFixed(1)
+
+              }
+              {
+                  labels != null && labels[values[index].toFixed(0)]
+              }
+
             </div>
             <div
               style={{
