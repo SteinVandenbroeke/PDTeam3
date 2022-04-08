@@ -68,8 +68,8 @@ function App() {
                               <Route index element={<DataSetsList />}/>
                               <Route path="add" element={<AddDataset />}/>
                               <Route path="overview" element={<DataSetOverview />}/>
-                              <Route path="item" element={<ItemOverview/>}/>
-                              <Route path="person" element={<PersonOverview/>}/>
+                              <Route path="item/:itemid" element={<ItemOverview />}/>
+                              <Route path="person/:personid" element={<PersonOverview />}/>
                           </Route>
                           <Route path="vbPagina" element={<Home />} />
                       </Route>

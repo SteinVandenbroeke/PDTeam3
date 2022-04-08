@@ -10,7 +10,7 @@ const PersonCard = (props) => {
                 <Card.Body style={{flex: 1, padding: 0, paddingLeft: 8}}>
                     <Card.Text>{props.id}</Card.Text>
                 </Card.Body>
-                <Link to="/dashboard/dataSets/person" class={"btn"}>
+                <Link to={ "/dashboard/dataSets/person/" + props.id } class={"btn"}>
                     <Button>Info</Button>
                 </Link>
             </Card>
@@ -19,7 +19,7 @@ const PersonCard = (props) => {
 }
 
 PersonCard.defaultProps = {
-    id: "Person ID Number",
+    id: "4679",
     url: "/svg/personIcon.svg"
 }
 

@@ -1,13 +1,11 @@
 import React from 'react';
-import ItemCard from "../../../components/itemCard";
-import PersonCard from "../../../components/personCard";
+import {useParams} from "react-router-dom";
 
 const ItemOverview = () => {
+    const {itemid} = useParams()
     return (
         <div>
-            <div style={{paddingTop: 20}}>
-                ITEM
-            </div>
+            {itemid}
         </div>
     )
 }

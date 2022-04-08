@@ -15,7 +15,7 @@ const ItemCard = (props) => {
                         {props.desc}
                     </Card.Text>
                 </Card.Body>
-                <Link to="/dashboard/dataSets/item" class={"btn"}>
+                <Link to={"/dashboard/dataSets/item/" + props.id} class={"btn"}>
                     <Button>Info</Button>
                 </Link>
             </Card>
@@ -26,7 +26,8 @@ const ItemCard = (props) => {
 ItemCard.defaultProps = {
     name: "Item Name",
     desc: "Short Item Description",
-    url: "/svg/itemIcon.svg"
+    url: "/svg/itemIcon.svg",
+    id: "1235"
 }
 
 export default ItemCard;
