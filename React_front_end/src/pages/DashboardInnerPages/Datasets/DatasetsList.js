@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React from 'react';
-import {Col, Row, Table, Button} from "react-bootstrap";
+import {Button} from "react-bootstrap";
 import Icon from 'react-eva-icons';
 import LogicTable from "../../../components/logicTable"
 import {Link, useNavigate} from "react-router-dom";
@@ -8,7 +8,7 @@ import {Link, useNavigate} from "react-router-dom";
 const DataSetsList = () => {
     const navigation = useNavigate();
     function openDataSet(id){
-        navigation("/dashboard/dataSets/overview");
+        navigation("/dashboard/dataSets/overview/" + id);
     }
 
     return (
