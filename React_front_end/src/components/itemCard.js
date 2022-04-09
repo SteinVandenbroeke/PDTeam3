@@ -5,7 +5,7 @@ import {Link} from "react-router-dom";
 const ItemCard = (props) => {
     return (
         <div style={{paddingTop:10}}>
-            <Card className="card-horizontal shadow" style={{textAlign: "left", borderWidth: 0, borderLeftWidth: 15, borderLeftColor: "#0d6efd", display: 'flex', flexDirection: 'row', padding: 10}}>
+            <Card className="shadow" style={{textAlign: "left", borderWidth: 0, borderLeftWidth: 15, borderLeftColor: "#0d6efd", display: 'flex', flexDirection: 'row', padding: 10}}>
                 <img src={props.url} alt="Item" width="32px" height="32px" />
                 <Card.Body style={{flex: 0.3, padding: 0, paddingLeft: 8}}>
                     <Card.Text>{props.name}</Card.Text>
