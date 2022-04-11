@@ -1,11 +1,11 @@
 import React from 'react';
+import {useParams} from "react-router-dom";
 
 const PersonOverview = () => {
+    const {personid} = useParams();
     return (
         <div>
-            <div style={{paddingTop: 20}}>
-                PERSON
-            </div>
+            {personid}
         </div>
     )
 }
