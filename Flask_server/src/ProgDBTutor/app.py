@@ -7,6 +7,8 @@ from flask import Flask, request, jsonify, make_response, session, flash, redire
 from flask.templating import render_template
 
 import uuid # for public id
+
+from sqlalchemy.sql.functions import current_user
 from  werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from config import config_data
@@ -18,6 +20,8 @@ import jwt
 from datetime import datetime, timedelta
 from functools import wraps
 from flask_sqlalchemy import SQLAlchemy
+
+from Dataset import Dataset
 
 
 
@@ -90,9 +94,7 @@ def checkExtension(bestand):
         '''
 @app.route('/api/upload', methods=['GET', 'POST'])
 def uploadFile():
-
     if request.method == 'POST':
-
         if 'bestand' not in request.files:
             flash('Geen bestand gevonden')
             return make_response('No file found.', 400)
@@ -116,6 +118,30 @@ def uploadFile():
 
             return make_response('File successfully uploaded.', 201)
     return
+
+@app.route('/api/uploadDataset', methods=['GET', 'POST'])
+def uploadDataset():
+    if request.method == 'POST':
+        if 'interactionCsv' not in request.files or 'userCsv' not in request.files or 'itemCsv' not in request.files:
+            flash('Geen bestand gevonden')
+            return make_response('No file found.', 400)
+        interactionCsv = request.files['interactionCsv']  # de gebruiker heeft een bestand geselecteerd
+        userCsv = request.files['userCsv']  # de gebruiker heeft een bestand geselecteerd
+        itemCsv = request.files['interactionCsv']  # de gebruiker heeft een bestand geselecteerd
+
+        if 'interactionConnections' not in request.form or 'usersConnections' not in request.form or 'itemConnections' not in request.form:
+            flash('Geen correcte connecties')
+            return make_response('No viable connections.', 400)
+        interactionConnections = request.form.get('interactionConnections')
+        usersConnections = request.form.get('usersConnections')
+        itemConnections = request.form.get('itemConnections')
+
+        if interactionCsv.filename == '' or userCsv.filename == '' or itemCsv.filename == '': # indien geen bestand geselecteerd
+            flash('Geen bestand geselecteerd')
+            return make_response('No file selected.', 400)
+    dataset = Dataset()
+    dataset.add(userCsv, itemCsv, interactionCsv, usersConnections, itemConnections, interactionConnections)
+    return make_response('File successfully uploaded.', 201)
 
 
 # React interface, alle niet verwezen app.route's worden doorverwezen naar react interface in de react_build folder

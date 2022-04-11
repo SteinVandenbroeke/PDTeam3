@@ -19,7 +19,7 @@ const ABTestInformation = (props) => {
     }
 
     return (
-        <LargeInformationCard title={"ABTest Information"}>
+        <LargeInformationCard title={"ABTest Information"} tooltip={"Information about this ABTest"}>
               <Row>
                   <Col sm={4}>
                       <h6>Dataset ID: {props.parameters.datasetId}</h6>
