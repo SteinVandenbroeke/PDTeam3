@@ -84,7 +84,7 @@ const AddUsers = () => {
                             </Row>
                             <Row style={{padding:10}}>
                                 <Button variant="primary" type="submit">
-                                    {!loading? "Login ": "Inloggen "}
+                                    {!loading? "Submit ": "Loading "}
                                     <Spinner
                                             className={!loading? "visually-hidden": ""}
                                             as="span"
