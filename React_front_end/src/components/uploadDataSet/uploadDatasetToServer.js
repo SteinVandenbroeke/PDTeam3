@@ -81,6 +81,10 @@ const UploadDatasetToServer = (props) => {
                              { uploading === 3 &&
                               <Card.Body>
                                   <h5>Upload to server</h5>
+                                  <Form.Group className="mb-3" style={{paddingRight: "50%"}}>
+                                      <Form.Label>Dataset name</Form.Label>
+                                      <Form.Control placeholder="Dataset name" onChange={(e)=>setDataSetName(e.target.value)} />
+                                  </Form.Group>
                                   <div style={{paddingRight: "50%", paddingTop: 20, paddingBottom: 20}}>
                                       <h1>Er ging iets fout bij het uploaden</h1>
                                       <Button variant="primary" onClick={() => upload(props.interactionCSV, props.usersCSV, props.itemsCSV, props.interactionConnections, props.UsersConnections, props.itemsConnections)}>Try Again</Button>{' '}
