@@ -139,8 +139,10 @@ def uploadDataset():
         if interactionCsv.filename == '' or userCsv.filename == '' or itemCsv.filename == '': # indien geen bestand geselecteerd
             flash('Geen bestand geselecteerd')
             return make_response('No file selected.', 400)
+
+        datasetName = request.form.get('datasetName')
     dataset = Dataset()
-    dataset.add(userCsv, itemCsv, interactionCsv, usersConnections, itemConnections, interactionConnections)
+    dataset.add(datasetName, userCsv, itemCsv, interactionCsv, usersConnections, itemConnections, interactionConnections)
     return make_response('File successfully uploaded.', 201)
 
 
