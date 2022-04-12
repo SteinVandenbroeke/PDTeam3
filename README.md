@@ -53,3 +53,26 @@ config_data['app_name'] = 'appname' (ProgDB Tutor)
 config_data['dbname'] = 'dbname' (dbtutor)  
 config_data['dbuser'] = 'user' (app)  
 config_data['uri'] = 'postgresql://username:password@localhost:5432/dbname'  
+
+## database ##
+
+### create user: ###
+```create user postgrespython with encrypted password 'dbAdmin';```
+
+### create database ###
+```CREATE DATABASE avsaDB OWNER postgresPython;```
+
+### create connection with database to datagrip ###
+add > data source > postgreSQL >  
+gegevens:
+name = avsadb 
+host = localhost
+user = postgrespython
+password = dbAdmin
+database = avsadb
+port = 5433 or default
+-> test connection
+
+### import datascheme ###
+right click public > Run SQL script... > Select schemaInitialization.sql
+
