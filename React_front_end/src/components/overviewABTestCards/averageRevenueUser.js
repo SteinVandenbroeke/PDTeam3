@@ -36,13 +36,15 @@ const AverageRevenueUser = (props) => {
         Letlabels(allData.points.slice(begin, end + 1));
 
         let data = [];
-        let totalRev = 0;
+        let totalAverageRevenue = 0;
         allData.NotAlgDependent.slice(begin, end + 1).map((value, index) =>{
-                    data.push(value.Revenue);
-                    totalRev += value.Revenue;
+                    data.push(value.Revenue/value.activeUsersAmount);
+                    if(value.activeUsersAmount > 0){
+                     totalAverageRevenue += value.Revenue/value.activeUsersAmount;
+                    }
                 });
 
-        setTotalRevenue(totalRev);
+        setTotalRevenue((totalAverageRevenue/allData.points.slice(begin, end + 1).length).toFixed(2));
         setDatasets(datasets => [...datasets, {
                   label: "Revenue",
                   data: data,

@@ -61,7 +61,7 @@ function App() {
                           <Route path="abTests" element={<ABTestsIndex />}>
                               <Route index element={<ABTestsList />}/>
                               <Route path="add" element={<AddABTest />}/>
-                              <Route path="overview" element={<ABTestOverview />}/>
+                              <Route path="overview/:abTestId" element={<ABTestOverview />}/>
                           </Route>
 
                           <Route path="dataSets" element={<DatasetsIndex />}>
