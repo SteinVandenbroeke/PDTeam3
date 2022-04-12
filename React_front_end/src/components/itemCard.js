@@ -15,7 +15,7 @@ const ItemCard = (props) => {
                         {props.desc}
                     </Card.Text>
                 </Card.Body>
-                <Link to={"/dashboard/dataSets/item/" + props.id} class={"btn"}>
+                <Link to={"/dashboard/dataSets/overview/" + props.setid + "/item/" + props.id} class={"btn"}>
                     <Button>Info</Button>
                 </Link>
             </Card>
