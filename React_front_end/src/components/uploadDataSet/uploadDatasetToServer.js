@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 
 const UploadDatasetToServer = (props) => {
     let [uploading , setUploading] = useState(0);
+    let [dataSetName , setDataSetName] = useState(0);
 
     function upload(csvInteractions, csvUsers, csvItems, interactionConnections, usersConnections, itemConnections){
         setUploading(1);
@@ -18,6 +19,7 @@ const UploadDatasetToServer = (props) => {
         formData.append('interactionCsv', csvInteractions);
         formData.append('userCsv', csvUsers);
         formData.append('itemCsv', csvItems);
+        formData.append('datasetName', dataSetName);
         request.sendPost("uploadDataset",formData).then(function(){}).catch(error => {toast.error(error.message); setUploading(3)});
 
     }
@@ -30,6 +32,10 @@ const UploadDatasetToServer = (props) => {
                             { uploading === 0 &&
                               <Card.Body>
                                   <h5>Upload to server</h5>
+                                  <Form.Group className="mb-3" style={{paddingRight: "50%"}}>
+                                      <Form.Label>Dataset name</Form.Label>
+                                      <Form.Control placeholder="Dataset name" onChange={(e)=>setDataSetName(e.target.value)} />
+                                  </Form.Group>
                                   <div style={{paddingRight: "50%", paddingTop: 20, paddingBottom: 20}}>
                                       {props.files.map((file, index) => {
                                         return (
