@@ -11,7 +11,7 @@ const Purchases = (props) => {
     const [labels, Letlabels] = React.useState([]);
     const [datasets, setDatasets]  = React.useState([]);
     const [totalPurchases, setTotalPurchases]  = React.useState(0);
-    const [loading, setLoading] = React.useState(false);
+    const [loading, setLoading] = React.useState(true);
 
     async function processData(begin, end){
         setLoading(true);

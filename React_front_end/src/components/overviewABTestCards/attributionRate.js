@@ -4,50 +4,45 @@ import {useNavigate } from "react-router-dom";
 import React, {useEffect} from "react";
 import LargeInformationCard from "../largeInformationCard";
 import { Line } from 'react-chartjs-2';
-import {
-Chart as ChartJS,
-CategoryScale,
-LinearScale,
-PointElement,
-LineElement,
-Title,
-Tooltip,
-Legend,
-} from 'chart.js';
-import SmallInformationCard from "../smallInformationCard";
 
-const RevenueCard = (props) => {
+
+const Purchases = (props) => {
     const navigation = useNavigate();
     const [labels, Letlabels] = React.useState([]);
     const [datasets, setDatasets]  = React.useState([]);
-    const [totalRevenue, setTotalRevenue]  = React.useState(0);
+    const [avargeARD, setavargeARD]  = React.useState([]);
     const [loading, setLoading] = React.useState(true);
 
-
-    function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
     async function processData(begin, end){
+        //TODO check if correct
         setLoading(true);
         setDatasets([]);
+        setavargeARD([]);
+        Letlabels([])
         let allData = props.abTestData;
 
         Letlabels(allData.points.slice(begin, end + 1));
 
         let data = [];
-        let totalRev = 0;
-        allData.NotAlgDependent.slice(begin, end + 1).map((value, index) =>{
-                    data.push(value.Revenue);
-                    totalRev += value.Revenue;
-                });
+        for(let algorithm in allData.algorithms){
+            let data = [];
+            let avargeARDTemp = 0;
+            allData.algorithms[algorithm].points.slice(begin, end + 1).map((value1, index) =>{
+                data.push(value1.ard);
+                avargeARDTemp += value1.ard;
+            });
 
-        setTotalRevenue(totalRev);
-        setDatasets(datasets => [...datasets, {
-                  label: "Revenue",
+            setDatasets(datasets => [...datasets, {
+                  label: algorithm,
                   data: data,
                 }]);
-        setLoading(false);
+
+            let avarge = (avargeARDTemp/props.abTestData.points.slice(begin, end + 1).length).toFixed(2);
+            setavargeARD(avargeARD => [...avargeARD,
+                  [algorithm, avarge]
+                ]);
+            setLoading(false);
+        }
     }
 
     useEffect(() => {
@@ -55,9 +50,13 @@ const RevenueCard = (props) => {
     }, [props.abTestData, props.startDate, props.endDate]);
 
     return (
-        <LargeInformationCard loading={loading} title={"Revenue"} tooltip={"Revenue from day x to day y"}>
-            <h5>Total from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: € {totalRevenue}</h5>
-            {labels.length < 500 &&
+        <LargeInformationCard loading={loading} title={"Attribution Rate"} tooltip={"Purchases from day x to day y"}>
+            {
+                avargeARD.map((value, index) => {
+                    {return <h5>Avarage AR for {value[0]} from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: {value[1]}</h5>}
+                })
+            }
+            {labels.length < 50 &&
             <Line options={{
                 backgroundColor: 'rgba(13,110,253,1)',
                 borderColor: 'rgba(13,110,253,0.5)',
@@ -75,10 +74,10 @@ const RevenueCard = (props) => {
             data={{
               labels, datasets: datasets
             }} />}
-            {labels.length >= 500 &&
+            {labels.length >= 50 &&
                 <p style={{color: "red"}}>To many datapoints to show in a graph</p>}
         </LargeInformationCard>
         )
 };
 
-export default RevenueCard;
+export default Purchases;

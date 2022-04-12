@@ -23,6 +23,7 @@ import ABTestInformation from "../../../components/overviewABTestCards/ABTestInf
 import ActiveUserCard from "../../../components/overviewABTestCards/activeUserCard";
 import Purchases from "../../../components/overviewABTestCards/Purchases";
 import ClickTroughRate from "../../../components/overviewABTestCards/ClickTroughRate";
+import AttributionRate from "../../../components/overviewABTestCards/attributionRate";
 
 ChartJS.register(
 CategoryScale,
@@ -211,7 +212,7 @@ const ABTestOverview = () => {
                         <ClickTroughRate abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
                     </Col>
                     <Col>
-                        <SmallInformationCard title={"Attribution Rate"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
+                        <AttributionRate abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
                     </Col>
                     <Col>
                         <SmallInformationCard title={"Average Revenue Per User"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>

@@ -11,7 +11,7 @@ const Purchases = (props) => {
     const [labels, Letlabels] = React.useState([]);
     const [datasets, setDatasets]  = React.useState([]);
     const [avargeCTR, setavargeCTR]  = React.useState([]);
-    const [loading, setLoading] = React.useState(false);
+    const [loading, setLoading] = React.useState(true);
 
     async function processData(begin, end){
         setLoading(true);
@@ -25,7 +25,7 @@ const Purchases = (props) => {
         for(let algorithm in allData.algorithms){
             let data = [];
             let avargeCTRTemp = 0;
-            allData.algorithms[algorithm].points.map((value1, index) =>{
+            allData.algorithms[algorithm].points.slice(begin, end + 1).map((value1, index) =>{
                 data.push(value1.ctr);
                 avargeCTRTemp += value1.ctr;
             });
@@ -35,7 +35,7 @@ const Purchases = (props) => {
                   data: data,
                 }]);
 
-            let avarge = (avargeCTRTemp/props.abTestData.points.length).toFixed(2);
+            let avarge = (avargeCTRTemp/props.abTestData.points.slice(begin, end + 1).length).toFixed(2);
             setavargeCTR(avargeCTR => [...avargeCTR,
                   [algorithm, avarge]
                 ]);

@@ -16,7 +16,7 @@ Legend,
 } from 'chart.js';
 import SmallInformationCard from "../smallInformationCard";
 
-const RevenueCard = (props) => {
+const AverageRevenueUser = (props) => {
     const navigation = useNavigate();
     const [labels, Letlabels] = React.useState([]);
     const [datasets, setDatasets]  = React.useState([]);
@@ -55,7 +55,7 @@ const RevenueCard = (props) => {
     }, [props.abTestData, props.startDate, props.endDate]);
 
     return (
-        <LargeInformationCard loading={loading} title={"Revenue"} tooltip={"Revenue from day x to day y"}>
+        <LargeInformationCard loading={loading} title={"Average Revenue per user"} tooltip={"Revenue from day x to day y"}>
             <h5>Total from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: € {totalRevenue}</h5>
             {labels.length < 500 &&
             <Line options={{
@@ -81,4 +81,4 @@ const RevenueCard = (props) => {
         )
 };
 
-export default RevenueCard;
+export default AverageRevenueUser;
