@@ -10,7 +10,7 @@ const PersonCard = (props) => {
                 <Card.Body style={{flex: 1, padding: 0, paddingLeft: 8}}>
                     <Card.Text>{props.id}</Card.Text>
                 </Card.Body>
-                <Link to={"/dashboard/dataSets/overview/" + props.setid + "/item/" + props.id} class={"btn"}>
+                <Link to={"/dashboard/dataSets/overview/" + props.setid + "/person/" + props.id} class={"btn"}>
                     <Button>Info</Button>
                 </Link>
             </Card>
