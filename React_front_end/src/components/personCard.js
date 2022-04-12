@@ -10,7 +10,7 @@ const PersonCard = (props) => {
                 <Card.Body style={{flex: 1, padding: 0, paddingLeft: 8}}>
                     <Card.Text>{props.id}</Card.Text>
                 </Card.Body>
-                <Link to={ "/dashboard/dataSets/person/" + props.id } class={"btn"}>
+                <Link to={"/dashboard/dataSets/overview/" + props.setid + "/item/" + props.id} class={"btn"}>
                     <Button>Info</Button>
                 </Link>
             </Card>
@@ -20,7 +20,8 @@ const PersonCard = (props) => {
 
 PersonCard.defaultProps = {
     id: "4679",
-    url: "/svg/personIcon.svg"
+    url: "/svg/personIcon.svg",
+    setid: "0"
 }
 
 export default PersonCard;

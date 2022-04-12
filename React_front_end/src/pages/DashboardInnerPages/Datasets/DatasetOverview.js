@@ -12,8 +12,8 @@ const DataSetOverview = () => {
                       {"itemid": "8572", "name": "Leather Boot", "desc": "Black waterproof leather boot"}];
     const dataPeople =[{"personid": "4758", "name": "Jhon Deer"},
                        {"personid": "1121", "name": "Eric Tea"}];
-    const listItems = dataItems.map((d) => <ItemCard name={d.name} desc={d.desc} id={d.itemid}/>);
-    const listPeople = dataPeople.map((d) => <PersonCard id={d.personid} />);
+    const listItems = dataItems.map((d) => <ItemCard name={d.name} desc={d.desc} id={d.itemid} setid={setid}/>);
+    const listPeople = dataPeople.map((d) => <PersonCard id={d.personid} setid={setid}/>);
 
     return (
         <div>

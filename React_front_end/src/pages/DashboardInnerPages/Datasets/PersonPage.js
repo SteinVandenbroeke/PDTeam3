@@ -2,10 +2,10 @@ import React from 'react';
 import {useParams} from "react-router-dom";
 
 const PersonOverview = () => {
-    const {personid} = useParams();
+    const {setid, personid} = useParams();
     return (
         <div>
-            {personid}
+            {personid} from dataset {setid}
         </div>
     )
 }
