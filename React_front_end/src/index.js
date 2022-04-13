@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import './styles/cardComponent.css';
+import './styles/component.css';
+import './styles/page.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 

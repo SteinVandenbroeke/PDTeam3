@@ -1,5 +1,4 @@
 .accordion {
-    max-width: 900px;
     margin: 1rem auto;
 }
 
@@ -17,6 +16,11 @@
 .accordion-title,
 .accordion-content {
     padding: 10px;
+}
+
+.accordion-content{
+    overflow-y: scroll;
+    max-height: 265px;
 }
 
 .accordion-title-text{
