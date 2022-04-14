@@ -128,7 +128,7 @@ class Dataset():
         purchaseData = pd.read_csv(purchasesCSV)
         purchaseDf = pd.DataFrame(purchaseData)
         purchaseConnections = json.loads(purchaseConnections)
-        createCustomersTable = 'CREATE TABLE ' + purchaseTableName + '(timestamp timestamp, user_id int, item_id int, parameter int);'
+        createCustomersTable = 'CREATE TABLE ' + purchaseTableName + '(timestamp timestamp, user_id int, item_id int, parameter int, FOREIGN KEY (user_id) REFERENCES '+ customerTableName +'(id), FOREIGN KEY (item_id) REFERENCES '+ articleTableName +'(id));'
         cursor.execute(sql.SQL(createCustomersTable))
 
         purchaseDataOrder = {}
@@ -162,8 +162,6 @@ class Dataset():
                         data += str(sortedData[i])
             createPurchaseInsert = 'insert into ' + purchaseTableName + ' values (' + data + ')'
             cursor.execute(sql.SQL(createPurchaseInsert))
-
-        #Foreign keys
 
 
         connection.commit()

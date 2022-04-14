@@ -143,7 +143,7 @@ def uploadDataset():
         datasetName = request.form.get('datasetName')
     dataset = Dataset()
     dataset.add(datasetName, userCsv, itemCsv, interactionCsv, usersConnections, itemConnections, interactionConnections)
-    return make_response('File successfully uploaded.', 201)
+    return make_response('{"message": "File successfully uploaded."}', 201)
 
 
 # React interface, alle niet verwezen app.route's worden doorverwezen naar react interface in de react_build folder
