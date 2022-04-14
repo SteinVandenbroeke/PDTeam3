@@ -127,7 +127,7 @@ def uploadDataset():
             return make_response('No file found.', 400)
         interactionCsv = request.files['interactionCsv']  # de gebruiker heeft een bestand geselecteerd
         userCsv = request.files['userCsv']  # de gebruiker heeft een bestand geselecteerd
-        itemCsv = request.files['interactionCsv']  # de gebruiker heeft een bestand geselecteerd
+        itemCsv = request.files['itemCsv']  # de gebruiker heeft een bestand geselecteerd
 
         if 'interactionConnections' not in request.form or 'usersConnections' not in request.form or 'itemConnections' not in request.form:
             flash('Geen correcte connecties')
