@@ -57,8 +57,8 @@ class Dataset():
                 if i != 0:
                     data += ', '
                 if isinstance(sortedData[i], str):
-                    sortedData[i] = sortedData[i].replace('\'', '\\\'')
-                    sortedData[i] = sortedData[i].replace('\"', '\\\"')
+                    sortedData[i] = sortedData[i].replace('\'', '')
+                    sortedData[i] = sortedData[i].replace('\"', '')
                     data += '\'' + sortedData[i] +'\''
                 else:
                     if pd.isnull(sortedData[i]):
@@ -76,7 +76,6 @@ class Dataset():
         articleParameters = 'id int PRIMARY KEY'
         id = ''
         articleDataOrder = {}
-        print(articleDf)
         for param in articleConnections['connections']:
             if articleConnections['connections'][param] == "id":
                 if id != '':
@@ -110,14 +109,12 @@ class Dataset():
                     sortedData.insert(articleDataOrder[articleConnections['csv'][i]], row[i])
             data = ""
             for i in range(len(sortedData)):
-                print(sortedData[i])
                 if i != 0:
                     data += ', '
                 if isinstance(sortedData[i], str):
-                    sortedData[i] = sortedData[i].replace('\'','\\\'')
-                    sortedData[i] = sortedData[i].replace('\"','\\\"')
+                    sortedData[i] = sortedData[i].replace('\'','')
+                    sortedData[i] = sortedData[i].replace('\"','')
                     data += '\'' + sortedData[i] +'\''
-                    print(sortedData[i])
                 else:
                     if pd.isnull(sortedData[i]):
                         data += '0'
