@@ -25,6 +25,7 @@ import Purchases from "../../../components/overviewABTestCards/Purchases";
 import ClickTroughRate from "../../../components/overviewABTestCards/ClickTroughRate";
 import AttributionRate from "../../../components/overviewABTestCards/attributionRate";
 import AverageRevenueUser from "../../../components/overviewABTestCards/averageRevenueUser";
+import MostRecomendedItems from "../../../components/overviewABTestCards/mostRecomendedItems";
 
 ChartJS.register(
 CategoryScale,
@@ -219,6 +220,7 @@ const ABTestOverview = () => {
                         <AverageRevenueUser abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
                     </Col>
                     <Col>
+                        <MostRecomendedItems abTestData={abTestData} startDate={values[0]} endDate={values[1]}/>
                         <SmallInformationCard title={"Most recomended items"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
                     </Col>
                     <Col>

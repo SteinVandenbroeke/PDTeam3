@@ -35,7 +35,7 @@ export class UploadDataSet{
         let matrix = [];
         let rows = csvFileText.split("\n")
 
-        loadConnections(rows[0].split(","), setConnectionHeaders, connectionHeaders)
+        loadConnections(rows[0].replace("\r", "").split(","), setConnectionHeaders, connectionHeaders)
         rows.map((row) => {
             let column = row.split(",")
             let rowArray = [];

@@ -23,11 +23,6 @@ const AverageRevenueUser = (props) => {
     const [totalRevenue, setTotalRevenue]  = React.useState(0);
     const [loading, setLoading] = React.useState(true);
 
-
-    function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
     async function processData(begin, end){
         setLoading(true);
         setDatasets([]);
