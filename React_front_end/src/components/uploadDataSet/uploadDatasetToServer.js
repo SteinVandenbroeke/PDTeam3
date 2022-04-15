@@ -20,7 +20,7 @@ const UploadDatasetToServer = (props) => {
         formData.append('userCsv', csvUsers);
         formData.append('itemCsv', csvItems);
         formData.append('datasetName', dataSetName);
-        request.sendPost("uploadDataset",formData).then(message => {toast.success(message.message); setUploading(3)}).catch(error => {toast.error(error.message); setUploading(3)});
+        request.sendPost("uploadDataset",formData).then(message => {toast.success(message.message); setUploading(2)}).catch(error => {toast.error(error.message); setUploading(3)});
     }
 
     return (
