@@ -55,6 +55,8 @@ const RevenueCard = (props) => {
             {labels.length < 500 &&
             <Line options={{
                   responsive: true,
+                  backgroundColor: 'rgba(13,110,253,1)',
+                  borderColor: 'rgba(13,110,253,0.5)',
                   plugins: {
                     legend: {
                       position: 'top',

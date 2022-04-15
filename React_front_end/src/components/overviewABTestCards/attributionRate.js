@@ -12,6 +12,7 @@ const Purchases = (props) => {
     const [datasets, setDatasets]  = React.useState([]);
     const [avargeARD, setavargeARD]  = React.useState([]);
     const [loading, setLoading] = React.useState(true);
+    const graphColors = ['#0d6efd', '#84c98b', '#27292d', '#bc1ed7', '#2b2b2b', '#0c1f3d', '#84c98b']
 
     async function processData(begin, end){
         //TODO check if correct
@@ -24,6 +25,7 @@ const Purchases = (props) => {
         Letlabels(allData.points.slice(begin, end + 1));
 
         let data = [];
+        let colorCounter = 0;
         for(let algorithm in allData.algorithms){
             let data = [];
             let avargeARDTemp = 0;
@@ -32,17 +34,25 @@ const Purchases = (props) => {
                 avargeARDTemp += value1.ard;
             });
 
+            let colorGraph = graphColors[colorCounter];
             setDatasets(datasets => [...datasets, {
                   label: algorithm,
                   data: data,
+                  backgroundColor: colorGraph,
+                  borderColor: colorGraph + 80,
                 }]);
 
             let avarge = (avargeARDTemp/props.abTestData.points.slice(begin, end + 1).length).toFixed(2);
             setavargeARD(avargeARD => [...avargeARD,
                   [algorithm, avarge]
                 ]);
-            setLoading(false);
+
+            colorCounter++;
+            if(colorCounter >= graphColors.length){
+                colorCounter = 0;
+            }
         }
+        setLoading(false);
     }
 
     useEffect(() => {

@@ -20,6 +20,15 @@ const CSVUploadSettings = (props) => {
         request.readFileText();
     }
 
+    function nexStep(){
+        /*
+        console.log(props.csvDbConnections)
+        if("t_dat" in props.csvDbConnections.connections){
+            console.log("ok")
+        }*/
+        props.setCurrentStep(props.currentStep + 1)
+    }
+
     return (
         <div style={{textAlign: "left"}}>
             <Row style={{paddingTop: 20}}>
@@ -29,7 +38,7 @@ const CSVUploadSettings = (props) => {
                           <h5>CSV to db conversion</h5>
                           <ConnectComponent data={props.csvDbConnections} dataSetFunction={props.setCsvDbConnections}></ConnectComponent>
                           <Button variant="secondary" onClick={()=>props.setCurrentStep(props.currentStep - 1)}>Previous</Button>{' '}
-                          <Button variant="primary" onClick={()=>props.setCurrentStep(props.currentStep + 1)}>Next</Button>
+                          <Button variant="primary" onClick={()=>nexStep()}>Next</Button>
                       </Card.Body>
                     </Card>
                 </Col>

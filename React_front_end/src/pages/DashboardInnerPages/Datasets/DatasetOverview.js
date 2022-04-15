@@ -3,7 +3,9 @@ import React from 'react';
 import ItemCard from "../../../components/itemCard"
 import PersonCard from "../../../components/personCard"
 import Accordion from "../../../components/Accordion"
-import {useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
+import {Button} from "react-bootstrap";
+import Icon from "react-eva-icons";
 
 const DataSetOverview = () => {
     const {setid} = useParams()
@@ -17,7 +19,12 @@ const DataSetOverview = () => {
 
     return (
         <div>
-            <div style={{paddingTop: 20}}>
+             <div style={{width: "100%", textAlign: "right", paddingBottom: "10px"}}>
+                <Link to={"/dashboard/dataSets/overview/" + setid + "/edit"} class={"btn"}>
+                    <Button variant="primary">Edit <Icon name="edit-outline"/></Button>
+                </Link>
+            </div>
+            <div>
                 This is dataset {setid}
                 <Accordion title="Items" data={listItems} />
                 <Accordion title="People" data={listPeople} />
