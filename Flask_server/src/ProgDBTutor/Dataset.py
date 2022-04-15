@@ -10,14 +10,17 @@ class Dataset():
     def __init__(self):
         print("")
 
-    def add(self,datasetName, customerCSV, articleCSV, purchasesCSV, customerConnections, articleConnections, purchaseConnections):
-        #connect to database
-        database = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'], userPassword=config_data['password'], dbhost=config_data['host'], dbport=config_data['port'])
+    def add(self, datasetName, customerCSV, articleCSV, purchasesCSV, customerConnections, articleConnections,
+            purchaseConnections):
+        # connect to database
+        database = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'],
+                                userPassword=config_data['password'], dbhost=config_data['host'],
+                                dbport=config_data['port'])
         connection = database.get_connection()
         cursor = connection.cursor()
 
-        #customer table:
-        customerTableName = datasetName+'_customers'
+        # customer table:
+        customerTableName = datasetName + '_customers'
         customerData = pd.read_csv(customerCSV)
         customerDf = pd.DataFrame(customerData)
         customerConnections = json.loads(customerConnections)
@@ -44,8 +47,8 @@ class Dataset():
                 elif customerConnections['connections'][param] == 'extra info (datetime)':
                     type = 'datetime'
                 customerDataOrder[param] = len(customerDataOrder)
-                customerParamaters += ', '+ param +' '+ type
-        createCustomersTable = 'CREATE TABLE ' + customerTableName + '(' + customerParamaters +');'
+                customerParamaters += ', ' + param + ' ' + type
+        createCustomersTable = 'CREATE TABLE ' + customerTableName + '(' + customerParamaters + ');'
         cursor.execute(sql.SQL(createCustomersTable))
         for row in customerDf.values:
             sortedData = []
@@ -59,7 +62,7 @@ class Dataset():
                 if isinstance(sortedData[i], str):
                     sortedData[i] = sortedData[i].replace('\'', '')
                     sortedData[i] = sortedData[i].replace('\"', '')
-                    data += '\'' + sortedData[i] +'\''
+                    data += '\'' + sortedData[i] + '\''
                 else:
                     if pd.isnull(sortedData[i]):
                         data += '0'
@@ -68,8 +71,8 @@ class Dataset():
             createCustomerInsert = 'insert into ' + customerTableName + ' values (' + data + ')'
             cursor.execute(sql.SQL(createCustomerInsert))
 
-        #article table:
-        articleTableName = datasetName+'_articles'
+        # article table:
+        articleTableName = datasetName + '_articles'
         articleData = pd.read_csv(articleCSV)
         articleDf = pd.DataFrame(articleData)
         articleConnections = json.loads(articleConnections)
@@ -94,7 +97,8 @@ class Dataset():
                     articleParameters += ', description varchar'
                 elif articleConnections['connections'][param] == 'extra info (int)':
                     articleParameters += ', ' + param + ' int'
-                elif articleConnections['connections'][param] == 'extra info (varchar)' or articleConnections['connections'][param] == 'extra info (image)':
+                elif articleConnections['connections'][param] == 'extra info (varchar)' or \
+                        articleConnections['connections'][param] == 'extra info (image)':
                     articleParameters += ', ' + param + ' varchar'
                 elif articleConnections['connections'][param] == 'extra info (datetime)':
                     articleParameters += ', ' + param + ' datetime'
@@ -112,9 +116,9 @@ class Dataset():
                 if i != 0:
                     data += ', '
                 if isinstance(sortedData[i], str):
-                    sortedData[i] = sortedData[i].replace('\'','')
-                    sortedData[i] = sortedData[i].replace('\"','')
-                    data += '\'' + sortedData[i] +'\''
+                    sortedData[i] = sortedData[i].replace('\'', '')
+                    sortedData[i] = sortedData[i].replace('\"', '')
+                    data += '\'' + sortedData[i] + '\''
                 else:
                     if pd.isnull(sortedData[i]):
                         data += '0'
@@ -123,12 +127,12 @@ class Dataset():
             createArticleInsert = 'insert into ' + articleTableName + ' values (' + data + ')'
             cursor.execute(sql.SQL(createArticleInsert))
 
-        #purchase table:
-        purchaseTableName = datasetName+'_purchases'
+        # purchase table:
+        purchaseTableName = datasetName + '_purchases'
         purchaseData = pd.read_csv(purchasesCSV)
         purchaseDf = pd.DataFrame(purchaseData)
         purchaseConnections = json.loads(purchaseConnections)
-        createCustomersTable = 'CREATE TABLE ' + purchaseTableName + '(timestamp timestamp, user_id int, item_id int, parameter int, FOREIGN KEY (user_id) REFERENCES '+ customerTableName +'(id), FOREIGN KEY (item_id) REFERENCES '+ articleTableName +'(id));'
+        createCustomersTable = 'CREATE TABLE ' + purchaseTableName + '(timestamp timestamp, user_id int, item_id int, parameter int, FOREIGN KEY (user_id) REFERENCES ' + customerTableName + '(id), FOREIGN KEY (item_id) REFERENCES ' + articleTableName + '(id));'
         cursor.execute(sql.SQL(createCustomersTable))
 
         purchaseDataOrder = {}
@@ -148,6 +152,15 @@ class Dataset():
                 if purchaseConnections['csv'][i] in purchaseDataOrder:
                     sortedData.insert(purchaseDataOrder[purchaseConnections['csv'][i]], row[i])
             data = ""
+
+            """
+            kan worden vervangen door:
+            procentString = ("%s," * len(sortedData))
+            procentString = procentString[:-1]
+            createPurchaseInsert = 'insert into ' + purchaseTableName + ' values (' + procentString + ' )'
+            cursor.execute(createPurchaseInsert, tuple(sortedData))
+            start
+            """
             for i in range(len(sortedData)):
                 if i != 0:
                     data += ', '
@@ -162,12 +175,51 @@ class Dataset():
                         data += str(sortedData[i])
             createPurchaseInsert = 'insert into ' + purchaseTableName + ' values (' + data + ')'
             cursor.execute(sql.SQL(createPurchaseInsert))
-
+            """
+            end
+            """
 
         connection.commit()
         connection.close()
         cursor.close()
         print("succes")
+
+    def change(self, datasetName, table, colm, value, id):
+        database = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'],
+                                userPassword=config_data['password'], dbhost=config_data['host'],
+                                dbport=config_data['port'])
+        connection = database.get_connection()
+        cursor = connection.cursor()
+
+        if not table in ["articles", "customers"]:
+            return ("Worng table type", 500)
+
+        table = datasetName + "_" + table
+        cursor.execute(sql.SQL("UPDATE {table} SET {col}=%s WHERE id=%s").format(table=sql.Identifier(table), col=sql.Identifier(colm)),[value, id])
+        connection.commit()
+        connection.close()
+        cursor.close()
+        return ('{"message": "Record succesfully edit"}', 201)
+
+    def changeApiWrapper(self, request):
+        if request.method == 'POST':
+            if 'dataSet' not in request.form or 'id' not in request.form or 'table' not in request.form or 'colmName' not in request.form or 'value' not in request.form:
+                return ('Missing form data.', 400)
+            table = request.form.get('table')
+            colmName = request.form.get('colmName')
+            value = request.form.get('value')
+            itemId = request.form.get('id')
+            dataSet = request.form.get('dataSet')
+
+            returnValue = self.change(dataSet, table, colmName, value, itemId)
+            return (returnValue[0], returnValue[1])
+        else:
+            return ('Wrong request', 400)
+
+    def getRecordById(self, id, table):
+        if not table in ["articles", "customers"]:
+            return ("Worng table type", 500)
+
 
 
     def addapt_numpy_float64(numpy_float64):

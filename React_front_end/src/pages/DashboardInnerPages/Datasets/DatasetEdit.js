@@ -62,7 +62,7 @@ const DataSetEdit = () => {
                                                       <Row>
                                                         <Col xs={10} style={{paddingRight: 0}}>
                                                             <Form.Control type="text" name="colmName" value={item.dbName} style={{borderTopRightRadius: 0, borderBottomRightRadius: 0, display: "none"}} />
-                                                            <Form.Control type="text" name="Value" value={item.dbValue} style={{borderTopRightRadius: 0, borderBottomRightRadius: 0}} />
+                                                            <Form.Control type="text" name="value" value={item.dbValue} style={{borderTopRightRadius: 0, borderBottomRightRadius: 0}} />
                                                         </Col>
                                                         <Col xs={2} style={{paddingLeft: 0}}>
                                                           <Button variant="primary" type="submit" style={{borderTopLeftRadius: 0, borderBottomLeftRadius: 0}}>
