@@ -70,6 +70,7 @@ function App() {
                               <Route path="add" element={<AddDataset />}/>
                               <Route path="overview/:setid" element={<DataSetOverview />}/>
                               <Route path="overview/:setid/item/:itemid" element={<ItemOverview />}/>
+                              <Route path="overview/:setid/person/:personid" element={<PersonOverview />}/>
                               <Route path="overview/:setid/edit/" element={<DatasetEdit />}/>
                           </Route>
                           <Route path="vbPagina" element={<Home />} />
