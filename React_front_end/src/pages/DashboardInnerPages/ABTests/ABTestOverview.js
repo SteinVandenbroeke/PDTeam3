@@ -25,6 +25,7 @@ import Purchases from "../../../components/overviewABTestCards/Purchases";
 import ClickTroughRate from "../../../components/overviewABTestCards/ClickTroughRate";
 import AttributionRate from "../../../components/overviewABTestCards/attributionRate";
 import AverageRevenueUser from "../../../components/overviewABTestCards/averageRevenueUser";
+import MostRecomendedItems from "../../../components/overviewABTestCards/mostRecomendedItems";
 
 ChartJS.register(
 CategoryScale,
@@ -130,19 +131,21 @@ const ABTestOverview = () => {
         let points3 = [];
         let dates = [];
         let currentDate = new Date("05/01/2021");
-        for(let i = 0; i < 1000; i++){
+
+        let mostrecItems = ["Trui", "Jas", "Schoenen", "Bh", "T-shirt", "Broek", "Sokken", "Onderbroek", "Topje"]
+        for(let i = 0; i < 100; i++){
             points1.push({
                         "ctr": Math.floor(Math.random() * 100),
                         "ard": Math.floor(Math.random() * 100),
                         "arpu": Math.floor(Math.random() * 100),
-                        "mostRecomendedItems": ["T-shirt", "Schoen", "Trui"],
+                        "mostRecomendedItems": [mostrecItems[Math.floor(Math.random()*mostrecItems.length)], mostrecItems[Math.floor(Math.random()*mostrecItems.length)], mostrecItems[Math.floor(Math.random()*mostrecItems.length)]],
                     });
 
             points2.push({
                         "ctr": Math.floor(Math.random() * 100),
                         "ard": Math.floor(Math.random() * 100),
                         "arpu": Math.floor(Math.random() * 100),
-                        "mostRecomendedItems": ["T-shirt", "Schoen", "Trui"],
+                        "mostRecomendedItems": [mostrecItems[Math.floor(Math.random()*mostrecItems.length)], mostrecItems[Math.floor(Math.random()*mostrecItems.length)], mostrecItems[Math.floor(Math.random()*mostrecItems.length)]],
                     })
 
             points3.push(
@@ -210,25 +213,25 @@ const ABTestOverview = () => {
                         <ActiveUserCard abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
                     </Col>
                     <Col xs={12} md={4}>
-                        <ClickTroughRate abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
-                    </Col>
-                    <Col>
-                        <AttributionRate abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
-                    </Col>
-                    <Col>
-                        <AverageRevenueUser abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
-                    </Col>
-                    <Col>
-                        <SmallInformationCard title={"Most recomended items"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
-                    </Col>
-                    <Col>
-                        <SmallInformationCard title={"Most buyed items"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
-                    </Col>
-                    <Col>
-                        <SmallInformationCard title={"Most active users"} value={20} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
+                        <RevenueCard abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
                     </Col>
                     <Col xs={12} md={4}>
-                        <RevenueCard abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
+                        <AverageRevenueUser abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
+                    </Col>
+                    <Col xs={12} md={4}>
+                        <ClickTroughRate abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
+                    </Col>
+                    <Col xs={12} md={4}>
+                        <AttributionRate abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
+                    </Col>
+                    <Col xs={12} md={4}>
+                        <MostRecomendedItems abTestData={abTestData} startDate={values[0]} endDate={values[1]}/>
+                    </Col>
+                    <Col xs={2}>
+                        <SmallInformationCard title={"Most buyed items"} value={<Button>Full list</Button>} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
+                    </Col>
+                    <Col xs={2}>
+                        <SmallInformationCard title={"Most active users"} value={<Button>Full list</Button>} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
                     </Col>
                 </Row>
 

@@ -29,6 +29,7 @@ import AddUsers from "./pages/Users/AddUser";
 import UserList from "./pages/Users/UserList";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import DatasetEdit from "./pages/DashboardInnerPages/Datasets/DatasetEdit";
 
 
 let userSession = createContext();
@@ -69,7 +70,7 @@ function App() {
                               <Route path="add" element={<AddDataset />}/>
                               <Route path="overview/:setid" element={<DataSetOverview />}/>
                               <Route path="overview/:setid/item/:itemid" element={<ItemOverview />}/>
-                              <Route path="overview/:setid/person/:personid" element={<PersonOverview />}/>
+                              <Route path="overview/:setid/edit/" element={<DatasetEdit />}/>
                           </Route>
                           <Route path="vbPagina" element={<Home />} />
                       </Route>

@@ -45,7 +45,6 @@ user = User(db)
 def token_required_def(f):
     return user.token_required(f)
 
-
 # User Database Route
 # this route sends back list of users users
 @app.route('/api/user', methods =['GET'])
@@ -53,71 +52,19 @@ def token_required_def(f):
 def get_all_users_def():
     return user.get_all_users(current_user)
 
-
 # route for logging user in
 @app.route('/api/login', methods =['POST'])
 def login_def():
     return user.login()
-
 
 # signup route
 @app.route('/api/signup', methods =['POST'])
 def signup_def():
     return user.signup()
 
-
-
 @app.route('/api/helloWorld')
 def helloWorld():
     return "Hallo world"
-
-
-uploadsFolder = '/uploads'
-goodExtensions = {'txt', 'json'}
-appl = Flask(__name__)
-appl.config['UPLOAD_FOLDER'] = uploadsFolder
-appl.config['MAX_CONTENT_LENGTH'] = 5000000  # max input bestanden van 5 MB
-
-# inspiratie gehaald voor deze code van https://flask.palletsprojects.com/
-def checkExtension(bestand):
-    return '.' in bestand and \
-           bestand.rsplit('.', 1)[1].lower() in goodExtensions
-
-'''
-        <!doctype html>
-        <title>Upload nieuw Bestand</title>
-        <h1>Upload nieuw Bestand</h1>
-        <form method=post enctype=multipart/form-data>
-          <input type=file name=bestand>
-          <input type=submit value=Upload>
-        </form>
-        '''
-@app.route('/api/upload', methods=['GET', 'POST'])
-def uploadFile():
-    if request.method == 'POST':
-        if 'bestand' not in request.files:
-            flash('Geen bestand gevonden')
-            return make_response('No file found.', 400)
-
-        bestand = request.files['bestand']  # de gebruiker heeft een bestand geselecteerd
-
-        if bestand.filename == '': # indien geen bestand geselecteerd
-            flash('Geen bestand geselecteerd')
-            return make_response('No file selected.', 400)
-
-        #if bestand and checkExtension(bestand.filename):
-        if bestand:
-            filename = secure_filename(bestand.filename) # secure filename om foutieve userInput tegen te gaan
-            #filename = "testtt.txt"
-            #bestand.save(os.path.join(appl.config['UPLOAD_FOLDER'], filename))
-            #return redirect(url_for('download_file', name=filename))
-            print(os.path.join('/uploads', filename))
-
-            bestand.save(os.path.join('uploads', filename))
-
-
-            return make_response('File successfully uploaded.', 201)
-    return
 
 @app.route('/api/uploadDataset', methods=['GET', 'POST'])
 def uploadDataset():
@@ -127,7 +74,7 @@ def uploadDataset():
             return make_response('No file found.', 400)
         interactionCsv = request.files['interactionCsv']  # de gebruiker heeft een bestand geselecteerd
         userCsv = request.files['userCsv']  # de gebruiker heeft een bestand geselecteerd
-        itemCsv = request.files['interactionCsv']  # de gebruiker heeft een bestand geselecteerd
+        itemCsv = request.files['itemCsv']  # de gebruiker heeft een bestand geselecteerd
 
         if 'interactionConnections' not in request.form or 'usersConnections' not in request.form or 'itemConnections' not in request.form:
             flash('Geen correcte connecties')
@@ -143,8 +90,19 @@ def uploadDataset():
         datasetName = request.form.get('datasetName')
     dataset = Dataset()
     dataset.add(datasetName, userCsv, itemCsv, interactionCsv, usersConnections, itemConnections, interactionConnections)
-    return make_response('File successfully uploaded.', 201)
+    return make_response('{"message": "File successfully uploaded."}', 201)
 
+@app.route('/api/changeDataset', methods=['GET', 'POST'])
+def changeDataset():
+    dataset = Dataset()
+    returnValue = dataset.changeApiWrapper(request)
+    return make_response(returnValue[0], returnValue[1])
+
+@app.route('/api/getDatasetItemById', methods=['GET', 'POST'])
+def changeDataset():
+    dataset = Dataset()
+    returnValue = dataset.changeApiWrapper(request)
+    return make_response(returnValue[0], returnValue[1])
 
 # React interface, alle niet verwezen app.route's worden doorverwezen naar react interface in de react_build folder
 @app.route('/', defaults={'path': ''})

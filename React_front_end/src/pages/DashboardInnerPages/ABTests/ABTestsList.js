@@ -8,7 +8,7 @@ import {Link, useNavigate} from "react-router-dom";
 const ABTestsList = () => {
     const navigation = useNavigate();
     function openAbTest(id){
-        navigation("/dashboard/abTests/overview");
+        navigation("/dashboard/abTests/overview/" + id);
     }
 
     return (
