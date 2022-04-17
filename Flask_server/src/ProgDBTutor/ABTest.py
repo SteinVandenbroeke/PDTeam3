@@ -1,8 +1,8 @@
+from Flask_server.src.ProgDBTutor.config import config_data
 from Flask_server.src.ProgDBTutor.quote_data_access import DBConnection
 
 
 class ABTest():
-
     def __init__(self, abTestId=None):
         if abTestId != None:
             database = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'],
@@ -10,7 +10,6 @@ class ABTest():
                                     dbport=config_data['port'])
             connection = database.get_connection()
             cursor = connection.cursor()
-
 
     def create(self, topKItemsCount, startDate, endDate, stepSize, trainingInterval, algoritmes, datasets):
         """
