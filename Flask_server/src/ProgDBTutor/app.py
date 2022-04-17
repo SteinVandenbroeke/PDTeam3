@@ -3,6 +3,8 @@
 
 # TUTORIAL geeksforgeeks
 # see https://www.geeksforgeeks.org/using-jwt-for-user-authentication-in-flask/
+import json
+
 from flask import Flask, request, jsonify, make_response, session, flash, redirect, url_for
 from flask.templating import render_template
 
@@ -92,17 +94,17 @@ def uploadDataset():
     dataset.add(datasetName, userCsv, itemCsv, interactionCsv, usersConnections, itemConnections, interactionConnections)
     return make_response('{"message": "File successfully uploaded."}', 201)
 
-@app.route('/api/changeDataset', methods=['GET', 'POST'])
+@app.route('/api/changeDataset', methods=['POST'])
 def changeDataset():
     dataset = Dataset()
     returnValue = dataset.changeApiWrapper(request)
     return make_response(returnValue[0], returnValue[1])
 
-@app.route('/api/getDatasetItemById', methods=['GET', 'POST'])
-def changeDataset():
+@app.route('/api/getRecordById', methods=['GET'])
+def getRecordById():
     dataset = Dataset()
-    returnValue = dataset.changeApiWrapper(request)
-    return make_response(returnValue[0], returnValue[1])
+    returnValue = dataset.getRecordById(request.args.get("dataSet"), request.args.get("table"), request.args.get("id"))
+    return make_response(returnValue[0],returnValue[1])
 
 # React interface, alle niet verwezen app.route's worden doorverwezen naar react interface in de react_build folder
 @app.route('/', defaults={'path': ''})

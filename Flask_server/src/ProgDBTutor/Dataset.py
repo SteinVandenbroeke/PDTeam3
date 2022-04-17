@@ -192,7 +192,7 @@ class Dataset():
         cursor = connection.cursor()
 
         if not table in ["articles", "customers"]:
-            return ("Worng table type", 500)
+            return ('{"message": "Worng table type"}', 500)
 
         table = datasetName + "_" + table
         cursor.execute(sql.SQL("UPDATE {table} SET {col}=%s WHERE id=%s").format(table=sql.Identifier(table), col=sql.Identifier(colm)),[value, id])
@@ -204,7 +204,7 @@ class Dataset():
     def changeApiWrapper(self, request):
         if request.method == 'POST':
             if 'dataSet' not in request.form or 'id' not in request.form or 'table' not in request.form or 'colmName' not in request.form or 'value' not in request.form:
-                return ('Missing form data.', 400)
+                return ('"message":{"Missing form data."}', 400)
             table = request.form.get('table')
             colmName = request.form.get('colmName')
             value = request.form.get('value')
@@ -214,13 +214,51 @@ class Dataset():
             returnValue = self.change(dataSet, table, colmName, value, itemId)
             return (returnValue[0], returnValue[1])
         else:
-            return ('Wrong request', 400)
+            return ('"message":{"Wrong request"}', 400)
 
-    def getRecordById(self, id, table):
+    def getRecordById(self, datasetName, table, id):
         if not table in ["articles", "customers"]:
-            return ("Worng table type", 500)
+            return ('Worng table type', 500)
+        table = datasetName + "_" + table
+        columnNames = self.getColumnNames(table)
+
+        database = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'],
+                                userPassword=config_data['password'], dbhost=config_data['host'],
+                                dbport=config_data['port'])
+        connection = database.get_connection()
+        cursor = connection.cursor()
+
+        select = 'SELECT * FROM {table} WHERE id=%s; '
+        cursor.execute(sql.SQL(select).format(table=sql.Identifier(table)), [id])
+        allrows = cursor.fetchall()
+
+        if len(allrows) <= 0:
+            return ("Id {id} not found in {table}".format(id=id, table=table), 400)
 
 
+        returnObject = []
+        for i in range (len(allrows[0])):
+            returnObject.append({"dbName": columnNames[i], "dbValue": allrows[0][i]})
+        cursor.close()
+        connection.close()
+        return (json.dumps(returnObject), 200)
+
+
+
+
+    def getColumnNames(self, table):
+        database = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'],
+                                userPassword=config_data['password'], dbhost=config_data['host'],
+                                dbport=config_data['port'])
+        connection = database.get_connection()
+        cursor = connection.cursor()
+        select = 'SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N%s;'
+        cursor.execute(sql.SQL(select).format(), [table])
+        allrows = cursor.fetchall()
+        returnList = []
+        for row in allrows:
+            returnList.append(row[0])
+        return returnList
 
     def addapt_numpy_float64(numpy_float64):
         return AsIs(numpy_float64)

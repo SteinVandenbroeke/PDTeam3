@@ -18,7 +18,7 @@ const DataSetsList = () => {
                     <Button variant="primary">Add new <Icon name="plus-circle-outline"/></Button>
                 </Link>
             </div>
-            <LogicTable action={openDataSet} data={[["id", "Dataset name", "Created by", "Creation date"], ["1", "H&M test dataset 1", "Stein Vandenbroeke", "09/03/2022"],["2", "H&M test dataset 2", "Stein Vandenbroeke", "09/03/2022"]]}/>
+            <LogicTable action={openDataSet} data={[["id", "Dataset name", "Created by", "Creation date"], ["h_m_dataset", "H&M test dataset 1", "Stein Vandenbroeke", "09/03/2022"],["2", "H&M test dataset 2", "Stein Vandenbroeke", "09/03/2022"]]}/>
         </div>
     );
 };

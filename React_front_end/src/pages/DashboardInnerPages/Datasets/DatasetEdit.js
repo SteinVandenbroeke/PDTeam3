@@ -15,9 +15,18 @@ const DataSetEdit = () => {
     const [currentItemId, setCurrentItemId] = React.useState(0);
     const [currentTable, setCurrentTable] = React.useState("Items");
     const [loading, setLoading] = useState(false);
+    const {setid} = useParams()
 
     function loadId(itemId, tabel){
-
+        setItemsDB([])
+        setLoading(true);
+        let getData = {
+            "id": itemId,
+            "table": tabel,
+            "dataSet": setid
+        }
+        let request = new ServerRequest();
+        request.sendGet("getRecordById",getData).then(requestData => {setItemsDB(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
     }
 
     function safeValue(event){
@@ -26,8 +35,9 @@ const DataSetEdit = () => {
         const formData = new FormData(event.target);
         formData.append("id", currentItemId)
         formData.append("table", currentTable)
+        formData.append("dataSet", setid)
         let request = new ServerRequest();
-        request.sendPost("editDataset",formData).then(message => {toast.success(message.message); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+        request.sendPost("changeDataset",formData).then(message => {toast.success(message.message); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
     }
 
     return (
@@ -40,9 +50,8 @@ const DataSetEdit = () => {
                             <h4>Search item</h4>
                             <Form.Select onChange={(e)=>setCurrentTable(e.target.value)}>
                                 <option>Default select</option>
-                                <option>Items</option>
-                                <option>Users</option>
-                                <option>Purchases</option>
+                                <option>articles</option>
+                                <option>customers</option>
                             </Form.Select>
                             <br/>
                             <Form.Control type="number" placeholder="id" onChange={(e)=>setCurrentItemId(e.target.value)} />
@@ -61,8 +70,8 @@ const DataSetEdit = () => {
                                                       <Form.Label>{item.dbName}</Form.Label>
                                                       <Row>
                                                         <Col xs={10} style={{paddingRight: 0}}>
-                                                            <Form.Control type="text" name="colmName" value={item.dbName} style={{borderTopRightRadius: 0, borderBottomRightRadius: 0, display: "none"}} />
-                                                            <Form.Control type="text" name="value" value={item.dbValue} style={{borderTopRightRadius: 0, borderBottomRightRadius: 0}} />
+                                                            <Form.Control type="text" name="colmName" defaultValue={item.dbName} style={{borderTopRightRadius: 0, borderBottomRightRadius: 0, display: "none"}} />
+                                                            <Form.Control type="text" name="value" defaultValue={item.dbValue} style={{borderTopRightRadius: 0, borderBottomRightRadius: 0}} />
                                                         </Col>
                                                         <Col xs={2} style={{paddingLeft: 0}}>
                                                           <Button variant="primary" type="submit" style={{borderTopLeftRadius: 0, borderBottomLeftRadius: 0}}>

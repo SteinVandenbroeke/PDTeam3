@@ -47,7 +47,31 @@ export class ServerRequest{
 	/**
 	Function to send an get request (with optional userToken)
 	 **/
-	async sendGet(page, data, loginRequired = true){
-		//TODO
+	async sendGet(page, data = {}, loginRequired = true){
+		if(loginRequired && this.authToken === null){
+			throw(new Error("User login is required, set loginRequired parameter to false or login"));
+			return;
+		}
+
+		let myHeaders = new Headers();
+		if(loginRequired){
+			myHeaders.append("x-access-token", this.authToken);
+		}
+
+		let getString = "?"
+		Object.keys(data).map(function(key, index) {
+		  getString = getString + "&" + key + "=" + data[key];
+		});
+
+		let response = await fetch("/api/" + page + getString, {
+			method: "GET",
+		});
+
+		if(response.status === 201 ||response.status === 200){
+			return await response.json();
+		}
+		else{
+			throw Error((await response.text()) + " " + response.status)
+		}
 	}
 }
