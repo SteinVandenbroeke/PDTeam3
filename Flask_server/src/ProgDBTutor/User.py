@@ -1,7 +1,7 @@
 # see https://www.geeksforgeeks.org/using-jwt-for-user-authentication-in-flask/
 from flask import Flask, request, jsonify, make_response, session, flash, redirect, url_for
 from flask.templating import render_template
-
+import json
 import uuid # for public id
 from  werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -49,6 +49,15 @@ class User():
             return  f(current_user, *args, **kwargs)
 
         return decorated
+
+    def getUsers(self):
+        self.cursor.execute(sql.SQL('SELECT * FROM "users"'))
+        data = self.cursor.fetchall()
+        returnList = []
+        for row in data:
+            item = [row[0],row[7],row[8], row[4].strftime("%m/%d/%Y %H:%M:%S"),row[2]]
+            returnList.append(item)
+        return (json.dumps(returnList), 200)
 
     # route for logging user in
     # @app.route('/api/login', methods =['POST'])

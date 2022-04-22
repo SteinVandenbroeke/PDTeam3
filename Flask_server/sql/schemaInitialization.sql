@@ -8,19 +8,19 @@ CREATE TYPE "fashion_news_val" AS ENUM (
   'Regularly'
 );
 
-CREATE TABLE "users" (
+CREATE TABLE users(
   "username" varchar PRIMARY KEY,
   "password" varchar,
   "admin" boolean,
   "email" varchar UNIQUE,
   "dateOfBirth" timestamp,
-  "profilePicture": varchar,
-  "public_id": varchar,
-  "fistName": varchar,
-  "lastName": varchar
+  "profilePicture" varchar,
+  "public_id" varchar,
+  "fistName" varchar,
+  "lastName" varchar
 );
 
-CREATE TABLE "ABtest" (
+CREATE TABLE ABtest(
   "test_name" varchar PRIMARY KEY,
   "algorithms" int[],
   "dataset" varchar,
@@ -29,15 +29,13 @@ CREATE TABLE "ABtest" (
   "stepsize" TIMESTAMP
 );
 
-CREATE TABLE "Algorithms" (
+CREATE TABLE Algorithms(
   "id" int PRIMARY KEY,
   "name" varchar
 );
 
-CREATE TABLE "Datasets" (
+CREATE TABLE Datasets(
   "name" varchar PRIMARY KEY,
-  "createdBy" varchar REFERENCES "users"("username"),
+  "createdBy" varchar REFERENCES users("username"),
   "creationDate" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-
-ALTER TABLE "contact" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");

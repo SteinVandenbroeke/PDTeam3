@@ -1,26 +1,53 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import ItemCard from "../../../components/itemCard"
 import PersonCard from "../../../components/personCard"
 import Accordion from "../../../components/Accordion"
 import {Link, useParams} from "react-router-dom";
-import {Button} from "react-bootstrap";
+import {Button, Row, Col, Card} from "react-bootstrap";
 import Icon from "react-eva-icons";
+import {toast} from "react-toastify";
+import {ServerRequest} from "../../../logic/ServerCommunication";
 
 const DataSetOverview = () => {
+
     const {setid} = useParams()
 
-    const dataItems =[{"itemid": "8572", "name": "Leather Boot", "desc": "Black waterproof leather boot"},
-        {"itemid": "1245", "name": "T-shirt", "desc": "White T-shirt"},
-        {"itemid": "1246", "name": "Leather Jacket", "desc": "Brown leather jacket"},
-        {"itemid": "1247", "name": "Green Sunglasses", "desc": "Jade green aviator sunglasses"},
-        {"itemid": "1248", "name": "Jeans", "desc": "Blue denim jeans"}];
-    const dataPeople =[{"personid": "4758", "name": "Jhon Deer"},
-        {"personid": "1121", "name": "Eric Tea"},
-        {"personid": "1542", "name": "Eric Coffee"},
-        {"personid": "4872", "name": "Denzo Key"}];
-    const listItems = dataItems.map((d) => <ItemCard name={d.name} desc={d.desc} id={d.itemid} setid={setid}/>);
-    const listPeople = dataPeople.map((d) => <PersonCard id={d.personid} setid={setid}/>);
+    const [loading, setLoading] = useState(false);
+    const [items, setItems] = useState([]);
+    const [people, setPeople] = useState([]);
+
+    const listItems = items.map((d) => <ItemCard name={d.name} desc={d.desc} id={d.itemid} setid={setid} />);
+    const listPeople = people.map((d) => <PersonCard id={d.personid} setid={setid}/>);
+    const [itemOffset, setItemOffset] = useState(0);
+    const [peopleOffset, setPeopleOffset] = useState(0);
+
+    function loadItems(){
+        setLoading(true);
+        let request = new ServerRequest();
+        let getData = {
+            "dataSet": setid,
+            "offset": itemOffset
+        }
+        request.sendGet("getItemList",getData).then(requestData => {setItems(items.concat(requestData)); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+        setItemOffset(itemOffset+10);
+    }
+
+    function loadPeople(){
+        setLoading(true);
+        let request = new ServerRequest();
+        let getData = {
+            "dataSet": setid,
+            "offset": peopleOffset
+        }
+        request.sendGet("getPeopleList",getData).then(requestData => {setPeople(people.concat(requestData)); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+        setPeopleOffset(peopleOffset+10);
+    }
+
+    useEffect(() => {
+        loadItems()
+        loadPeople()
+    },[]);
 
     return (
         <div>
@@ -30,9 +57,21 @@ const DataSetOverview = () => {
                 </Link>
             </div>
             <div>
-                This is dataset {setid}
-                <Accordion title="Items" data={listItems} />
-                <Accordion title="People" data={listPeople} />
+                <h2> This is dataset {setid} </h2>
+                <Row>
+                    <Col>
+                        <Card className={"shadow-lg"}  style={{paddingTop: 10}}>
+                            <h3>Items</h3>
+                            <div style={{height:500, overflowY:"auto"}}>{listItems} <Button variant="primary" onClick={()=>loadItems()}>Load More</Button> </div>
+                        </Card>
+                    </Col>
+                    <Col>
+                        <Card className={"shadow-lg"} style={{paddingTop: 10}}>
+                            <h3>People</h3>
+                            <div style={{height:500, overflowY:"auto"}}> {listPeople} <Button variant="primary" onClick={()=>loadPeople()}>Load More</Button></div>
+                        </Card>
+                    </Col>
+                </Row>
             </div>
         </div>
     );

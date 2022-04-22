@@ -229,6 +229,28 @@ class Dataset():
             returnList.append(item)
         return (json.dumps(returnList), 200)
 
+
+    def getItemList(self, datasetName, offset):
+        query = 'SELECT id,title,description FROM '+ datasetName +'_articles LIMIT 40 OFFSET '+offset
+        self.cursor.execute(sql.SQL(query))
+        data = self.cursor.fetchall()
+        returnList = []
+        for row in data:
+            item = {"itemid":row[0], "name":row[1], "desc":row[2]}
+            returnList.append(item)
+        return (json.dumps(returnList), 200)
+
+    def getPeopleList(self, datasetName, offset):
+        query = 'SELECT id FROM '+ datasetName +'_customers LIMIT 40 OFFSET '+offset
+        self.cursor.execute(sql.SQL(query))
+        data = self.cursor.fetchall()
+        returnList = []
+        for row in data:
+            item = {"personid":row[0]}
+            returnList.append(item)
+        return (json.dumps(returnList), 200)
+
+
     def addapt_numpy_float64(numpy_float64):
         return AsIs(numpy_float64)
 

@@ -114,7 +114,7 @@ def uploadDataset():
             return make_response('No file selected.', 400)
 
         datasetName = request.form.get('datasetName')
-    userName = "Niels"
+    userName = "Niels" #TODO
     dataset = Dataset()
     dataset.add(datasetName, userCsv, itemCsv, interactionCsv, usersConnections, itemConnections, interactionConnections, userName)
     return make_response('{"message": "File successfully uploaded."}', 201)
@@ -145,6 +145,24 @@ def reactApp(path):
 def getDatasets():
     dataset = Dataset()
     returnValue = dataset.getDatasets()
+    return make_response(returnValue[0],returnValue[1])
+
+@app.route('/api/getItemList', methods=['GET'])
+def getItemList():
+    dataset = Dataset()
+    returnValue = dataset.getItemList(request.args.get("dataSet"), request.args.get("offset"))
+    return make_response(returnValue[0],returnValue[1])
+
+@app.route('/api/getPeopleList', methods=['GET'])
+def getPeopleList():
+    dataset = Dataset()
+    returnValue = dataset.getPeopleList(request.args.get("dataSet"), request.args.get("offset"))
+    return make_response(returnValue[0],returnValue[1])
+
+@app.route('/api/getUsers', methods=['GET'])
+def getUsers():
+    user = User(app)
+    returnValue = user.getUsers()
     return make_response(returnValue[0],returnValue[1])
 
 # RUN DEV SERVER
