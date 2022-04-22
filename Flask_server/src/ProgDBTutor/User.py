@@ -53,12 +53,13 @@ class User():
     # route for logging user in
     # @app.route('/api/login', methods =['POST'])
     def login(self, email, password):
-        select = "SELECT users.email, users.password, users.public_id  FROM users WHERE email=%s;"
+        select = 'SELECT users.email, users.password, users.public_id, users."profilePicture"  FROM users WHERE email=%s;'
         self.cursor.execute(sql.SQL(select), [email])
         data = self.cursor.fetchone()
         userCount = data[0]
         dbPassword = data[1]
         public_id = data[2]
+        profileImage = data[3]
 
         if not userCount:
             return ('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm ="User does not exist !!"'})
@@ -70,13 +71,19 @@ class User():
                 'exp' : datetime.utcnow() + timedelta(minutes = 30)
             }, self.app.config['SECRET_KEY'])
 
-            return (jsonify({'token' : token}), 201)
+            return (jsonify({'token' : token, 'profileImage': profileImage}), 201)
         # returns 403 if password is wrong
         return ('Could not verify', 403, {'WWW-Authenticate' : 'Basic realm ="Wrong Password !!"'})
 
+    def uploadProfileImage(self, file, name):
+        if file.filename.split('.')[1] == "jpg" or file.filename.split('.')[1] == "png" or file.filename.split('.')[1] == "JPG" or file.filename.split('.')[1] == "jpeg":
+            file.save("react_build/profileImages/" + name + "." + file.filename.split('.')[1])
+        else:
+            print("wrong image format")
+
     # signup route
     # @app.route('/api/signup', methods =['POST'])
-    def signup(self, userName, email, password, admin, date):
+    def signup(self, userName, email, password, admin, date, firstName, lastName, profileImage):
         select = 'SELECT COUNT("username") as userCount, COUNT("email") as emailCount FROM users WHERE email=%s or username=%s;'
         self.cursor.execute(sql.SQL(select), [email, userName])
         data = self.cursor.fetchone()
@@ -85,9 +92,10 @@ class User():
         if not userNameCount and not emailCount:
             publicId = str(uuid.uuid4())
             passwordHash = generate_password_hash(password)
-            insert = 'INSERT INTO users ("username", "password", "admin", "email", "public_id", "dateOfBirth") VALUES (%s,%s,%s,%s,%s,%s)';
-            self.cursor.execute(sql.SQL(insert), [userName, passwordHash, admin, email, publicId, date])
+            insert = 'INSERT INTO users ("username", "password", "admin", "email", "public_id", "dateOfBirth", "fistName", "lastName", "profilePicture") VALUES (%s,%s,%s,%s,%s,%s, %s, %s, %s)';
+            self.cursor.execute(sql.SQL(insert), [userName, passwordHash, admin, email, publicId, date,firstName,lastName, userName + "." + profileImage.filename.split('.')[1] ])
             self.connection.commit()
+            self.uploadProfileImage(profileImage, userName)
             return ('{"message": "Successfully registered."}', 201)
         else:
             return ('Username or email already exists.', 202)

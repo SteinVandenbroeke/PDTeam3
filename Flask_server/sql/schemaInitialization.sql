@@ -12,10 +12,12 @@ CREATE TABLE "users" (
   "username" varchar PRIMARY KEY,
   "password" varchar,
   "admin" boolean,
-  "email" varchar,
+  "email" varchar UNIQUE,
   "dateOfBirth" timestamp,
   "profilePicture": varchar,
-  "public_id": varchar
+  "public_id": varchar,
+  "fistName": varchar,
+  "lastName": varchar
 );
 
 CREATE TABLE "ABtest" (

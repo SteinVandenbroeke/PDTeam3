@@ -78,11 +78,14 @@ def signup_def():
     email = data['email']
     password = data['password']
     date = data['dateOfBrith']
+    firstName = data['firstName']
+    lastName = data['lastName']
+    profileImage = request.files["profileImage"]
     admin = False
     if 'adminPermision' in data and data['adminPermision'] == "on":
         admin = True
 
-    returnValue = user.signup(username, email, password, admin)
+    returnValue = user.signup(username, email, password, admin, date,firstName, lastName, profileImage)
     return make_response(returnValue[0], returnValue[1])
 
 @app.route('/api/helloWorld')
