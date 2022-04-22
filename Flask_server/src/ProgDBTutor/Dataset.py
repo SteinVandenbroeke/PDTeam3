@@ -8,16 +8,15 @@ from psycopg2.extensions import register_adapter, AsIs
 
 class Dataset():
     def __init__(self):
-        print("")
-
-    def add(self, datasetName, customerCSV, articleCSV, purchasesCSV, customerConnections, articleConnections,
-            purchaseConnections):
-        # connect to database
+        # connect to self.database
         database = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'],
                                 userPassword=config_data['password'], dbhost=config_data['host'],
                                 dbport=config_data['port'])
-        connection = database.get_connection()
-        cursor = connection.cursor()
+        self.connection = database.get_connection()
+        self.cursor = self.connection.cursor()
+
+    def add(self, datasetName, customerCSV, articleCSV, purchasesCSV, customerConnections, articleConnections,
+            purchaseConnections, userName):
 
         # customer table:
         customerTableName = datasetName + '_customers'
@@ -49,27 +48,16 @@ class Dataset():
                 customerDataOrder[param] = len(customerDataOrder)
                 customerParamaters += ', ' + param + ' ' + type
         createCustomersTable = 'CREATE TABLE ' + customerTableName + '(' + customerParamaters + ');'
-        cursor.execute(sql.SQL(createCustomersTable))
+        self.cursor.execute(sql.SQL(createCustomersTable))
         for row in customerDf.values:
             sortedData = []
             for i in range(len(row)):
                 if customerConnections['csv'][i] in customerDataOrder:
                     sortedData.insert(customerDataOrder[customerConnections['csv'][i]], row[i])
-            data = ""
-            for i in range(len(sortedData)):
-                if i != 0:
-                    data += ', '
-                if isinstance(sortedData[i], str):
-                    sortedData[i] = sortedData[i].replace('\'', '')
-                    sortedData[i] = sortedData[i].replace('\"', '')
-                    data += '\'' + sortedData[i] + '\''
-                else:
-                    if pd.isnull(sortedData[i]):
-                        data += '0'
-                    else:
-                        data += str(sortedData[i])
-            createCustomerInsert = 'insert into ' + customerTableName + ' values (' + data + ')'
-            cursor.execute(sql.SQL(createCustomerInsert))
+            procentString = ("%s," * len(sortedData))
+            procentString = procentString[:-1]
+            createCustomerInsert = 'insert into ' + customerTableName + ' values (' + procentString + ' )'
+            self.cursor.execute(createCustomerInsert, tuple(sortedData))
 
         # article table:
         articleTableName = datasetName + '_articles'
@@ -105,27 +93,16 @@ class Dataset():
                 articleDataOrder[param] = len(articleDataOrder)
 
         createArticlesTable = 'CREATE TABLE ' + articleTableName + '(' + articleParameters + ');'
-        cursor.execute(sql.SQL(createArticlesTable))
+        self.cursor.execute(sql.SQL(createArticlesTable))
         for row in articleDf.values:
             sortedData = []
             for i in range(len(row)):
                 if articleConnections['csv'][i] in articleDataOrder:
                     sortedData.insert(articleDataOrder[articleConnections['csv'][i]], row[i])
-            data = ""
-            for i in range(len(sortedData)):
-                if i != 0:
-                    data += ', '
-                if isinstance(sortedData[i], str):
-                    sortedData[i] = sortedData[i].replace('\'', '')
-                    sortedData[i] = sortedData[i].replace('\"', '')
-                    data += '\'' + sortedData[i] + '\''
-                else:
-                    if pd.isnull(sortedData[i]):
-                        data += '0'
-                    else:
-                        data += str(sortedData[i])
-            createArticleInsert = 'insert into ' + articleTableName + ' values (' + data + ')'
-            cursor.execute(sql.SQL(createArticleInsert))
+            procentString = ("%s," * len(sortedData))
+            procentString = procentString[:-1]
+            createArticleInsert = 'insert into ' + articleTableName + ' values (' + procentString + ' )'
+            self.cursor.execute(createArticleInsert, tuple(sortedData))
 
         # purchase table:
         purchaseTableName = datasetName + '_purchases'
@@ -133,7 +110,7 @@ class Dataset():
         purchaseDf = pd.DataFrame(purchaseData)
         purchaseConnections = json.loads(purchaseConnections)
         createCustomersTable = 'CREATE TABLE ' + purchaseTableName + '(timestamp timestamp, user_id int, item_id int, parameter int, FOREIGN KEY (user_id) REFERENCES ' + customerTableName + '(id), FOREIGN KEY (item_id) REFERENCES ' + articleTableName + '(id));'
-        cursor.execute(sql.SQL(createCustomersTable))
+        self.cursor.execute(sql.SQL(createCustomersTable))
 
         purchaseDataOrder = {}
         for param in purchaseConnections['connections']:
@@ -151,16 +128,15 @@ class Dataset():
             for i in range(len(row)):
                 if purchaseConnections['csv'][i] in purchaseDataOrder:
                     sortedData.insert(purchaseDataOrder[purchaseConnections['csv'][i]], row[i])
-            data = ""
 
-            """
-            kan worden vervangen door:
             procentString = ("%s," * len(sortedData))
             procentString = procentString[:-1]
             createPurchaseInsert = 'insert into ' + purchaseTableName + ' values (' + procentString + ' )'
-            cursor.execute(createPurchaseInsert, tuple(sortedData))
-            start
+            self.cursor.execute(createPurchaseInsert, tuple(sortedData))
+
+
             """
+            data = ""
             for i in range(len(sortedData)):
                 if i != 0:
                     data += ', '
@@ -174,31 +150,27 @@ class Dataset():
                     else:
                         data += str(sortedData[i])
             createPurchaseInsert = 'insert into ' + purchaseTableName + ' values (' + data + ')'
-            cursor.execute(sql.SQL(createPurchaseInsert))
-            """
-            end
+            self.cursor.execute(sql.SQL(createPurchaseInsert))
             """
 
-        connection.commit()
-        connection.close()
-        cursor.close()
+
+        self.cursor.execute(sql.SQL('insert into "Datasets" ("name","createdBy") values (%s,%s)'),[datasetName.lower(), userName])
+
+        self.connection.commit()
+        self.connection.close()
+        self.cursor.close()
         print("succes")
 
     def change(self, datasetName, table, colm, value, id):
-        database = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'],
-                                userPassword=config_data['password'], dbhost=config_data['host'],
-                                dbport=config_data['port'])
-        connection = database.get_connection()
-        cursor = connection.cursor()
 
         if not table in ["articles", "customers"]:
             return ('{"message": "Worng table type"}', 500)
 
         table = datasetName + "_" + table
-        cursor.execute(sql.SQL("UPDATE {table} SET {col}=%s WHERE id=%s").format(table=sql.Identifier(table), col=sql.Identifier(colm)),[value, id])
-        connection.commit()
-        connection.close()
-        cursor.close()
+        self.cursor.execute(sql.SQL("UPDATE {table} SET {col}=%s WHERE id=%s").format(table=sql.Identifier(table), col=sql.Identifier(colm)),[value, id])
+        self.connection.commit()
+        self.connection.close()
+        self.cursor.close()
         return ('{"message": "Record succesfully edit"}', 201)
 
     def changeApiWrapper(self, request):
@@ -222,15 +194,9 @@ class Dataset():
         table = datasetName + "_" + table
         columnNames = self.getColumnNames(table)
 
-        database = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'],
-                                userPassword=config_data['password'], dbhost=config_data['host'],
-                                dbport=config_data['port'])
-        connection = database.get_connection()
-        cursor = connection.cursor()
-
         select = 'SELECT * FROM {table} WHERE id=%s; '
-        cursor.execute(sql.SQL(select).format(table=sql.Identifier(table)), [id])
-        allrows = cursor.fetchall()
+        self.cursor.execute(sql.SQL(select).format(table=sql.Identifier(table)), [id])
+        allrows = self.cursor.fetchall()
 
         if len(allrows) <= 0:
             return ("Id {id} not found in {table}".format(id=id, table=table), 400)
@@ -239,32 +205,36 @@ class Dataset():
         returnObject = []
         for i in range (len(allrows[0])):
             returnObject.append({"dbName": columnNames[i], "dbValue": allrows[0][i]})
-        cursor.close()
-        connection.close()
+        self.cursor.close()
+        self.connection.close()
         return (json.dumps(returnObject), 200)
 
 
-
-
     def getColumnNames(self, table):
-        database = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'],
-                                userPassword=config_data['password'], dbhost=config_data['host'],
-                                dbport=config_data['port'])
-        connection = database.get_connection()
-        cursor = connection.cursor()
         select = 'SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N%s;'
-        cursor.execute(sql.SQL(select).format(), [table])
-        allrows = cursor.fetchall()
+        self.cursor.execute(sql.SQL(select).format(), [table])
+        allrows = self.cursor.fetchall()
         returnList = []
         for row in allrows:
             returnList.append(row[0])
         return returnList
+
+
+    def getDatasets(self):
+        self.cursor.execute(sql.SQL('SELECT * FROM "Datasets"'))
+        data = self.cursor.fetchall()
+        returnList = []
+        for row in data:
+            item = [row[0], row[1], row[2].strftime("%m/%d/%Y %H:%M:%S")]
+            returnList.append(item)
+        return (json.dumps(returnList), 200)
 
     def addapt_numpy_float64(numpy_float64):
         return AsIs(numpy_float64)
 
     def addapt_numpy_int64(numpy_int64):
         return AsIs(numpy_int64)
+
 
     register_adapter(numpy.float64, addapt_numpy_float64)
     register_adapter(numpy.int64, addapt_numpy_int64)

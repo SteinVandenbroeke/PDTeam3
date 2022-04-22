@@ -90,8 +90,9 @@ def uploadDataset():
             return make_response('No file selected.', 400)
 
         datasetName = request.form.get('datasetName')
+    userName = "Niels"
     dataset = Dataset()
-    dataset.add(datasetName, userCsv, itemCsv, interactionCsv, usersConnections, itemConnections, interactionConnections)
+    dataset.add(datasetName, userCsv, itemCsv, interactionCsv, usersConnections, itemConnections, interactionConnections, userName)
     return make_response('{"message": "File successfully uploaded."}', 201)
 
 @app.route('/api/changeDataset', methods=['POST'])
@@ -115,6 +116,12 @@ def reactApp(path):
 
     return app.send_static_file(path)
 
+
+@app.route('/api/getDatasets', methods=['GET'])
+def getDatasets():
+    dataset = Dataset()
+    returnValue = dataset.getDatasets()
+    return make_response(returnValue[0],returnValue[1])
 
 # RUN DEV SERVER
 if __name__ == "__main__":

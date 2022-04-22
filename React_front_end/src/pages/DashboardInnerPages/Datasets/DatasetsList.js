@@ -1,15 +1,30 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {Button} from "react-bootstrap";
 import Icon from 'react-eva-icons';
 import LogicTable from "../../../components/logicTable"
 import {Link, useNavigate} from "react-router-dom";
+import {toast} from "react-toastify";
+import {ServerRequest} from "../../../logic/ServerCommunication";
 
 const DataSetsList = () => {
     const navigation = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [datasets, setDatasets] = useState([]);
     function openDataSet(id){
         navigation("/dashboard/dataSets/overview/" + id);
     }
+    function loadDatasets(){
+        setDatasets([])
+        setLoading(true);
+        let request = new ServerRequest();
+        request.sendGet("getDatasets").then((response)=>response.json()).then(requestData => {setDatasets(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+
+    }
+
+    useEffect(() => {
+        loadDatasets()
+    },[]);
 
     return (
         <div>
@@ -18,7 +33,7 @@ const DataSetsList = () => {
                     <Button variant="primary">Add new <Icon name="plus-circle-outline"/></Button>
                 </Link>
             </div>
-            <LogicTable action={openDataSet} data={[["id", "Dataset name", "Created by", "Creation date"], ["h_m_dataset", "H&M test dataset 1", "Stein Vandenbroeke", "09/03/2022"],["2", "H&M test dataset 2", "Stein Vandenbroeke", "09/03/2022"]]}/>
+            <LogicTable action={openDataSet} data={[["id", "Created by", "Creation date"], datasets]}/>
         </div>
     );
 };

@@ -34,4 +34,10 @@ CREATE TABLE "Algorithms" (
   "name" varchar
 );
 
+CREATE TABLE "Datasets" (
+  "name" varchar PRIMARY KEY,
+  "createdBy" varchar REFERENCES "users"("username"),
+  "creationDate" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 ALTER TABLE "contact" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
