@@ -77,6 +77,7 @@ def signup_def():
     username = data['userName']
     email = data['email']
     password = data['password']
+    date = data['dateOfBrith']
     admin = False
     if 'adminPermision' in data and data['adminPermision'] == "on":
         admin = True

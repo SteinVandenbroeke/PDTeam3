@@ -8,27 +8,21 @@ from werkzeug.utils import secure_filename
 from config import config_data
 from quote_data_access import Quote, DBConnection, QuoteDataAccess
 import os
+from psycopg2 import sql
 
 # imports for PyJWT authentication
 import jwt
 from datetime import datetime, timedelta
 from functools import wraps
-from flask_sqlalchemy import SQLAlchemy
 
-
-
-
-
-
-
-# Database ORMs
 class User():
-    def __init__(self,db):
-        id = db.Column(db.Integer, primary_key=True)
-        public_id = db.Column(db.String(50), unique = True)
-        name = db.Column(db.String(100))
-        email = db.Column(db.String(70), unique = True)
-        password = db.Column(db.String(100))
+    def __init__(self, app):
+        database = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'],
+                                userPassword=config_data['password'], dbhost=config_data['host'],
+                                dbport=config_data['port'])
+        self.connection = database.get_connection()
+        self.cursor = self.connection.cursor()
+        self.app = app
 
     # decorator for verifying the JWT
     def token_required(self,f):
@@ -43,7 +37,7 @@ class User():
                 return jsonify({'message' : 'Token is missing !!'}), 401
             try:
                 # decoding the payload to fetch the stored details
-                data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+                data = jwt.decode(token, self.app.config['SECRET_KEY'], algorithms=['HS256'])
                 current_user = User.query\
                     .filter_by(public_id = data['public_id'])\
                     .first()
@@ -56,96 +50,44 @@ class User():
 
         return decorated
 
-    # User Database Route
-    # this route sends back list of users users
-    # @app.route('/api/user', methods =['GET'])
-    # @token_required
-    def get_all_users(current_user):
-        # querying the database
-        # for all the entries in it
-        users = User.query.all()
-        # converting the query objects
-        # to list of jsons
-        output = []
-        for user in users:
-            # appending the user data json
-            # to the response list
-            output.append({
-                'public_id': user.public_id,
-                'name' : user.name,
-                'email' : user.email
-            })
-
-        return jsonify({'users': output})
-
     # route for logging user in
     # @app.route('/api/login', methods =['POST'])
-    def login():
-        # creates dictionary of form data
-        auth = request.form
+    def login(self, email, password):
+        select = "SELECT users.email, users.password, users.public_id  FROM users WHERE email=%s;"
+        self.cursor.execute(sql.SQL(select), [email])
+        data = self.cursor.fetchone()
+        userCount = data[0]
+        dbPassword = data[1]
+        public_id = data[2]
 
-        if not auth or not auth.get('email') or not auth.get('password'):
-            # returns 401 if any email or / and password is missing
-            return make_response(
-                'Could not verify',
-                401,
-                {'WWW-Authenticate' : 'Basic realm ="Login required !!"'}
-            )
+        if not userCount:
+            return ('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm ="User does not exist !!"'})
 
-        user = User.query\
-            .filter_by(email = auth.get('email'))\
-            .first()
-
-        if not user:
-            # returns 401 if user does not exist
-            return make_response(
-                'Could not verify',
-                401,
-                {'WWW-Authenticate' : 'Basic realm ="User does not exist !!"'}
-            )
-
-        if check_password_hash(user.password, auth.get('password')):
+        if check_password_hash(dbPassword, password):
             # generates the JWT Token
             token = jwt.encode({
-                'public_id': user.public_id,
+                'public_id': public_id,
                 'exp' : datetime.utcnow() + timedelta(minutes = 30)
-            }, app.config['SECRET_KEY'])
+            }, self.app.config['SECRET_KEY'])
 
-            return make_response(jsonify({'token' : token}), 201)
+            return (jsonify({'token' : token}), 201)
         # returns 403 if password is wrong
-        return make_response(
-            'Could not verify',
-            403,
-            {'WWW-Authenticate' : 'Basic realm ="Wrong Password !!"'}
-        )
+        return ('Could not verify', 403, {'WWW-Authenticate' : 'Basic realm ="Wrong Password !!"'})
 
     # signup route
     # @app.route('/api/signup', methods =['POST'])
-    def signup():
-        # creates a dictionary of the form data
-        data = request.form
-
-        # gets name, email and password
-        name, email = data.get('name'), data.get('email')
-        password = data.get('password')
-
-        # checking for existing user
-        user = User.query\
-            .filter_by(email = email)\
-            .first()
-        if not user:
-            # database ORM object
-            user = User(
-                public_id = str(uuid.uuid4()),
-                name = name,
-                email = email,
-                password = generate_password_hash(password)
-            )
-            # insert user
-            db.session.add(user)
-            db.session.commit()
-
-            return make_response('Successfully registered.', 201)
+    def signup(self, userName, email, password, admin, date):
+        select = 'SELECT COUNT("username") as userCount, COUNT("email") as emailCount FROM users WHERE email=%s or username=%s;'
+        self.cursor.execute(sql.SQL(select), [email, userName])
+        data = self.cursor.fetchone()
+        userNameCount = data[0]
+        emailCount = data[1]
+        if not userNameCount and not emailCount:
+            publicId = str(uuid.uuid4())
+            passwordHash = generate_password_hash(password)
+            insert = 'INSERT INTO users ("username", "password", "admin", "email", "public_id", "dateOfBirth") VALUES (%s,%s,%s,%s,%s,%s)';
+            self.cursor.execute(sql.SQL(insert), [userName, passwordHash, admin, email, publicId, date])
+            self.connection.commit()
+            return ('{"message": "Successfully registered."}', 201)
         else:
-            # returns 202 if user already exists
-            return make_response('User already exists. Please Log in.', 202)
+            return ('Username or email already exists.', 202)
