@@ -23,9 +23,9 @@ from datetime import datetime, timedelta
 from functools import wraps
 from flask_sqlalchemy import SQLAlchemy
 
+from User import User
+
 from Dataset import Dataset
-
-
 
 # INITIALIZE SINGLETON SERVICES
 app = Flask('Tutorial ', static_url_path="/stop/", static_folder="react_build/")
@@ -33,18 +33,13 @@ app.config['SECRET_KEY'] = '*^*(*&)(*)(*afafafaSDD47j\3yX R~X@H!jmM]Lwf/,?KT'
 # database name
 app.config['SQLALCHEMY_DATABASE_URI'] = config_data['uri']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-# creates SQLALCHEMY object
-db = SQLAlchemy(app)
 
 DEBUG = False
 HOST = "127.0.0.1" if DEBUG else "0.0.0.0"
 
-from User import User
-
-user = User(db)
-
 # decorator for verifying the JWT
 def token_required_def(f):
+    user = User(app)
     return user.token_required(f)
 
 # User Database Route
@@ -52,17 +47,42 @@ def token_required_def(f):
 @app.route('/api/user', methods =['GET'])
 @token_required_def
 def get_all_users_def():
+    user = User(app)
     return user.get_all_users(current_user)
 
 # route for logging user in
 @app.route('/api/login', methods =['POST'])
 def login_def():
-    return user.login()
+    auth = request.form
+    email = auth.get('email')
+    password = auth.get('password')
+
+    if not auth or not email or not password:
+        # returns 401 if any email or / and password is missing
+        return make_response(
+            'Could not verify',
+            401,
+            {'WWW-Authenticate': 'Basic realm ="Login required !!"'}
+        )
+    user = User(app)
+    returnValue = user.login(email, password)
+    return make_response(*returnValue)
 
 # signup route
 @app.route('/api/signup', methods =['POST'])
 def signup_def():
-    return user.signup()
+    user = User(app)
+    data = request.form
+
+    username = data['userName']
+    email = data['email']
+    password = data['password']
+    admin = False
+    if 'adminPermision' in data and data['adminPermision'] == "on":
+        admin = True
+
+    returnValue = user.signup(username, email, password, admin)
+    return make_response(returnValue[0], returnValue[1])
 
 @app.route('/api/helloWorld')
 def helloWorld():

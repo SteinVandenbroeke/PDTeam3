@@ -8,16 +8,14 @@ CREATE TYPE "fashion_news_val" AS ENUM (
   'Regularly'
 );
 
-CREATE TABLE "contact" (
-  "username" varchar,
-  "name" varchar,
-  "email" varchar
-);
-
 CREATE TABLE "users" (
   "username" varchar PRIMARY KEY,
   "password" varchar,
-  "admin" bool
+  "admin" boolean,
+  "email" varchar,
+  "dateOfBirth" timestamp,
+  "profilePicture": varchar,
+  "public_id": varchar
 );
 
 CREATE TABLE "ABtest" (
