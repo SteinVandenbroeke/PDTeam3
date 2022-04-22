@@ -10,15 +10,15 @@ import {ServerRequest} from "../../../logic/ServerCommunication";
 const DataSetsList = () => {
     const navigation = useNavigate();
     const [loading, setLoading] = useState(false);
-    const [datasets, setDatasets] = useState([]);
+    const [datasets, setDatasets] = useState([[]]);
     function openDataSet(id){
         navigation("/dashboard/dataSets/overview/" + id);
     }
     function loadDatasets(){
-        setDatasets([])
+        setDatasets([[]])
         setLoading(true);
         let request = new ServerRequest();
-        request.sendGet("getDatasets").then((response)=>response.json()).then(requestData => {setDatasets(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+        request.sendGet("getDatasets").then(requestData => {setDatasets([["id", "Created by", "Creation date"]].concat(requestData)); setLoading(false);});
 
     }
 
@@ -33,7 +33,7 @@ const DataSetsList = () => {
                     <Button variant="primary">Add new <Icon name="plus-circle-outline"/></Button>
                 </Link>
             </div>
-            <LogicTable action={openDataSet} data={[["id", "Created by", "Creation date"], datasets]}/>
+            <LogicTable action={openDataSet} data={datasets}/>
         </div>
     );
 };
