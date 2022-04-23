@@ -1,9 +1,11 @@
 import { Outlet, Link } from "react-router-dom";
 import {Navbar, Container, Nav, Card, Image, ListGroup} from "react-bootstrap";
-import {useContext, React, useState} from "react";
+import {useContext, React, useState, useEffect} from "react";
 import {userSession} from "../App";
 import User from "../logic/User";
 import Icon from "react-eva-icons";
+import {toast} from "react-toastify";
+import {ServerRequest} from "../logic/ServerCommunication";
 
 const ProfileImageMenu = () => {
 
@@ -14,11 +16,22 @@ const ProfileImageMenu = () => {
         });
     }
 
+    function loadProfileImage(){
+        let request = new ServerRequest();
+        request.sendGet("getCurrentUserInformation").then(requestData => {setImage("/profileImages/" + requestData.profilePicture)}).catch(error => {toast.error(error.message); logout();});
+    }
+
     let [showMenu , setShowMenu] = useState(false);
+    let [image , setImage] = useState("https://d1nhio0ox7pgb.cloudfront.net/_img/g_collection_png/standard/256x256/menu.png");
+
+    useEffect(() => {
+        loadProfileImage()
+    },[]);
+
 
     return (
         <>
-            <Image onClick={()=>{setShowMenu(!showMenu)}} roundedCircle={true} height={50} src={"https://scontent.fbru1-1.fna.fbcdn.net/v/t1.6435-9/78431746_2293299950961562_7867165954851995648_n.jpg?_nc_cat=106&ccb=1-5&_nc_sid=09cbfe&_nc_ohc=UpMJOOQDA7EAX-FFLhh&_nc_ht=scontent.fbru1-1.fna&oh=00_AT--woVzrD7i2DiqMtz8n0KS3O0dvV2-8lG7QUWQde11eQ&oe=624621AC"}></Image>
+            <Image onClick={()=>{setShowMenu(!showMenu)}} roundedCircle={true} height={50} src={image}></Image>
             {showMenu &&
                 <>
                     <div style={{height: "100vh", width: "100%", position: "absolute", left: 0, top:0}} onClick={()=>{setShowMenu(false)}}/>

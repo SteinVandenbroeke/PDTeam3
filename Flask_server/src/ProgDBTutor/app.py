@@ -37,15 +37,17 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 DEBUG = False
 HOST = "127.0.0.1" if DEBUG else "0.0.0.0"
 
-# decorator for verifying the JWT
-def token_required_def(f):
+@app.route('/api/getCurrentUserInformation', methods =['GET'])
+def getUserInformation():
     user = User(app)
-    return user.token_required(f)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    return make_response(*user.getUserInformationAsReturnRequest())
 
 # User Database Route
 # this route sends back list of users users
 @app.route('/api/user', methods =['GET'])
-@token_required_def
 def get_all_users_def():
     user = User(app)
     return user.get_all_users(current_user)
@@ -114,7 +116,7 @@ def uploadDataset():
             return make_response('No file selected.', 400)
 
         datasetName = request.form.get('datasetName')
-    userName = "NielsBroecky" #TODO
+    userName = "Stein" #TODO
     dataset = Dataset()
     dataset.add(datasetName, userCsv, itemCsv, interactionCsv, usersConnections, itemConnections, interactionConnections, userName)
     return make_response('{"message": "File successfully uploaded."}', 201)
@@ -139,7 +141,6 @@ def reactApp(path):
         path = "index.html"
 
     return app.send_static_file(path)
-
 
 @app.route('/api/getDatasets', methods=['GET'])
 def getDatasets():

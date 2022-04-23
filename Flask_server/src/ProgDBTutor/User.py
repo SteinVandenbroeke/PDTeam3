@@ -23,32 +23,52 @@ class User():
         self.connection = database.get_connection()
         self.cursor = self.connection.cursor()
         self.app = app
+        self.username = None
+        self.admin = False
+        self.email = None
+        self.dateOfBirth = None
+        self.profilePicture = None
+        self.firstName = None
+        self.lastName = None
+        self.isLoggedIn = False
+
+    def getUserInformationAsReturnRequest(self):
+        return (jsonify({'loggedIn': self.isLoggedIn,
+                         'username': self.username,
+                         'admin': self.admin,
+                         'email': self.email,
+                         "dateOfBirth": self.dateOfBirth,
+                         "profilePicture": self.profilePicture,
+                         "firstName": self.firstName,
+                         "lastName": self.lastName}), 201)
 
     # decorator for verifying the JWT
-    def token_required(self,f):
-        @wraps(f)
-        def decorated(*args, **kwargs):
-            token = None
-            # jwt is passed in the request header
-            if 'x-access-token' in request.headers:
-                token = request.headers['x-access-token']
-            # return 401 if token is not passed
-            if not token:
-                return jsonify({'message' : 'Token is missing !!'}), 401
-            try:
-                # decoding the payload to fetch the stored details
-                data = jwt.decode(token, self.app.config['SECRET_KEY'], algorithms=['HS256'])
-                current_user = User.query\
-                    .filter_by(public_id = data['public_id'])\
-                    .first()
-            except:
-                return jsonify({
-                    'message' : 'Token is invalid !!'
-                }), 401
-            # returns the current logged in users contex to the routes
-            return  f(current_user, *args, **kwargs)
-
-        return decorated
+    def checkTokenAndLoadData(self, request):
+        token = None
+        # jwt is passed in the request header
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+        # return 401 if token is not passed
+        if not token:
+            print("no token")
+            return False
+        try:
+            # decoding the payload to fetch the stored details
+            data = jwt.decode(token, self.app.config['SECRET_KEY'], algorithms=['HS256'])
+            select = 'SELECT users.email, users.public_id, users."profilePicture", users."admin", users."username", users."dateOfBirth", users."fistName", users."lastName"  FROM users WHERE public_id=%s;'
+            self.cursor.execute(sql.SQL(select), [data['public_id']])
+            userData = self.cursor.fetchone()
+            self.email = userData[0]
+            self.profilePicture = userData[2]
+            self.admin = userData[3]
+            self.username = userData[4]
+            self.dateOfBirth =userData[5]
+            self.firstName = userData[6]
+            self.lastName = userData[7]
+            return True
+        except:
+            print("invalid token")
+            return False
 
     def getUsers(self):
         self.cursor.execute(sql.SQL('SELECT * FROM "users"'))
@@ -58,7 +78,6 @@ class User():
             item = [row[0],row[7],row[8], row[4].strftime("%m/%d/%Y %H:%M:%S"),row[2]]
             returnList.append(item)
         return (json.dumps(returnList), 200)
-
     # route for logging user in
     # @app.route('/api/login', methods =['POST'])
     def login(self, email, password):
@@ -85,10 +104,14 @@ class User():
         return ('Could not verify', 403, {'WWW-Authenticate' : 'Basic realm ="Wrong Password !!"'})
 
     def uploadProfileImage(self, file, name):
-        if file.filename.split('.')[1] == "jpg" or file.filename.split('.')[1] == "png" or file.filename.split('.')[1] == "JPG" or file.filename.split('.')[1] == "jpeg":
-            file.save("react_build/profileImages/" + name + "." + file.filename.split('.')[1])
-        else:
-            print("wrong image format")
+        try:
+            if file.filename.split('.')[1] == "jpg" or file.filename.split('.')[1] == "png" or file.filename.split('.')[1] == "JPG" or file.filename.split('.')[1] == "jpeg":
+                file.save("react_build/profileImages/" + name + "." + file.filename.split('.')[1])
+            else:
+                print("wrong image format")
+        except:
+            print("no profile image")
+
 
     # signup route
     # @app.route('/api/signup', methods =['POST'])

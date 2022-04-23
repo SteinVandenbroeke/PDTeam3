@@ -33,7 +33,8 @@ export class ServerRequest{
 
 		let response = await fetch("/api/" + page, {
 			method: "POST",
-			body: data
+			body: data,
+			headers: myHeaders
 		});
 
 		if(response.status === 201 ||response.status === 200){
@@ -56,6 +57,7 @@ export class ServerRequest{
 		let myHeaders = new Headers();
 		if(loginRequired){
 			myHeaders.append("x-access-token", this.authToken);
+			console.log(this.authToken);
 		}
 
 		let getString = "?"
@@ -65,6 +67,7 @@ export class ServerRequest{
 
 		let response = await fetch("/api/" + page + getString, {
 			method: "GET",
+			headers: myHeaders
 		});
 
 		if(response.status === 201 ||response.status === 200){
