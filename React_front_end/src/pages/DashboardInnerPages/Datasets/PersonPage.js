@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
 import Accordion from "../../../components/Accordion";
 import ItemCard from "../../../components/itemCard";
-import DateTimePicker from 'react-datetime-picker';
 import {toast} from "react-toastify";
 import {ServerRequest} from "../../../logic/ServerCommunication";
 import LogicTable from "../../../components/logicTable";
@@ -11,16 +10,17 @@ import {Spinner} from "react-bootstrap";
 const PersonOverview = () => {
     const {setid, personid} = useParams();
     const [personData, setPersonData] = useState([{"dbName": "id", "dbValue": 0}]);
-    const [purchaseData, setPurchaseData] = useState()
+    const [purchaseData, setPurchaseData] = useState([])
     const [loading, setLoading] = useState(false);
-
     const [metaDataList,setMetaDataList] = useState([["Property", "Value"]]);
+    const [purchaseList,setPurchaseList] = useState([]);
 
+
+    /*
     //static
     const [selectedAlgo, setSelectedAlgo] = useState("Popularity");
     const [selectedDate, setSelectedDate] = useState(new Date());
     const recItems = []
-
     const personDataStatic = {
         "history" : [{"itemID" : "1452", "time_stamp" : "12-4-2022"}, {"itemID" : "1754", "time_stamp" : "17-4-2022"},],
         "recommendations" : [
@@ -29,45 +29,12 @@ const PersonOverview = () => {
         ]
     }
     const histItems = personDataStatic["history"].map((d) => <ItemCard name={d.itemID} desc={d.time_stamp} id={d.itemID} setid={setid}/>);
-    const purchasesList = personDataStatic["history"].map((d) => <ItemCard name={d.itemID} desc={d.time_stamp} id={d.itemID} setid={setid}/>);
-
 
     function toDayString(d){
         if (d instanceof Date){
             return d.getDate() + "-" + (d.getMonth() + 1) + "-" + d.getFullYear()
         } else { return "Not a Date."}
     }
-
-    function loadId(){
-        setLoading(true);
-        let getData = {
-            "id": personid,
-            "table": "customers",
-            "dataSet": setid
-        }
-        let request = new ServerRequest();
-        request.sendGet("getRecordById",getData).then(requestData => {setPersonData(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
-        getData["table"] = "purchases"
-        request.sendGet("getRecordById",getData).then(requestData => {setPurchaseData(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
-    }
-
-
-
-    useEffect(()=>{
-        personData.map((item) => {
-            if(item.dbName !== "id"){
-                setMetaDataList(oldDataList=>[...oldDataList,[item.dbName, item.dbValue]])
-            }
-        });
-    },[personData]);
-
-
-    useEffect(() => {
-        loadId()
-    },[]);
-
-
-
 
     for (const key1 in personDataStatic["recommendations"]){
         if (personDataStatic["recommendations"][key1]["algorithm"] === selectedAlgo &&
@@ -78,6 +45,49 @@ const PersonOverview = () => {
             }
         }
     }
+    */
+
+
+
+
+    function loadId(){
+        setPurchaseData([])
+        setPersonData([])
+        setLoading(true);
+        let getData = {
+            "id": personid,
+            "table": "customers",
+            "dataSet": setid
+        }
+        let request = new ServerRequest();
+        request.sendGet("getRecordById",getData).then(requestData => {setPersonData(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+        getData = {
+            "id": personid,
+            "dataSet": setid
+        }
+        request.sendGet("getPurchases",getData).then(requestData => {setPurchaseData(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+    }
+
+    useEffect(()=>{
+        personData.map((item) => {
+            if(item.dbName !== "id"){
+                setMetaDataList(oldDataList=>[...oldDataList,[item.dbName, item.dbValue]])
+            }
+        });
+    },[personData]);
+
+    useEffect(()=>{
+        purchaseData.map((item) => {
+            setPurchaseList(oldPurchaseList=>[...oldPurchaseList,<ItemCard name={item.item_id} desc={item.timestamp} id={item.item_id} setid={setid}/>])
+        });
+    },[purchaseData]);
+
+
+    useEffect(() => {
+        loadId()
+    },[]);
+
+
 
     return (
         <div>
@@ -110,7 +120,7 @@ const PersonOverview = () => {
                 />
             </Accordion>
             */}
-            <Accordion title={"History"} data={histItems}>
+            <Accordion title={"History"} data={purchaseList}>
                 <Spinner
                     className={!loading? "visually-hidden": ""}
                     as="span"

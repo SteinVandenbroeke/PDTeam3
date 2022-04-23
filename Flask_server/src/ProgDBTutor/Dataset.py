@@ -1,4 +1,6 @@
 import json
+from datetime import datetime
+
 import pandas as pd
 from quote_data_access import DBConnection
 from config import config_data
@@ -188,7 +190,7 @@ class Dataset():
 
         returnObject = []
         for i in range (len(allrows[0])):
-            if type(allrows[0][i]) is not str and type(allrows[0][i]) is not int and type(allrows[0][i]) is not tuple:
+            if type(allrows[0][i]) is datetime:
                 returnObject.append({"dbName": columnNames[i], "dbValue": allrows[0][i].strftime("%m/%d/%Y %H:%M:%S")})
             else:
                 returnObject.append({"dbName": columnNames[i], "dbValue": allrows[0][i]})
@@ -272,6 +274,22 @@ class Dataset():
             returnList.append(item)
         return (json.dumps(returnList), 200)
 
+    def getPurchases(self, userName, dataset):
+        columnNames = self.getColumnNames(dataset+'_purchases')
+        query = 'SELECT * FROM ' + dataset + '_purchases WHERE user_id='+userName
+        self.cursor.execute(sql.SQL(query))
+        data = self.cursor.fetchall()
+        returnList = []
+        for row in data:
+            returnItem = {}
+            for i in range(len(row)):
+                if type(row[i]) is datetime:
+                    returnItem[columnNames[i]] = row[i].strftime("%m/%d/%Y %H:%M:%S")
+                else:
+                    returnItem[columnNames[i]] = row[i]
+            returnList.append(returnItem)
+        print(returnList)
+        return (json.dumps(returnList), 200)
 
     def addapt_numpy_float64(numpy_float64):
         return AsIs(numpy_float64)

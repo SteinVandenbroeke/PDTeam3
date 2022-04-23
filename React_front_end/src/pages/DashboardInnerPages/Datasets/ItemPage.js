@@ -5,6 +5,7 @@ import ItemCard from "../../../components/itemCard";
 import LogicTable from "../../../components/logicTable";
 import {toast} from "react-toastify";
 import {ServerRequest} from "../../../logic/ServerCommunication";
+import {Spinner} from "react-bootstrap";
 
 const ItemOverview = () => {
     const {setid, itemid} = useParams()
@@ -13,9 +14,9 @@ const ItemOverview = () => {
 
     const [itemTitle, setItemTitle] = useState("")
     const [itemDescription, setItemDescription] = useState("")
-    const metaDataList = [["Property", "Value"]];
+    const [metaDataList, setMetaDataList] = [["Property", "Value"]]
 
-    const metaDataTable = <LogicTable data={metaDataList} />
+
 
     function loadId(){
         setItemData([])
@@ -29,19 +30,16 @@ const ItemOverview = () => {
         request.sendGet("getRecordById",getData).then(requestData => {setItemData(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
     }
 
+
     useEffect(()=>{
+        console.log(itemData)
         itemData.map((item) => {
-            if(item.dbName === "title"){
-                setItemTitle(item.dbValue);
-            }
-            else if(item.dbName === "description"){
-                setItemDescription(item.dbValue);
-            }
-            else{
-                metaDataList.push([item.dbName, item.dbValue])
-            }
+            setMetaDataList(oldDataList=>[...oldDataList,[item.dbName, item.dbValue]])
         });
+        console.log(metaDataList)
     },[itemData]);
+
+
 
     useEffect(() => {
         loadId()
@@ -59,7 +57,16 @@ const ItemOverview = () => {
                     <br/>
                     <b>Description:</b> {itemDescription}
                 <div style={{flex:0.6}}>
-                    <Accordion title="Metadata" data={metaDataTable} width={600} />
+                    <Accordion title={"MetaData"} data={<LogicTable data={metaDataList} />}>
+                        <Spinner
+                            className={!loading? "visually-hidden": ""}
+                            as="span"
+                            animation="border"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                        />
+                    </Accordion>
                 </div>
             </div>
         </div>

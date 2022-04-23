@@ -195,6 +195,19 @@ def getPeopleList():
     returnValue = dataset.getPeopleList(request.args.get("dataSet"), request.args.get("offset"))
     return make_response(returnValue[0],returnValue[1])
 
+
+@app.route('/api/getPurchases', methods=['GET'])
+def getPurchases():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
+    dataset = Dataset()
+    returnValue = dataset.getPurchases(request.args.get("id"), request.args.get("dataSet"))
+    return make_response(returnValue[0],returnValue[1])
+
+
 @app.route('/api/getUsers', methods=['GET'])
 def getUsers():
     user = User(app)
@@ -221,7 +234,6 @@ def deleteUser():
     back = user.checkTokenAndLoadData(request)
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
-    print(user.username, request.args.get("userName"))
     if user.username == request.args.get("userName"):
         return make_response('{"message": Cannot delete user u are logged in with."}', 500)
     returnValue = user.deleteUser(request.args.get("userName"))
