@@ -50,6 +50,11 @@ def getUserInformation():
 @app.route('/api/user', methods =['GET'])
 def get_all_users_def():
     user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
+    user = User(app)
     return user.get_all_users(current_user)
 
 # route for logging user in
@@ -74,6 +79,10 @@ def login_def():
 @app.route('/api/signup', methods =['POST'])
 def signup_def():
     user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
     data = request.form
 
     username = data['userName']
@@ -123,12 +132,22 @@ def uploadDataset():
 
 @app.route('/api/changeDataset', methods=['POST'])
 def changeDataset():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
     dataset = Dataset()
     returnValue = dataset.changeApiWrapper(request)
     return make_response(returnValue[0], returnValue[1])
 
 @app.route('/api/getRecordById', methods=['GET'])
 def getRecordById():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
     dataset = Dataset()
     returnValue = dataset.getRecordById(request.args.get("dataSet"), request.args.get("table"), request.args.get("id"))
     return make_response(returnValue[0],returnValue[1])
@@ -144,24 +163,44 @@ def reactApp(path):
 
 @app.route('/api/getDatasets', methods=['GET'])
 def getDatasets():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
     dataset = Dataset()
     returnValue = dataset.getDatasets()
     return make_response(returnValue[0],returnValue[1])
 
 @app.route('/api/getItemList', methods=['GET'])
 def getItemList():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
     dataset = Dataset()
     returnValue = dataset.getItemList(request.args.get("dataSet"), request.args.get("offset"))
     return make_response(returnValue[0],returnValue[1])
 
 @app.route('/api/getPeopleList', methods=['GET'])
 def getPeopleList():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
     dataset = Dataset()
     returnValue = dataset.getPeopleList(request.args.get("dataSet"), request.args.get("offset"))
     return make_response(returnValue[0],returnValue[1])
 
 @app.route('/api/getUsers', methods=['GET'])
 def getUsers():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
     user = User(app)
     returnValue = user.getUsers()
     return make_response(returnValue[0],returnValue[1])
