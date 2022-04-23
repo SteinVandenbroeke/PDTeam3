@@ -10,19 +10,15 @@ import {ServerRequest} from "../../logic/ServerCommunication";
 const UserList = () => {
     const [loading, setLoading] = useState(false);
 
-    function deleteUser(){
+    function deleteUser(username){
         let request = new ServerRequest();
         let getData = {
-            "userName": "lienemien",
+            "userName": username,
         }
         request.sendGet("deleteUser",getData).then(message => {toast.success(message.message); loadUsers()}).catch(error => {toast.error(error.message); setLoading(false)});
     }
 
-    let Delete= (<Button onClick={()=>deleteUser()} variant="outline-danger">
-        <Icon
-            fill="#dc3545"
-            name="trash-2-outline"
-        /></Button>);
+
     let Permission= (<Form.Check
         type="switch"
         id="Permission-switch"
@@ -43,6 +39,12 @@ const UserList = () => {
     useEffect(() => {
         for(var i = 0; i < userData.length; i++){
             let temp = userData[i]
+            let Delete=(
+                <Button onClick={()=>deleteUser(temp[0])} variant="outline-danger"><Icon
+                    fill="#dc3545"
+                    name="trash-2-outline"
+                /></Button>
+            );
             temp.push(Delete)
             setTableData(oldData=>[...oldData,temp])
         }
