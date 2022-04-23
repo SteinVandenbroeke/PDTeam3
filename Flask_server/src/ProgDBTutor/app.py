@@ -105,6 +105,11 @@ def helloWorld():
 
 @app.route('/api/uploadDataset', methods=['GET', 'POST'])
 def uploadDataset():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
     if request.method == 'POST':
         if 'interactionCsv' not in request.files or 'userCsv' not in request.files or 'itemCsv' not in request.files:
             flash('Geen bestand gevonden')
@@ -125,7 +130,7 @@ def uploadDataset():
             return make_response('No file selected.', 400)
 
         datasetName = request.form.get('datasetName')
-    userName = "Stein" #TODO
+    userName = user.username
     dataset = Dataset()
     dataset.add(datasetName, userCsv, itemCsv, interactionCsv, usersConnections, itemConnections, interactionConnections, userName)
     return make_response('{"message": "File successfully uploaded."}', 201)
@@ -151,15 +156,6 @@ def getRecordById():
     dataset = Dataset()
     returnValue = dataset.getRecordById(request.args.get("dataSet"), request.args.get("table"), request.args.get("id"))
     return make_response(returnValue[0],returnValue[1])
-
-# React interface, alle niet verwezen app.route's worden doorverwezen naar react interface in de react_build folder
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def reactApp(path):
-    if not os.path.exists("react_build/" + path) or path == "":
-        path = "index.html"
-
-    return app.send_static_file(path)
 
 @app.route('/api/getDatasets', methods=['GET'])
 def getDatasets():
@@ -204,6 +200,15 @@ def getUsers():
     user = User(app)
     returnValue = user.getUsers()
     return make_response(returnValue[0],returnValue[1])
+
+# React interface, alle niet verwezen app.route's worden doorverwezen naar react interface in de react_build folder
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def reactApp(path):
+    if not os.path.exists("react_build/" + path) or path == "":
+        path = "index.html"
+
+    return app.send_static_file(path)
 
 # RUN DEV SERVER
 if __name__ == "__main__":
