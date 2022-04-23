@@ -1,14 +1,27 @@
-import {Button, Col, Form, Row} from "react-bootstrap";
+import {Button, Col, Form, Row, Spinner} from "react-bootstrap";
 import LogicTable from "../logicTable";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Slider from "../slider";
 import Icon from "react-eva-icons";
+import {ServerRequest} from "../../logic/ServerCommunication";
+import {toast} from "react-toastify";
 
 
 const SelectABSettings = (props) => {
     const [topKValue, setTopKValue] = React.useState([1]);
-    const [periodValues, setPeriodValues] = React.useState([1, 10]);
+    const [periodValues, setPeriodValues] = React.useState([0, 1]);
     const [stepSizeValue, setStepSizeValue] = React.useState([1]);
+    const [periodSlider, setPeriodSlider] = React.useState([1, 10, 2,2,3,74,56,5,5,4,45,4545,45,45,5,445,74]);
+    const [loading, setLoading] = useState(false);
+
+    function loadPeriod(){
+        setLoading(true)
+        let request = new ServerRequest();
+        let getData = {
+            "id": props.datasetId
+        }
+        request.sendGet("getTimeStampList",getData).then(requestData => {setPeriodSlider(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+    }
 
     function confirmDayInterval(){
         props.setCurrentStep(props.currentStep + 1);
@@ -16,6 +29,12 @@ const SelectABSettings = (props) => {
         props.setPeriodValues(periodValues);
         props.setStepSizeValue(stepSizeValue);
     }
+
+    useEffect(() => {
+        if(props.datasetId != null){
+            loadPeriod()
+        }
+    },[props.datasetId]);
 
     return (
         <div>
@@ -25,7 +44,15 @@ const SelectABSettings = (props) => {
                     <Form.Label style={{paddingBottom:20}}>Select the amount of top-K items. These items will be shown to the users as recommended items.</Form.Label>
                     <Slider max={20} min={0} step={1} setValues={setTopKValue} values={topKValue}/>
                     <Form.Label style={{paddingBottom:20}}>Select the start and end date of this ABTest. </Form.Label>
-                    <Slider max={20} min={0} step={1} setValues={setPeriodValues} values={periodValues}/>
+                    <Spinner
+                        className={!loading? "visually-hidden": ""}
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                    />
+                    <Slider max={periodSlider.length - 1} labels={periodSlider} min={0} step={1} setValues={setPeriodValues} values={periodValues}/>
                     <Form.Label style={{paddingBottom:20}}>Select the step size. This will determine when to update the top-K items</Form.Label>
                     <Slider max={20} min={0} step={1} setValues={setStepSizeValue}  values={stepSizeValue}/>
 

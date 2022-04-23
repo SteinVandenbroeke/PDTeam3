@@ -14,11 +14,12 @@ const DataSetsList = () => {
     function openDataSet(id){
         navigation("/dashboard/dataSets/overview/" + id);
     }
+
     function loadDatasets(){
         setDatasets([[]])
         setLoading(true);
         let request = new ServerRequest();
-        request.sendGet("getDatasets").then(requestData => {setDatasets([["id", "Created by", "Creation date"]].concat(requestData)); setLoading(false);});
+        request.sendGet("getDatasets").then(requestData => {setDatasets([["id", "Created by", "Creation date"]].concat(requestData)); setLoading(false);}).catch(error => {toast.error(error.message); setLoading(false)});
     }
 
     useEffect(() => {
@@ -36,7 +37,6 @@ const DataSetsList = () => {
                 className={!loading? "visually-hidden": ""}
                 as="span"
                 animation="border"
-                size="sm"
                 role="status"
                 aria-hidden="true"
             />

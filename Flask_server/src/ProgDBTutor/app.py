@@ -133,6 +133,7 @@ def uploadDataset():
     userName = user.username
     dataset = Dataset()
     dataset.add(datasetName, userCsv, itemCsv, interactionCsv, usersConnections, itemConnections, interactionConnections, userName)
+
     return make_response('{"message": "File successfully uploaded."}', 201)
 
 @app.route('/api/changeDataset', methods=['POST'])
@@ -205,6 +206,17 @@ def getPurchases():
 
     dataset = Dataset()
     returnValue = dataset.getPurchases(request.args.get("id"), request.args.get("dataSet"))
+    return make_response(returnValue[0],returnValue[1])
+
+@app.route('/api/getTimeStampList', methods=['GET'])
+def getTimeStampList():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
+    dataset = Dataset()
+    returnValue = dataset.getTimeStampList(request.args.get("id"))
     return make_response(returnValue[0],returnValue[1])
 
 

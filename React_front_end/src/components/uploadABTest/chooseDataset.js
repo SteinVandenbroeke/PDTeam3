@@ -1,17 +1,42 @@
-import {Button, Form} from "react-bootstrap";
+import {Button, Form, Spinner} from "react-bootstrap";
 import LogicTable from "../logicTable";
-import React from "react";
+import React, {useEffect, useState} from "react";
+import {ServerRequest} from "../../logic/ServerCommunication";
+import {toast} from "react-toastify";
 
 
 const ChooseDataset = (props) => {
+    const [loading, setLoading] = useState(false);
+    const [datasets, setDatasets] = useState([[]]);
+
     function clickDataset(id){
         props.setCurrentStep(props.currentStep + 1);
         props.setDataset(id);
     }
+
+    function loadDatasets(){
+        setDatasets([[]])
+        setLoading(true);
+        let request = new ServerRequest();
+        request.sendGet("getDatasets").then(requestData => {setDatasets([["id", "Created by", "Creation date"]].concat(requestData)); setLoading(false);}).catch(error => {toast.error(error.message); setLoading(false)});
+    }
+
+    useEffect(() => {
+        loadDatasets()
+    },[]);
+
     return (
         <div>
            <Form.Label>Choose the required database.</Form.Label>
-            <LogicTable action={clickDataset} data={[["id", "Dataset name", "Created by", "Creation date"], ["1", "H&M test dataset 1", "Stein Vandenbroeke", "09/03/2022"],["2", "H&M test dataset 2", "Stein Vandenbroeke", "09/03/2022"]]}/>
+            <Spinner
+                className={!loading? "visually-hidden": ""}
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+            />
+            <LogicTable action={clickDataset} data={datasets}/>
         </div>
     )
 }

@@ -13,10 +13,10 @@ import UploadABTestToServer from "../../../components/uploadABTest/UploadABTestT
 
 const AddABTest = () => {
     let [currentStep , setCurrentStep] = useState(0);
-    let [dataSetId , setDatasetId] = useState([]);
-    let [periodValues , setPeriodValues] = useState([]);
-    let [topKValue , setTopKValue] = useState([]);
-    let [stepSizeValue , setStepSizeValue] = useState([]);
+    let [dataSetId , setDatasetId] = useState(null);
+    let [periodValues , setPeriodValues] = useState([1, 10]);
+    let [topKValue , setTopKValue] = useState([1]);
+    let [stepSizeValue , setStepSizeValue] = useState([1]);
     let [algorithms , setAlgorithms] = useState([]);
     return (
         <div style={{textAlign: "left"}}>
@@ -26,7 +26,7 @@ const AddABTest = () => {
                 currentStep === 0 && (<ChooseDataset setDataset={setDatasetId}  currentStep={currentStep} setCurrentStep={setCurrentStep} />)
             }
             {
-                currentStep === 1 && (<SelectABSettings setPeriodValues={setPeriodValues} setTopKValue={setTopKValue} setStepSizeValue={setStepSizeValue} currentStep={currentStep} setCurrentStep={setCurrentStep} />)
+                currentStep === 1 && (<SelectABSettings datasetId={dataSetId} setPeriodValues={setPeriodValues} setTopKValue={setTopKValue} setStepSizeValue={setStepSizeValue} currentStep={currentStep} setCurrentStep={setCurrentStep} />)
             }
             {
                 currentStep === 2 && (<AddAlgoritms currentStep={currentStep} setCurrentStep={setCurrentStep} setAlgorithms={setAlgorithms}/>)

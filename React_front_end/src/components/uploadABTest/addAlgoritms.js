@@ -33,7 +33,7 @@ const AddAlgoritms = (props) => {
     }
 
     function addAlgorithm(){
-        if(valueSelect === "0"){
+        if(valueSelect == "0"){
             toast.error("You need to select an algorithm.");
             return
         }
@@ -58,7 +58,7 @@ const AddAlgoritms = (props) => {
                 <Col xs lg="3">
                     <Form.Label style={{paddingBottom:10}}>Algorithms:</Form.Label>
                     <Form.Select onChange={(e)=>setAlgo(e.target.value)} value={valueSelect}>
-                      <option className={"disabled"}> empty Alogithm</option>
+                      <option value="0" className={"disabled"}> empty Alogithm</option>
                       <option value="Popularity">Popularity</option>
                       <option value="Recency">Recency</option>
                       <option value="ItemKNN">ItemKNN</option>
