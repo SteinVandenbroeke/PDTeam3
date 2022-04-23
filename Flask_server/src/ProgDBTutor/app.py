@@ -218,6 +218,12 @@ def reactApp(path):
 @app.route('/api/deleteUser', methods=['GET'])
 def deleteUser():
     user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    print(user.username, request.args.get("userName"))
+    if user.username == request.args.get("userName"):
+        return make_response('{"message": Cannot delete user u are logged in with."}', 500)
     returnValue = user.deleteUser(request.args.get("userName"))
     return make_response(returnValue[0],returnValue[1])
 
