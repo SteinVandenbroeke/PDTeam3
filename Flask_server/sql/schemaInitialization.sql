@@ -20,7 +20,7 @@ CREATE TABLE users(
   "lastName" varchar
 );
 
-CREATE TABLE ABtest(
+CREATE TABLE abtest(
   "test_name" varchar PRIMARY KEY,
   "algorithms" int[],
   "dataset" varchar,
@@ -29,12 +29,12 @@ CREATE TABLE ABtest(
   "stepsize" TIMESTAMP
 );
 
-CREATE TABLE Algorithms(
+CREATE TABLE algorithms(
   "id" int PRIMARY KEY,
   "name" varchar
 );
 
-CREATE TABLE Datasets(
+CREATE TABLE datasets(
   "name" varchar PRIMARY KEY,
   "createdBy" varchar REFERENCES users("username"),
   "creationDate" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP

@@ -19,7 +19,8 @@ class Dataset():
             purchaseConnections, userName):
 
         # customer table:
-        customerTableName = datasetName + '_customers'
+
+        customerTableName = datasetName.lower() + '_customers'
         customerData = pd.read_csv(customerCSV)
         customerDf = pd.DataFrame(customerData)
         customerConnections = json.loads(customerConnections)
@@ -135,26 +136,8 @@ class Dataset():
             self.cursor.execute(createPurchaseInsert, tuple(sortedData))
 
 
-            """
-            data = ""
-            for i in range(len(sortedData)):
-                if i != 0:
-                    data += ', '
-                if isinstance(sortedData[i], str):
-                    sortedData[i] = sortedData[i].replace('\'', '')
-                    sortedData[i] = sortedData[i].replace('\"', '')
-                    data += '\'' + sortedData[i] + '\''
-                else:
-                    if pd.isnull(sortedData[i]):
-                        data += '0'
-                    else:
-                        data += str(sortedData[i])
-            createPurchaseInsert = 'insert into ' + purchaseTableName + ' values (' + data + ')'
-            self.cursor.execute(sql.SQL(createPurchaseInsert))
-            """
 
-
-        self.cursor.execute(sql.SQL('insert into "Datasets" ("name","createdBy") values (%s,%s)'),[datasetName.lower(), userName])
+        self.cursor.execute(sql.SQL('insert into "datasets" ("name","createdBy") values (%s,%s)'),[datasetName.lower(), userName])
 
         self.connection.commit()
         self.connection.close()
@@ -221,7 +204,7 @@ class Dataset():
 
 
     def getDatasets(self):
-        self.cursor.execute(sql.SQL('SELECT * FROM "Datasets"'))
+        self.cursor.execute(sql.SQL('SELECT * FROM "datasets"'))
         data = self.cursor.fetchall()
         returnList = []
         for row in data:

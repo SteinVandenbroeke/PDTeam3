@@ -114,7 +114,7 @@ def uploadDataset():
             return make_response('No file selected.', 400)
 
         datasetName = request.form.get('datasetName')
-    userName = "Niels" #TODO
+    userName = "NielsBroecky" #TODO
     dataset = Dataset()
     dataset.add(datasetName, userCsv, itemCsv, interactionCsv, usersConnections, itemConnections, interactionConnections, userName)
     return make_response('{"message": "File successfully uploaded."}', 201)

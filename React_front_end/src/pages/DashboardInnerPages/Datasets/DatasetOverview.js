@@ -4,7 +4,7 @@ import ItemCard from "../../../components/itemCard"
 import PersonCard from "../../../components/personCard"
 import Accordion from "../../../components/Accordion"
 import {Link, useParams} from "react-router-dom";
-import {Button, Row, Col, Card} from "react-bootstrap";
+import {Button, Row, Col, Card, Spinner} from "react-bootstrap";
 import Icon from "react-eva-icons";
 import {toast} from "react-toastify";
 import {ServerRequest} from "../../../logic/ServerCommunication";
@@ -62,12 +62,28 @@ const DataSetOverview = () => {
                     <Col>
                         <Card className={"shadow-lg"}  style={{paddingTop: 10}}>
                             <h3>Items</h3>
+                            <Spinner
+                                className={!loading? "visually-hidden": ""}
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                            />
                             <div style={{height:500, overflowY:"auto"}}>{listItems} <Button variant="primary" onClick={()=>loadItems()}>Load More</Button> </div>
                         </Card>
                     </Col>
                     <Col>
                         <Card className={"shadow-lg"} style={{paddingTop: 10}}>
                             <h3>People</h3>
+                            <Spinner
+                                className={!loading? "visually-hidden": ""}
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                            />
                             <div style={{height:500, overflowY:"auto"}}> {listPeople} <Button variant="primary" onClick={()=>loadPeople()}>Load More</Button></div>
                         </Card>
                     </Col>
