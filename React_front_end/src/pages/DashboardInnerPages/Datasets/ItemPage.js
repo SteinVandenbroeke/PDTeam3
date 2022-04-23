@@ -14,7 +14,7 @@ const ItemOverview = () => {
 
     const [itemTitle, setItemTitle] = useState("")
     const [itemDescription, setItemDescription] = useState("")
-    const [metaDataList, setMetaDataList] = [["Property", "Value"]]
+    const [metaDataList, setMetaDataList] = useState([["Property", "Value"]])
 
 
 
