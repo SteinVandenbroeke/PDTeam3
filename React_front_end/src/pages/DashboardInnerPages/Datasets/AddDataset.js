@@ -12,10 +12,10 @@ const AddDataset = () => {
     let [csvInteractionDbConnections, setInteractionCsvDbConnections] = useState({"database": ["timestamp", "user_id", "item_id", "parameter"], "csv": [], "connections": {}})
 
     let [usersCSV , setUsersCSV] = useState(null);
-    let [csvUsersDbConnections, setUsersCsvDbConnections] = useState({"database": ["id", "extra info (int)", "extra info (varchar)", "extra info (datetime)"], "csv": [], "connections": {}})
+    let [csvUsersDbConnections, setUsersCsvDbConnections] = useState({"database": ["id", "extra info (int)", "extra info (varchar)", "extra info (datetime)", "extra info (double)"], "csv": [], "connections": {}})
 
     let [itemsCSV , setItemsCSV] = useState(null);
-    let [csvItemsDbConnections, setItemsCsvDbConnections] = useState({"database": ["id", "title", "description", "extra info (int)", "extra info (varchar)", "extra info (datetime)", "extra info (image)"], "csv": [], "connections": {}})
+    let [csvItemsDbConnections, setItemsCsvDbConnections] = useState({"database": ["id", "title", "description", "extra info (int)", "extra info (varchar)", "extra info (datetime)", "extra info (double)", "extra info (image)"], "csv": [], "connections": {}})
 
 
     return (
