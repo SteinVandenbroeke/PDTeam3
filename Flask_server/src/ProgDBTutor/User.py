@@ -78,6 +78,20 @@ class User():
             item = [row[0],row[7],row[8], row[4].strftime("%m/%d/%Y %H:%M:%S"),row[2]]
             returnList.append(item)
         return (json.dumps(returnList), 200)
+
+    def deleteUser(self, userName):
+        try:
+            self.cursor.execute(sql.SQL('DELETE FROM users WHERE username=%s'), [userName])
+            self.connection.commit()
+        except:
+            self.connection.close()
+            return ('{"message":"User could not be deleted."}', 500)
+        self.connection.close()
+        return ('{"message":"User deleted succesfully."}', 201)
+
+
+
+
     # route for logging user in
     # @app.route('/api/login', methods =['POST'])
     def login(self, email, password):

@@ -142,7 +142,6 @@ class Dataset():
         self.connection.commit()
         self.connection.close()
         self.cursor.close()
-        print("succes")
 
     def change(self, datasetName, table, colm, value, id):
 
@@ -211,6 +210,41 @@ class Dataset():
             item = [row[0], row[1], row[2].strftime("%m/%d/%Y %H:%M:%S")]
             returnList.append(item)
         return (json.dumps(returnList), 200)
+
+    def deleteDataset(self, datasetName):
+        message = '{"message": "Dataset succesfully Deleted"}'
+        errorCode = 201
+        try:
+            query = 'DROP TABLE ' + datasetName + '_articles CASCADE'
+            self.cursor.execute(sql.SQL(query))
+            self.connection.commit()
+        except:
+            message =  '{"message": "Dataset Table '+datasetName+'_articles was not found."}'
+            errorCode = 500
+        try:
+            query = 'DROP TABLE ' + datasetName + '_customers CASCADE'
+            self.cursor.execute(sql.SQL(query))
+            self.connection.commit()
+        except:
+            message = '{"message": "Dataset Table ' + datasetName + '_customers was not found."}'
+            errorCode = 500
+        try:
+            query = 'DROP TABLE ' + datasetName + '_purchases CASCADE'
+            self.cursor.execute(sql.SQL(query))
+            self.connection.commit()
+        except:
+            message = '{"message": "Dataset Table ' + datasetName + '_purchases was not found."}'
+            errorCode = 500
+        try:
+            self.cursor.execute(sql.SQL('DELETE FROM datasets WHERE name=%s'), [datasetName])
+            self.connection.commit()
+        except:
+            message = '{"message": "Dataset ' + datasetName + ' was not found"}'
+            errorCode = 500
+
+        self.connection.close()
+        self.cursor.close()
+        return (message, errorCode)
 
 
     def getItemList(self, datasetName, offset):

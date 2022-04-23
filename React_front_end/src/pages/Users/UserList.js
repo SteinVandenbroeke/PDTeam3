@@ -10,7 +10,15 @@ import {ServerRequest} from "../../logic/ServerCommunication";
 const UserList = () => {
     const [loading, setLoading] = useState(false);
 
-    let Delete= (<Button variant="outline-danger">
+    function deleteUser(){
+        let request = new ServerRequest();
+        let getData = {
+            "userName": "lienemien",
+        }
+        request.sendGet("deleteUser",getData).then(message => {toast.success(message.message); loadUsers()}).catch(error => {toast.error(error.message); setLoading(false)});
+    }
+
+    let Delete= (<Button onClick={()=>deleteUser()} variant="outline-danger">
         <Icon
             fill="#dc3545"
             name="trash-2-outline"
@@ -19,20 +27,26 @@ const UserList = () => {
         type="switch"
         id="Permission-switch"
     />);
-    let BirthDate= (<Form.Group style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}} controlId="dob">
-        <Form.Control style={{width:200}} type="date" name="dob" placeholder="Date of Birth" />
-    </Form.Group>);
 
     const [userData,setUserData] = useState([])
-    let UserData= [["001","Vandenbroeke", "Stein","Steen", BirthDate, Permission,Delete],["003","Van den Broeck", "Niels","NielsBroecky", BirthDate, Permission,Delete]]
-    let TableData= [["UserName","Last Name", "First Name","Date of Birth", "Admin Permissions",""]].concat(userData)
+    const [TableData, setTableData] = useState([["UserName","Last Name", "First Name","Date of Birth", "Admin Permissions",""]])
 
 
     function loadUsers(){
+        setTableData([["UserName","Last Name", "First Name","Date of Birth", "Admin Permissions",""]])
+        setUserData([])
         setLoading(true);
         let request = new ServerRequest();
         request.sendGet("getUsers").then(requestData => {setUserData(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
     }
+
+    useEffect(() => {
+        for(var i = 0; i < userData.length; i++){
+            let temp = userData[i]
+            temp.push(Delete)
+            setTableData(oldData=>[...oldData,temp])
+        }
+    },[userData]);
 
     useEffect(() => {
         loadUsers()
