@@ -168,6 +168,11 @@ def getDatasets():
     returnValue = dataset.getDatasets()
     return make_response(returnValue[0],returnValue[1])
 
+@app.route('/api/deleteDataset', methods=['GET'])
+def deleteDataset():
+    dataset = Dataset()
+    returnValue = dataset.deleteDataset(request.args.get("dataSet"))
+    return make_response(returnValue[0],returnValue[1])
 @app.route('/api/getItemList', methods=['GET'])
 def getItemList():
     user = User(app)
@@ -209,6 +214,13 @@ def reactApp(path):
         path = "index.html"
 
     return app.send_static_file(path)
+
+@app.route('/api/deleteUser', methods=['GET'])
+def deleteUser():
+    user = User(app)
+    returnValue = user.deleteUser(request.args.get("userName"))
+    return make_response(returnValue[0],returnValue[1])
+
 
 # RUN DEV SERVER
 if __name__ == "__main__":

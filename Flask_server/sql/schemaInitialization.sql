@@ -23,7 +23,7 @@ CREATE TABLE users(
 CREATE TABLE abtest(
   "test_name" varchar PRIMARY KEY,
   "algorithms" int[],
-  "dataset" varchar,
+  "dataset" varchar REFERENCES datasets(name) ON DELETE CASCADE,
   "begin_ts" TIMESTAMP,
   "end_ts" TIMESTAMP,
   "stepsize" TIMESTAMP

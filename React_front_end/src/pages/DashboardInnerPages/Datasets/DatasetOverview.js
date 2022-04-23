@@ -44,6 +44,15 @@ const DataSetOverview = () => {
         setPeopleOffset(peopleOffset+10);
     }
 
+    function deleteDataset(){
+        setLoading(true);
+        let request = new ServerRequest();
+        let getData = {
+            "dataSet": setid,
+        }
+        request.sendGet("deleteDataset",getData).then(message => {toast.success(message.message); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+    }
+
     useEffect(() => {
         loadItems()
         loadPeople()
@@ -52,9 +61,12 @@ const DataSetOverview = () => {
     return (
         <div>
              <div style={{width: "100%", textAlign: "right", paddingBottom: "10px"}}>
-                <Link to={"/dashboard/dataSets/overview/" + setid + "/edit"} class={"btn"}>
-                    <Button variant="primary">Edit <Icon name="edit-outline"/></Button>
-                </Link>
+                 <Link to={"/dashboard/dataSets/overview/" + setid + "/edit"} class={"btn"}>
+                     <Button variant="primary">Edit Dataset<Icon name="edit-outline"/></Button>
+                 </Link>
+                 <Link to={"/dashboard/dataSets"} class={"btn"}>
+                    <Button onClick={()=>deleteDataset()} variant="danger">Delete Dataset</Button>
+                 </Link>
             </div>
             <div>
                 <h2> This is dataset {setid} </h2>
