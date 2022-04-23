@@ -171,12 +171,14 @@ class Dataset():
             return ('"message":{"Wrong request"}', 400)
 
     def getRecordById(self, datasetName, table, id):
-        if not table in ["articles", "customers"]:
+        if not table in ["articles", "customers", "purchases"]:
             return ('Worng table type', 500)
         table = datasetName + "_" + table
         columnNames = self.getColumnNames(table)
-
-        select = 'SELECT * FROM {table} WHERE id=%s; '
+        if table == datasetName + "_purchases":
+            select = 'SELECT * FROM {table} WHERE user_id=%s; '
+        else:
+            select = 'SELECT * FROM {table} WHERE id=%s; '
         self.cursor.execute(sql.SQL(select).format(table=sql.Identifier(table)), [id])
         allrows = self.cursor.fetchall()
 
@@ -186,7 +188,10 @@ class Dataset():
 
         returnObject = []
         for i in range (len(allrows[0])):
-            returnObject.append({"dbName": columnNames[i], "dbValue": allrows[0][i]})
+            if type(allrows[0][i]) is not str and type(allrows[0][i]) is not int and type(allrows[0][i]) is not tuple:
+                returnObject.append({"dbName": columnNames[i], "dbValue": allrows[0][i].strftime("%m/%d/%Y %H:%M:%S")})
+            else:
+                returnObject.append({"dbName": columnNames[i], "dbValue": allrows[0][i]})
         self.cursor.close()
         self.connection.close()
         return (json.dumps(returnObject), 200)

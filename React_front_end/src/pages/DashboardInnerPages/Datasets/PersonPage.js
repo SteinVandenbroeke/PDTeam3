@@ -11,6 +11,7 @@ import {Spinner} from "react-bootstrap";
 const PersonOverview = () => {
     const {setid, personid} = useParams();
     const [personData, setPersonData] = useState([{"dbName": "id", "dbValue": 0}]);
+    const [purchaseData, setPurchaseData] = useState()
     const [loading, setLoading] = useState(false);
 
     const [metaDataList,setMetaDataList] = useState([["Property", "Value"]]);
@@ -19,6 +20,7 @@ const PersonOverview = () => {
     const [selectedAlgo, setSelectedAlgo] = useState("Popularity");
     const [selectedDate, setSelectedDate] = useState(new Date());
     const recItems = []
+
     const personDataStatic = {
         "history" : [{"itemID" : "1452", "time_stamp" : "12-4-2022"}, {"itemID" : "1754", "time_stamp" : "17-4-2022"},],
         "recommendations" : [
@@ -26,7 +28,8 @@ const PersonOverview = () => {
             {"test" : "ABtest0", "algorithm" : "Popularity", "timestamp" : "14-4-2022", "rec_list" : ["8957", "5421", "7841"]},
         ]
     }
-
+    const histItems = personDataStatic["history"].map((d) => <ItemCard name={d.itemID} desc={d.time_stamp} id={d.itemID} setid={setid}/>);
+    const purchasesList = personDataStatic["history"].map((d) => <ItemCard name={d.itemID} desc={d.time_stamp} id={d.itemID} setid={setid}/>);
 
 
     function toDayString(d){
@@ -36,7 +39,6 @@ const PersonOverview = () => {
     }
 
     function loadId(){
-        console.log(setid)
         setLoading(true);
         let getData = {
             "id": personid,
@@ -45,20 +47,20 @@ const PersonOverview = () => {
         }
         let request = new ServerRequest();
         request.sendGet("getRecordById",getData).then(requestData => {setPersonData(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+        getData["table"] = "purchases"
+        request.sendGet("getRecordById",getData).then(requestData => {setPurchaseData(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
     }
 
 
 
     useEffect(()=>{
         personData.map((item) => {
-            console.log(item.dbName)
             if(item.dbName !== "id"){
-                console.log(item.dbName)
                 setMetaDataList(oldDataList=>[...oldDataList,[item.dbName, item.dbValue]])
-                console.log(metaDataList)
             }
         });
     },[personData]);
+
 
     useEffect(() => {
         loadId()
@@ -76,7 +78,6 @@ const PersonOverview = () => {
             }
         }
     }
-    const histItems = personDataStatic["history"].map((d) => <ItemCard name={d.itemID} desc={d.time_stamp} id={d.itemID} setid={setid}/>);
 
     return (
         <div>
@@ -84,6 +85,7 @@ const PersonOverview = () => {
                 <div style={{paddingLeft: 20, flex:0.1, textAlign:"left"}}>
                     <b>ID:</b> {personid}
                 </div>
+                {/*
                 <div style={{flex:0.2, textAlign:"left"}}>
                     <select value={selectedAlgo} onChange={e=>setSelectedAlgo(e.target.value)}>
                         <option>Popularity</option>
@@ -94,7 +96,9 @@ const PersonOverview = () => {
                 <div style={{flex:0.7, textAlign:"left"}}>
                     <DateTimePicker value={selectedDate} onChange={setSelectedDate} />
                 </div>
+                */}
             </div>
+            {/*
             <Accordion title={"Recommendations"} data={recItems}>
                 <Spinner
                     className={!loading? "visually-hidden": ""}
@@ -105,6 +109,7 @@ const PersonOverview = () => {
                     aria-hidden="true"
                 />
             </Accordion>
+            */}
             <Accordion title={"History"} data={histItems}>
                 <Spinner
                     className={!loading? "visually-hidden": ""}
