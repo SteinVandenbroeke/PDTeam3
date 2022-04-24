@@ -53,6 +53,8 @@ def get_all_users_def():
     back = user.checkTokenAndLoadData(request)
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
+    elif not user.admin:
+        return make_response('you must be admin to perform this action', 500)
 
     user = User(app)
     return user.get_all_users(current_user)
@@ -82,6 +84,8 @@ def signup_def():
     back = user.checkTokenAndLoadData(request)
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
+    elif not user.admin:
+        return make_response('you must be admin to perform this action', 500)
 
     data = request.form
 
@@ -109,6 +113,8 @@ def uploadDataset():
     back = user.checkTokenAndLoadData(request)
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
+    elif not user.admin:
+        return make_response('you must be admin to perform this action', 500)
 
     if request.method == 'POST':
         if 'interactionCsv' not in request.files or 'userCsv' not in request.files or 'itemCsv' not in request.files:
@@ -142,6 +148,8 @@ def changeDataset():
     back = user.checkTokenAndLoadData(request)
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
+    elif not user.admin:
+        return make_response('you must be admin to perform this action', 500)
 
     dataset = Dataset()
     returnValue = dataset.changeApiWrapper(request)
@@ -171,9 +179,17 @@ def getDatasets():
 
 @app.route('/api/deleteDataset', methods=['GET'])
 def deleteDataset():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    elif not user.admin:
+        return make_response('you must be admin to perform this action', 500)
+
     dataset = Dataset()
     returnValue = dataset.deleteDataset(request.args.get("dataSet"))
     return make_response(returnValue[0],returnValue[1])
+
 @app.route('/api/getItemList', methods=['GET'])
 def getItemList():
     user = User(app)
@@ -242,6 +258,13 @@ def reactApp(path):
 
 @app.route('/api/deleteUser', methods=['GET'])
 def deleteUser():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    elif not user.admin:
+        return make_response('you must be admin to perform this action', 500)
+
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
