@@ -110,7 +110,7 @@ class User():
             # generates the JWT Token
             token = jwt.encode({
                 'public_id': public_id,
-                'exp' : datetime.utcnow() + timedelta(minutes = 30)
+                'exp' : datetime.utcnow() + timedelta(minutes = 240)
             }, self.app.config['SECRET_KEY'])
 
             return (jsonify({'token' : token, 'profileImage': profileImage}), 201)
