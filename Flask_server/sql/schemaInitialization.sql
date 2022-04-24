@@ -16,7 +16,7 @@ CREATE TABLE users(
   "dateOfBirth" timestamp,
   "profilePicture" varchar,
   "public_id" varchar,
-  "fistName" varchar,
+  "firstName" varchar,
   "lastName" varchar
 );
 
