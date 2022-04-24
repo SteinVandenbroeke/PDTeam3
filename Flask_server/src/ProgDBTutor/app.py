@@ -242,6 +242,8 @@ def getUsers():
     back = user.checkTokenAndLoadData(request)
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
+    elif not user.admin:
+        return make_response('you must be admin to perform this action', 500)
 
     user = User(app)
     returnValue = user.getUsers()
