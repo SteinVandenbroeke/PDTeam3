@@ -75,7 +75,7 @@ class User():
         data = self.cursor.fetchall()
         returnList = []
         for row in data:
-            item = [row[0],row[7],row[8], row[4].strftime("%m/%d/%Y %H:%M:%S"),row[2]]
+            item = [row[0],row[7],row[8], row[4].strftime("%m/%d/%Y"),row[2]]
             returnList.append(item)
         return (json.dumps(returnList), 200)
 
