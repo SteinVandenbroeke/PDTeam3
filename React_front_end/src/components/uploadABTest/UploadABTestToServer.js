@@ -17,8 +17,7 @@ const UploadABTestToServer = (props) => {
         formData.append("topKValues", topKValues);
         formData.append('stepSizeValue', stepSizeValue);
         formData.append('algorithms', algorithms);
-        request.sendPost("upload",formData, true).then(function(){}).catch(error => {toast.error(error.message); setUploading(3)});
-        props.setCurrentStep(props.currentStep + 1)
+        request.sendPost("upload",formData, true).then(message => {toast.success(message.message); setUploading(2)}).catch(error => {toast.error(error.message); setUploading(3)});
     }
 
     return (
@@ -26,6 +25,7 @@ const UploadABTestToServer = (props) => {
             <Row style={{paddingTop: 20}}>
                 <Col xs={2} sm={12} md={7} style={{padding: 40}}>
                     <Card className={"shadow-lg"}>
+                        { uploading === 0 &&
                           <Card.Body >
                               <h5>Upload AB Test to server</h5>
                               <div style={{paddingBottom: 20}}>
@@ -47,6 +47,36 @@ const UploadABTestToServer = (props) => {
                               </div>
                               <Button  variant="primary" onClick={() => upload(props.dataSetId, props.periodValues, props.topKValues, props.stepSizeValue, props.algorithms)}>Upload</Button>{' '}
                           </Card.Body>
+                        }
+                        { uploading === 1 &&
+                              <Card.Body>
+                                  <h5>Upload to server</h5>
+                                  <div style={{paddingRight: "50%", paddingTop: 20, paddingBottom: 20}}>
+                                      <h1>Bestanden uploaden</h1>
+                                      <Spinner animation="border" role="status">
+                                          <span className="visually-hidden">Loading...</span>
+                                      </Spinner>
+                                  </div>
+                              </Card.Body>
+                        }
+                        { uploading === 2 &&
+                          <Card.Body>
+                              <h5>Upload to server</h5>
+                              <div style={{paddingRight: "50%", paddingTop: 20, paddingBottom: 20}}>
+                                  <h1>Bestanden zijn succesvol geupload, u vindt de A/B test onder 'A/B Tests'</h1>
+                              </div>
+                          </Card.Body>
+                        }
+
+                         { uploading === 3 &&
+                          <Card.Body>
+                              <h5>Upload to server</h5>
+                              <div style={{paddingRight: "50%", paddingTop: 20, paddingBottom: 20}}>
+                                  <h1>Er ging iets fout bij het uploaden</h1>
+                                  <Button  variant="primary" onClick={() => upload(props.dataSetId, props.periodValues, props.topKValues, props.stepSizeValue, props.algorithms)}>Upload</Button>{' '}
+                              </div>
+                          </Card.Body>
+                        }
                     </Card>
                 </Col>
                 <Col xs={0} sm={0} md={5}>

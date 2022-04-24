@@ -20,7 +20,7 @@ const UploadDatasetToServer = (props) => {
         formData.append('userCsv', csvUsers);
         formData.append('itemCsv', csvItems);
         formData.append('datasetName', dataSetName);
-        request.sendPost("uploadDataset",formData).then(message => {toast.success(message.message); setUploading(2)}).catch(error => {toast.error(error.message); setUploading(3)});
+        request.sendPost("uploadDataset",formData, true).then(message => {toast.success(message.message); setUploading(2)}).catch(error => {toast.error(error.message); setUploading(3)});
     }
 
     return (
@@ -72,7 +72,7 @@ const UploadDatasetToServer = (props) => {
                               <Card.Body>
                                   <h5>Upload to server</h5>
                                   <div style={{paddingRight: "50%", paddingTop: 20, paddingBottom: 20}}>
-                                      <h1>Bestanden zijn succesvol geupload, u vind de dataset onder 'datasets'</h1>
+                                      <h1>Bestanden zijn succesvol geupload, u vindt de dataset onder 'datasets'</h1>
                                   </div>
                               </Card.Body>
                             }

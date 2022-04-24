@@ -44,6 +44,8 @@ class Dataset():
                 type = ""
                 if customerConnections['connections'][param] == 'extra info (int)':
                     type = 'int'
+                elif customerConnections['connections'][param] == 'extra info (double)':
+                    type = 'float'
                 elif customerConnections['connections'][param] == 'extra info (varchar)':
                     type = 'varchar'
                 elif customerConnections['connections'][param] == 'extra info (datetime)':
@@ -88,9 +90,12 @@ class Dataset():
                     articleParameters += ', description varchar'
                 elif articleConnections['connections'][param] == 'extra info (int)':
                     articleParameters += ', ' + param + ' int'
-                elif articleConnections['connections'][param] == 'extra info (varchar)' or \
-                        articleConnections['connections'][param] == 'extra info (image)':
+                elif articleConnections['connections'][param] == 'extra info (double)':
+                    articleParameters += ', ' + param + ' float'
+                elif articleConnections['connections'][param] == 'extra info (varchar)':
                     articleParameters += ', ' + param + ' varchar'
+                elif articleConnections['connections'][param] == 'extra info (image)':
+                    articleParameters += ', image varchar'
                 elif articleConnections['connections'][param] == 'extra info (datetime)':
                     articleParameters += ', ' + param + ' datetime'
                 articleDataOrder[param] = len(articleDataOrder)
@@ -288,7 +293,6 @@ class Dataset():
                 else:
                     returnItem[columnNames[i]] = row[i]
             returnList.append(returnItem)
-        print(returnList)
         return (json.dumps(returnList), 200)
 
     def addapt_numpy_float64(numpy_float64):

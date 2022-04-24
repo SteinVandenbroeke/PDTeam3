@@ -40,12 +40,6 @@ const AddABTest = () => {
                                                             stepSizeValue={stepSizeValue}
                                                             algorithms={algorithms}/>)
             }
-            {
-                currentStep === 4 && (
-                    <h6 style={{paddingTop:20}}>Upload succesfull</h6>
-                )
-            }
-
         </div>
     );
 };
