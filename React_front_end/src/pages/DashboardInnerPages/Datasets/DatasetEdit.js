@@ -11,7 +11,7 @@ import {toast} from "react-toastify";
 import {ServerRequest} from "../../../logic/ServerCommunication";
 
 const DataSetEdit = () => {
-    const [itemsDB, setItemsDB] = React.useState([{dbName: "Title", dbValue: "dit is de title"},{dbName: "Description", dbValue: "dit is de beschrijving"},{dbName: "Price", dbValue: "€10"}]);
+    const [itemsDB, setItemsDB] = React.useState([{dbName: "Title", dbValue: "This is the title"},{dbName: "Description", dbValue: "This is the description"},{dbName: "Price", dbValue: "This is the price"}]);
     const [currentItemId, setCurrentItemId] = React.useState(0);
     const [currentTable, setCurrentTable] = React.useState("Items");
     const [loading, setLoading] = useState(false);

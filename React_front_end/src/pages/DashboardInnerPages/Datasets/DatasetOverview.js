@@ -62,7 +62,7 @@ const DataSetOverview = () => {
         <div>
              <div style={{width: "100%", textAlign: "right", paddingBottom: "10px"}}>
                  <Link to={"/dashboard/dataSets/overview/" + setid + "/edit"} class={"btn"}>
-                     <Button variant="primary">Edit Dataset<Icon name="edit-outline"/></Button>
+                     <Button variant="primary">Edit Data<Icon name="edit-outline"/></Button>
                  </Link>
                  <Link to={"/dashboard/dataSets"} class={"btn"}>
                     <Button onClick={()=>deleteDataset()} variant="danger">Delete Dataset</Button>
