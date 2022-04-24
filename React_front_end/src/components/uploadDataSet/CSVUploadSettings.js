@@ -24,22 +24,23 @@ const CSVUploadSettings = (props) => {
     function nexStep(){
 
         console.log(props.csvDbConnections)
-        if("article_id" in props.csvDbConnections.connections &&
-           "customer_id" in props.csvDbConnections.connections &&
-           "price" in props.csvDbConnections.connections &&
-           "t_dat" in props.csvDbConnections.connections) {
+        if( Object.values(props.csvDbConnections.connections).includes("timestamp") &&
+            Object.values(props.csvDbConnections.connections).includes("item_id") &&
+            Object.values(props.csvDbConnections.connections).includes("user_id") &&
+            Object.values(props.csvDbConnections.connections).includes("parameter")) {
             //interaction
             props.setCurrentStep(props.currentStep + 1);
         }
-        else if(!("title" in props.csvDbConnections.database) &&
-                !("description" in props.csvDbConnections.database) &&
-                "customer_id" in props.csvDbConnections.connections){
+
+        else if(!(props.csvDbConnections.database.includes("title")) &&
+                !(props.csvDbConnections.database.includes("description")) &&
+                Object.values(props.csvDbConnections.connections).includes("id")){
             //users
-             props.setCurrentStep(props.currentStep + 1);
+            props.setCurrentStep(props.currentStep + 1);
         }
-        else if("article_id" in props.csvDbConnections.connections &&
-           "prod_name" in props.csvDbConnections.connections &&
-           "product_type_name" in props.csvDbConnections.connections) {
+        else if(Object.values(props.csvDbConnections.connections).includes("id") &&
+           Object.values(props.csvDbConnections.connections).includes("title") &&
+           Object.values(props.csvDbConnections.connections).includes("description")) {
             //articels
             props.setCurrentStep(props.currentStep + 1);
         }
