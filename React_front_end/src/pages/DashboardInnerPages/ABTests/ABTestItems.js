@@ -5,8 +5,20 @@ import BackButton from "../../../components/backButton"
 import ItemCard from "../../../components/itemCard";
 import LogicTable from "../../../components/logicTable";
 import Slider from "../../../components/slider"
+import {Row,Col} from "react-bootstrap";
 
 const ABTestItems = (props) => {
+    const [values, setValues] = React.useState([0, 1]);
+    const [abTestData, setAbTestData] = React.useState({
+            "algorithms": [],
+            "points": [0,10],
+            "parameters": {
+                "topK": null,
+                "stepSize": null,
+                "datasetId": null
+            },
+            "NotAlgDependent":[]
+        });
      const dataItems = {
          "popularity":{items: [
              {Title: "titel1", itemId: 1, buyRate: 5, reccomendRate: 9, price: 13},
@@ -15,7 +27,7 @@ const ABTestItems = (props) => {
          "recency":{items: [
              {Title: "titel3", itemId: 3, buyRate: 7, reccomendRate: 11, price: 15},
                  {Title: "titel4", itemId: 4, buyRate: 8, reccomendRate: 12, price: 16}]}}
-    var l = dataItems.length
+
     //const [itemData, setItemData] = React.useState([])
     //function loadData(){
     //    setItemData([{name:"test1"},{}])
@@ -27,26 +39,23 @@ const ABTestItems = (props) => {
     return (
         <div className="App">
             <BackButton/>
-            <header>
-                <h1>AB tests</h1>
-            </header>
+
+            <Slider labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />
 
             <ItemCard name={"item"} desc={"Representation of item"}/>
 
             <div className="container">
-                <div className="row">
+                <Row>
                     {dataItems.map((item, index) => {
                         return(
-                        <div className="col">
+                        <Col>
                             <LogicTable data={[["d"], [2]]}/>
-                        </div>
+                        </Col>
                         )}
                     )}
-                </div>
+                </Row>
 
             </div>
-
-
 
         </div>
     );

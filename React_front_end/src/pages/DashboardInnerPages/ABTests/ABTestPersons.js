@@ -6,13 +6,23 @@ import LogicTable from "../../../components/logicTable";
 import Slider from "../../../components/slider";
 
 const ABTestPersons = (props) => {
+    const [values, setValues] = React.useState([0, 1]);
+    const [abTestData, setAbTestData] = React.useState({
+            "algorithms": [],
+            "points": [0,10],
+            "parameters": {
+                "topK": null,
+                "stepSize": null,
+                "datasetId": null
+            },
+            "NotAlgDependent":[]
+        });
     const {abTestId} = useParams()
     const navigation = useNavigate();
     function openUser(id){
         navigation("/dashboard/dataSets/overview/"+ abTestId + "/person/"+ id);
     }
 
-    //<Slider labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />
 
     const exampleUsers = [{"userId": 2, "userName": "userTest1", "Purchases": 9, "CTR": 32},
         {"userId": 9, "userName": "userTest2", "Purchases": 1, "CTR": 34}]
@@ -30,6 +40,10 @@ const ABTestPersons = (props) => {
     return (
         <div className="App">
             <BackButton/>
+
+
+            <Slider labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />
+
             <LogicTable action={openUser} data={data1}/>
         </div>
     );
