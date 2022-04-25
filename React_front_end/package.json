@@ -23,7 +23,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build && rm -R ../Flask_server/src/ProgDBTutor/react_build && cp -R build ../Flask_server/src/ProgDBTutor/react_build",
+    "build": "react-scripts build && rm -R ../Flask_server/src/ProgDBTutor/react_build && cp -R build ../Flask_server/src/ProgDBTutor/react_build && mkdir ../Flask_server/src/ProgDBTutor/react_build/profileImages",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
