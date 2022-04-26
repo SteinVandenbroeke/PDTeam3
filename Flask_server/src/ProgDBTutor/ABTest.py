@@ -17,6 +17,12 @@ class ABTest():
         connection = database.get_connection()
         self.cursor = connection.cursor()
         self.abTestId = abTestId
+        self.testName
+        self.algorithms
+        self.dataset
+        self.beginTs
+        self.endTs
+        self.stepSize
 
     def history_from_subset_interactions(self, interactions, amt_users=5) -> List[List]:
         """ Take the history of the first users in the dataset and return as list of lists"""
@@ -95,11 +101,16 @@ class ABTest():
         """
         print("item data in ABtest")
 
-    def _getAbTestInformation(self):
+    def initialize(self):
         if self.abTestId == None:
             exit("Wrong abtestId")
         print(self.abTestId)
         select = 'SELECT * FROM abtest WHERE test_name = %s;'
         self.cursor.execute(sql.SQL(select).format(), [self.abTestId])
         data = self.cursor.fetchone()
-        return {"test_name": data[0],"algorithms": data[1],"dataset": data[2],"begin_ts": data[3],"end_ts": data[4], "stepsize": data[5]}
+        self.testName = data[0]
+        self.algorithms = data[1]
+        self.dataset = data[2]
+        self.beginTs = data[3]
+        self.endTs = data[4]
+        self.stepSize = data[5]
