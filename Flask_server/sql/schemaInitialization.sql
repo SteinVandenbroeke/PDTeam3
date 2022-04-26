@@ -16,6 +16,11 @@ CREATE TABLE datasets(
   "creationDate" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE algorithms(
+  "id" int PRIMARY KEY,
+  "name" varchar
+);
+
 CREATE TABLE abtest(
   "test_name" varchar PRIMARY KEY,
   "dataset" varchar REFERENCES datasets(name) ON DELETE CASCADE,
@@ -59,11 +64,6 @@ CREATE TABLE "abrecid_personrecid" (
   "personid" int,
   "test_name" varchar,
   PRIMARY KEY ("idAbRec", "personid", "test_name")
-);
-
-CREATE TABLE algorithms(
-  "id" int PRIMARY KEY,
-  "name" varchar
 );
 
 --TODO add to python ALTER TABLE "abtestsitems" ADD FOREIGN KEY ("item_id") REFERENCES "setname_items" ("item_id");
