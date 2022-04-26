@@ -8,6 +8,7 @@ export class User{
     constructor() {
         this.isLoggedInV = false;
         this.userToken = null;
+        this.admin = false;
         if(window.localStorage.getItem("authToken") !== null){
             this.isLoggedInV = true;
             this.userToken = window.localStorage.getItem("authToken");
@@ -32,6 +33,8 @@ export class User{
             }
             let response = await request.sendPost("login",formdata, false);
             this.userToken = response.token;
+            this.admin = response.admin;
+            console.log(this.admin);
             window.localStorage.setItem("authToken", this.userToken);
             this.isLoggedInV = true;
             return true;
@@ -57,6 +60,15 @@ export class User{
      */
     isLoggedIn(){
         return this.isLoggedInV;
+    }
+
+    /***
+     * Returns if user has admin privileges
+     * @returns {boolean}
+     */
+    isAdmin(){
+        console.log("is admin: " + this.admin)
+        return this.admin;
     }
 
     /***
