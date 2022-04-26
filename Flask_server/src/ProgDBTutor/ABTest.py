@@ -22,6 +22,7 @@ class ABTest():
         self.beginTs = None
         self.endTs = None
         self.stepSize = None
+        self.topK = None
         if abTestId != None:
             self.initialize()
 
@@ -103,7 +104,7 @@ class ABTest():
         """
         print("item data in ABtest")
 
-    def initialize(self, abTestId=None, algorithms = None, dataset = None, beginTs = None, endTs = None, stepSize = None):
+    def initialize(self, abTestId=None, algorithms = None, dataset = None, beginTs = None, endTs = None, stepSize = None, topK = None):
         """
         initializes the ABTest information, by default it will load the date on abTestId from the database
         @param abTestId: the id (name) of the ABTest
@@ -114,6 +115,7 @@ class ABTest():
         @param stepSize: the stepsize
         @return:
         """
+
         if self.abTestId == None and abTestId != None:
             self.abTestId = abTestId
             self.algorithms = []
@@ -123,6 +125,7 @@ class ABTest():
             self.beginTs = beginTs
             self.endTs = endTs
             self.stepSize = stepSize
+            self.topK = topK
         elif self.abTestId == None and abTestId == None:
             exit("No data to initialize")
         else:
