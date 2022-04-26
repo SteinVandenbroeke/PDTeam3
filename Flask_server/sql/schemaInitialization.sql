@@ -10,13 +10,26 @@ CREATE TABLE users(
   "lastName" varchar
 );
 
+CREATE TABLE datasets(
+  "name" varchar PRIMARY KEY,
+  "createdBy" varchar REFERENCES users("username"),
+  "creationDate" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE abtest(
   "test_name" varchar PRIMARY KEY,
-  "algorithms" int[],
   "dataset" varchar REFERENCES datasets(name) ON DELETE CASCADE,
   "begin_ts" TIMESTAMP,
   "end_ts" TIMESTAMP,
   "stepsize" int
+);
+
+CREATE TABLE abtest_algorithms(
+    "test_name" varchar REFERENCES abtest(test_name) ON UPDATE CASCADE ON DELETE CASCADE,
+    "algorithmid" int REFERENCES algorithms(id),
+    "interval" int,
+    "K" int,
+    PRIMARY KEY("test_name", "algorithmid", "interval")
 );
 
 CREATE TABLE "abtestsitems" (
@@ -26,7 +39,7 @@ CREATE TABLE "abtestsitems" (
   "timestamp" timestamp ,
   "num_of_rec" int,
   "num_of_suc_rec" int,
-   PRIMARY Key("item_id", "test", "algorithm", "timestamp")
+   PRIMARY KEY("item_id", "test", "algorithm", "timestamp")
 );
 
 CREATE TABLE "abrec" (
@@ -52,14 +65,6 @@ CREATE TABLE algorithms(
   "id" int PRIMARY KEY,
   "name" varchar
 );
-
-CREATE TABLE datasets(
-  "name" varchar PRIMARY KEY,
-  "createdBy" varchar REFERENCES users("username"),
-  "creationDate" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-
 
 --TODO add to python ALTER TABLE "abtestsitems" ADD FOREIGN KEY ("item_id") REFERENCES "setname_items" ("item_id");
 
