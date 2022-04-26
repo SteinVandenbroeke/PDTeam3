@@ -14,8 +14,8 @@ class ABTest():
         database = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'],
                                 userPassword=config_data['password'], dbhost=config_data['host'],
                                 dbport=config_data['port'])
-        connection = database.get_connection()
-        self.cursor = connection.cursor()
+        self.connection = database.get_connection()
+        self.cursor = self.connection.cursor()
         self.abTestId = abTestId
         self.algorithms = []
         self.dataset = None
@@ -117,24 +117,26 @@ class ABTest():
         """
 
         if self.abTestId == None and abTestId != None:
-            self.abTestId = abTestId
-            self.algorithms = []
+            algorithmsTemp = []
             for algorithm in algorithms:
-                self.algorithms.append([algorithm[0], algorithm[1][0]])
-            self.dataset = dataset
-            self.beginTs = beginTs
-            self.endTs = endTs
-            self.stepSize = stepSize
-            self.topK = topK
+                algorithmsTemp.append([algorithm[0], algorithm[1][0]])
+
+            select = 'INSERT INTO abtest VALUE (%s,%s,%s,%s,%s,%s,%s);'
+            self.cursor.execute(sql.SQL(select), [abTestId, algorithmsTemp, dataset, beginTs, endTs, stepSize, topK])
+            self.connection.commit()
+
         elif self.abTestId == None and abTestId == None:
             exit("No data to initialize")
-        else:
-            print(self.abTestId)
-            select = 'SELECT * FROM abtest WHERE test_name = %s;'
-            self.cursor.execute(sql.SQL(select).format(), [self.abTestId])
-            data = self.cursor.fetchone()
-            self.algorithms = data[1]
-            self.dataset = data[2]
-            self.beginTs = data[3]
-            self.endTs = data[4]
-            self.stepSize = data[5]
+
+        print(self.abTestId)
+        select = 'SELECT * FROM abtest WHERE test_name = %s;'
+        self.cursor.execute(sql.SQL(select).format(), [self.abTestId])
+        data = self.cursor.fetchone()
+        algorithms = data[1]
+        self.algorithms = []
+        for algorithm in algorithms:
+            self.algorithms.append([algorithm[0], algorithm[1][0]])
+        self.dataset = data[2]
+        self.beginTs = data[3]
+        self.endTs = data[4]
+        self.stepSize = data[5]
