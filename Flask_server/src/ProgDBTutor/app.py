@@ -26,6 +26,7 @@ from flask_sqlalchemy import SQLAlchemy
 from User import User
 
 from Dataset import Dataset
+from ABTest import *
 
 # INITIALIZE SINGLETON SERVICES
 app = Flask('Tutorial ', static_url_path="/stop/", static_folder="react_build/")
@@ -144,6 +145,21 @@ def uploadDataset():
 
     return make_response('{"message": "File successfully uploaded."}', 201)
 
+<<<<<<< HEAD
+@app.route('/api/uploadAB', methods=['GET', 'POST'])
+def uploadABTest():
+    algorithms = json.load(request.form.get('algorithms'))
+
+    for algo in algorithms:
+        print(algo)
+        print("\ntest")
+    
+    return make_response('{"message": "AB test successfully uploaded."}', 201)
+
+@app.route('/api/create', methods=['GET', 'POST'])
+def create():
+    ABTest().execute(2, "2019-01-01", "2021-01-01", 2, "data")
+=======
 @app.route('/api/createAbTest', methods=['GET', 'POST'])
 def createAbTest():
     user = User(app)
@@ -159,6 +175,7 @@ def createAbTest():
     print(request.form.get("topKValues"))
     print(request.form.get("stepSizeValue"))
     return make_response('{"message": "Created."}', 201)
+>>>>>>> e9872084096331421872d535c76c0d2e327010fa
 
 @app.route('/api/changeDataset', methods=['POST'])
 def changeDataset():
