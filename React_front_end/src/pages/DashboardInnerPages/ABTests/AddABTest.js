@@ -13,6 +13,7 @@ import UploadABTestToServer from "../../../components/uploadABTest/UploadABTestT
 
 const AddABTest = () => {
     let [currentStep , setCurrentStep] = useState(0);
+    let [abTestName , setAbTestName] = useState(null);
     let [dataSetId , setDatasetId] = useState(null);
     let [periodValues , setPeriodValues] = useState([1, 10]);
     let [topKValue , setTopKValue] = useState([1]);
@@ -26,7 +27,7 @@ const AddABTest = () => {
                 currentStep === 0 && (<ChooseDataset setDataset={setDatasetId}  currentStep={currentStep} setCurrentStep={setCurrentStep} />)
             }
             {
-                currentStep === 1 && (<SelectABSettings datasetId={dataSetId} setPeriodValues={setPeriodValues} setTopKValue={setTopKValue} setStepSizeValue={setStepSizeValue} currentStep={currentStep} setCurrentStep={setCurrentStep} />)
+                currentStep === 1 && (<SelectABSettings setAbTestName={setAbTestName} datasetId={dataSetId} setPeriodValues={setPeriodValues} setTopKValue={setTopKValue} setStepSizeValue={setStepSizeValue} currentStep={currentStep} setCurrentStep={setCurrentStep} />)
             }
             {
                 currentStep === 2 && (<AddAlgoritms currentStep={currentStep} setCurrentStep={setCurrentStep} setAlgorithms={setAlgorithms}/>)
@@ -34,6 +35,7 @@ const AddABTest = () => {
             {
                 currentStep === 3 && (<UploadABTestToServer currentStep={currentStep}
                                                             setCurrentStep={setCurrentStep}
+                                                            abTestName={abTestName}
                                                             dataSetId={dataSetId}
                                                             periodValues={periodValues}
                                                             topKValues={topKValue}

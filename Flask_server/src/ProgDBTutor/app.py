@@ -27,7 +27,6 @@ from User import User
 from Dataset import Dataset
 from ABTest import *
 
-from ABTest import ABTest
 
 # INITIALIZE SINGLETON SERVICES
 app = Flask('Tutorial ', static_url_path="/stop/", static_folder="react_build/")
@@ -154,7 +153,7 @@ def uploadABTest():
     for algo in algorithms:
         print(algo)
         print("\ntest")
-    
+
     return make_response('{"message": "AB test successfully uploaded."}', 201)
 
 @app.route('/api/create', methods=['GET', 'POST'])
@@ -170,6 +169,7 @@ def createAbTest():
     elif not user.admin:
         return make_response('you must be admin to perform this action', 500)
 
+    print(request.form.get("abTestName"))
     period = json.loads(request.form.get("periodValues"))
     algorithms = json.loads(request.form.get("algorithms"))
     abtest = ABTest()
