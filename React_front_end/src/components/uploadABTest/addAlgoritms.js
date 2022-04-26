@@ -11,8 +11,9 @@ import { toast } from 'react-toastify';
 
 const AddAlgoritms = (props) => {
     const [trainingIntervalvalue, setTrainingIntervalvalue] = React.useState([1]);
-    const [valueSelect, setValueSelect] = React.useState("0");
+    const [valueSelect, setValueSelect] = React.useState(0);
     const [algorithms,setAlgorithms] = React.useState([[]]);
+    const [k, setK] = React.useState([0]);
 
 
     function finish(){
@@ -41,13 +42,18 @@ const AddAlgoritms = (props) => {
             toast.error("You cannot add an algorithm with the same parameters twice.");
             return
         }
-        setAlgorithms(algorithms => [...algorithms, [valueSelect,trainingIntervalvalue]]);
+        setAlgorithms(algorithms => [...algorithms, [valueSelect,trainingIntervalvalue, k]]);
         setValueSelect("0")
         setTrainingIntervalvalue([1])
     }
     function setAlgo(id){
+        if(id != 3){
+            setK([0])
+        }
         setValueSelect(id)
     }
+
+
 
     return (
         <div style={{textAlign: "left"}}>
@@ -59,10 +65,16 @@ const AddAlgoritms = (props) => {
                     <Form.Label style={{paddingBottom:10}}>Algorithms:</Form.Label>
                     <Form.Select onChange={(e)=>setAlgo(e.target.value)} value={valueSelect}>
                       <option value="0" className={"disabled"}> empty Alogithm</option>
-                      <option value="Popularity">Popularity</option>
-                      <option value="Recency">Recency</option>
-                      <option value="ItemKNN">ItemKNN</option>
+                      <option value="1">Popularity</option>
+                      <option value="2">Recency</option>
+                      <option value="3">ItemKNN</option>
                     </Form.Select>
+                    {valueSelect == 3 && (
+                        <div>
+                            <Form.Label style={{paddingBottom:20}}>K:</Form.Label>
+                            <Slider max={20} min={1} step={1} setValues={setK} values={k}/>
+                        </div>
+                    )}
                 </Col>
                 <Col xs lg="3">
                     <Form.Label style={{paddingBottom:20}}>Training interval:</Form.Label>
@@ -75,7 +87,7 @@ const AddAlgoritms = (props) => {
                     <Form.Label style={{paddingBottom:10}}>Added algorithms:</Form.Label>
                     <Card className={"shadow-lg"}>
                       <Card.Body>
-                          <LogicTable data={[["Algoriths","Training interval"]].concat(algorithms)}/>
+                          <LogicTable data={[["Algoriths","Training interval","k"]].concat(algorithms)}/>
                       </Card.Body>
                     </Card>
                 </Col>
