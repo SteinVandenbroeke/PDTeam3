@@ -37,6 +37,10 @@ class ABTest():
 
         return list(user_histories.values())
 
+    def create(self):
+        for algo in self.algorithms:
+            self.execute()
+
     def execute(self, topKItemsCount, startDate, endDate, algorithm, datasets, users=1, k=1):
         """
         Create: function to create a new ABTest, and wil make the current ABTest te created ABTest
