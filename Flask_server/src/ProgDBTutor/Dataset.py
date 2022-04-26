@@ -341,6 +341,17 @@ class Dataset():
         except:
             return ('"message":{"Wrong dataset name"}', 412)
 
+    def getArticleCount(self, datasetId):
+        self.cursor.execute(sql.SQL('SELECT COUNT(id) FROM '+datasetId+'_articles'))
+        count = self.cursor.fetchall()[0][0]
+        return (json.dumps(count), 200)
+
+    def getCustomerCount(self, datasetId):
+        self.cursor.execute(sql.SQL('SELECT COUNT(id) FROM '+datasetId+'_customers'))
+        count = self.cursor.fetchall()[0][0]
+        return (json.dumps(count), 200)
+
+
     def addapt_numpy_float64(numpy_float64):
         return AsIs(numpy_float64)
 

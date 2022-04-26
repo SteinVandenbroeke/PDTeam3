@@ -15,7 +15,7 @@ const ABTestPersons = (props) => {
     const [values, setValues] = useState([0, 1]);
     const [datasetId, setDatasetId] = useState(null)
     const data1 = [["User Id","Purchase Amount", "CTR"]]
-    const {abTestId} = useParams()
+    const {abTestId, startDate, endDate} = useParams()
     const navigation = useNavigate();
 
     //static
@@ -51,6 +51,8 @@ const ABTestPersons = (props) => {
         let getData = {
             "abTestId": abTestId,
             "offset": personOffset,
+            "startDate": startDate,
+            "endDate": endDate
         }
         let request = new ServerRequest();
         request.sendGet("getUsersFromABTest",getData).then(requestData => {setPersonData(personData.concat(requestData)); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
@@ -75,9 +77,7 @@ const ABTestPersons = (props) => {
     return (
         <div className="App">
             <BackButton/>
-
-            <Slider labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />
-
+            {/*<Slider labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />*/}
             <LogicTable action={openUser} data={data1}/>
             <Button variant="primary" onClick={()=>loadUsers()}>Load More</Button>
         </div>
