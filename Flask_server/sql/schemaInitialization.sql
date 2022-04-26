@@ -1,13 +1,3 @@
-CREATE TYPE "club_member_val" AS ENUM (
-  'ACTIVE',
-  'PRE-CREATE'
-);
-
-CREATE TYPE "fashion_news_val" AS ENUM (
-  'NONE',
-  'Regularly'
-);
-
 CREATE TABLE users(
   "username" varchar PRIMARY KEY,
   "password" varchar,
@@ -29,6 +19,35 @@ CREATE TABLE abtest(
   "stepsize" TIMESTAMP
 );
 
+CREATE TABLE "abtestsitems" (
+  "item_id" int,
+  "test" varchar,
+  "algorithm" int,
+  "timestamp" timestamp ,
+  "num_of_rec" int,
+  "num_of_suc_rec" int,
+   PRIMARY Key("item_id", "test", "algorithm", "timestamp")
+);
+
+CREATE TABLE "abrec" (
+  "idAbRec" int PRIMARY KEY,
+  "algorithm" int,
+  "timestamp" timestamp
+);
+
+CREATE TABLE "abreclist" (
+  "idAbRec" int,
+  "itemId" int,
+  PRIMARY KEY ("idAbRec", "itemId")
+);
+
+CREATE TABLE "abrecid_personrecid" (
+  "idAbRec" int,
+  "personid" int,
+  "test_name" varchar,
+  PRIMARY KEY ("idAbRec", "personid", "test_name")
+);
+
 CREATE TABLE algorithms(
   "id" int PRIMARY KEY,
   "name" varchar
@@ -39,3 +58,23 @@ CREATE TABLE datasets(
   "createdBy" varchar REFERENCES users("username"),
   "creationDate" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+
+
+--TODO add to python ALTER TABLE "abtestsitems" ADD FOREIGN KEY ("item_id") REFERENCES "setname_items" ("item_id");
+
+ALTER TABLE "abtestsitems" ADD FOREIGN KEY ("test") REFERENCES "abtest" ("test_name");
+
+ALTER TABLE "abtestsitems" ADD FOREIGN KEY ("algorithm") REFERENCES "algorithms" ("id");
+
+ALTER TABLE "abrec" ADD FOREIGN KEY ("algorithm") REFERENCES "algorithms" ("id");
+
+ALTER TABLE "abrecid_personrecid" ADD FOREIGN KEY ("idAbRec") REFERENCES "abrec" ("idAbRec");
+
+ALTER TABLE "abreclist" ADD FOREIGN KEY ("idAbRec") REFERENCES "abrec" ("idAbRec");
+
+ALTER TABLE "abreclist" ADD FOREIGN KEY ("itemId") REFERENCES "setname_items" ("item_id");
+
+ALTER TABLE "abrecid_personrecid" ADD FOREIGN KEY ("test_name") REFERENCES "abtest" ("test_name");
+
+ALTER TABLE "abrecid_personrecid" ADD FOREIGN KEY ("personid") REFERENCES "setname_people" ("person_id");
