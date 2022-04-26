@@ -38,7 +38,25 @@ class ABTest():
 
         return list(user_histories.values())
 
-    def execute(self, topKItemsCount, startDate, endDate, algorithm, datasets, users=1, k=1):
+    def create(self):
+        for algo in self.algorithms:
+            time = self.beginTs
+            while(time < self.endTs):
+                results = self.execute(self.topK, self.beginTs, time, algo[0])
+                if(algo[0] == "Popularity" || algo[0] == "Recency"):
+                    self.cursor.execute(sql.SQL('insert into "abrec" ("algorithm","timestamp") values (%s,%s)'),[algo[0], time])
+                    idAbRec = self.cursor.fetchone()[0]
+                    query = 'SELECT id FROM {table}_customers'.format(table=self.dataset)
+                    self.cursor.execute(sql.SQL(query))
+                    customers = self.fetchall()
+                    for customer in customers:
+                        self.cursor.execute(sql.SQL('insert into "abrecid_personrecid" ("idAbRec","personid","test_name") values (%s,%s,%s)'),[idAbRec, customer[0], self.abTestId])
+                    for item in results:
+                        self.cursor.execute(sql.SQL('insert into "abreclist" ("idAbRec","itemId") values (%s,%s)'),[idAbRec, item])
+                time += self.datetime.timedelta(days=stepSize)
+        self.connection.commit()
+
+    def execute(self, topKItemsCount, startDate, endDate, algorithm, users=1, k=1):
         """
         Create: function to create a new ABTest, and wil make the current ABTest te created ABTest
         @param topKItemsCount: top k items
@@ -47,18 +65,16 @@ class ABTest():
         @param algoritmes: algorithm id
         @param datasets: list of all used dataset id's
         """
-        query = 'SELECT name FROM algorithms WHERE id = ' + str(algorithm)
-        self.cursor.execute(sql.SQL(query))
-        algoname = self.cursor.fetchall()[0][0]
 
-        if (algoname == "Popularity"):
+
+        if (algorithm == 0):
             query = 'SELECT item_id FROM data_purchases WHERE "timestamp" > \'' + startDate + '\' AND "timestamp" < \''+ endDate +"\'"
             self.cursor.execute(sql.SQL(query))
             interactions = [r[0] for r in self.cursor.fetchall()]
             result = [item for items, c in Counter(interactions).most_common()
                                             for item in [items] * c]
             return result[:topKItemsCount]
-        elif (algoname == "Recency"):
+        elif (algorithm == 1):
             query = 'SELECT timestamp, item_id FROM data_purchases WHERE "timestamp" > \'' + startDate + '\' AND "timestamp" < \''+ endDate +"\'"
             self.cursor.execute(sql.SQL(query))
             items = self.cursor.fetchall()
@@ -66,7 +82,7 @@ class ABTest():
             result = list(dict.fromkeys([x[1] for x in sorted_result]))
             result.reverse()
             return result[:topKItemsCount]
-        elif (algoname == "ItemKNN"):
+        elif (algorithm == 2):
             alg = ItemKNNIterative(k=k, normalize=False)
             query = 'SELECT user_id, item_id FROM data_purchases WHERE "timestamp" > \'' + startDate + '\' AND "timestamp" < \''+ endDate +"\'"
             self.cursor.execute(sql.SQL(query))

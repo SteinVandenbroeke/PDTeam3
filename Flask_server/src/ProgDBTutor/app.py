@@ -173,6 +173,7 @@ def createAbTest():
     algorithms = json.loads(request.form.get("algorithms"))
     abtest = ABTest()
     abtest.initialize(request.form.get("abTestName"), algorithms,request.form.get("dataSetId"), period[0], period[1], request.form.get("stepSizeValue"), request.form.get("topKValues"))
+    abtest.create()
     return make_response('{"message": "Created."}', 201)
 
 @app.route('/api/changeDataset', methods=['POST'])
