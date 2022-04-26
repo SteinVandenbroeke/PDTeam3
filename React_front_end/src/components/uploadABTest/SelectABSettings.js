@@ -9,6 +9,7 @@ import {toast} from "react-toastify";
 
 const SelectABSettings = (props) => {
     const [topKValue, setTopKValue] = React.useState([1]);
+    const [maxTopK, setMaxTopK] = useState([1])
     const [periodValues, setPeriodValues] = React.useState([0, 1]);
     const [stepSizeValue, setStepSizeValue] = React.useState([1]);
     const [periodSlider, setPeriodSlider] = React.useState([1, 10, 2,2,3,74,56,5,5,4,45,4545,45,45,5,445,74]);
@@ -22,6 +23,15 @@ const SelectABSettings = (props) => {
             "id": props.datasetId
         }
         request.sendGet("getTimeStampList",getData).then(requestData => {setPeriodSlider(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+    }
+
+    function loadArticleCount(){
+        setLoading(true)
+        let request = new ServerRequest();
+        let getData = {
+            "id": props.datasetId
+        }
+        request.sendGet("getArticleCount",getData).then(requestData => {setMaxTopK(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
     }
 
     function confirmDayInterval(){
@@ -39,6 +49,7 @@ const SelectABSettings = (props) => {
     useEffect(() => {
         if(props.datasetId != null){
             loadPeriod()
+            loadArticleCount()
         }
     },[props.datasetId]);
 
@@ -50,7 +61,7 @@ const SelectABSettings = (props) => {
                     <Form.Label>Enter a name for your AB-test.</Form.Label>
                     <Form.Control placeholder="AB-test name" onChange={(e)=>setAbTestname(e.target.value) } />
                     <Form.Label style={{paddingBottom:20, paddingTop:20}}>Select the amount of top-K items. These items will be shown to the users as recommended items.</Form.Label>
-                    <Slider max={20} min={0} step={1} setValues={setTopKValue} values={topKValue}/>
+                    <Slider max={maxTopK} min={0} step={1} setValues={setTopKValue} values={topKValue}/>
                     <Form.Label style={{paddingBottom:20}}>Select the start and end date of this ABTest. </Form.Label>
                     <Spinner
                         className={!loading? "visually-hidden": ""}
@@ -62,7 +73,7 @@ const SelectABSettings = (props) => {
                     />
                     <Slider max={periodSlider.length - 1} labels={periodSlider} min={0} step={1} setValues={setPeriodValues} values={periodValues}/>
                     <Form.Label style={{paddingBottom:20}}>Select the step size. This will determine when to update the top-K items</Form.Label>
-                    <Slider max={20} min={0} step={1} setValues={setStepSizeValue}  values={stepSizeValue}/>
+                    <Slider max={periodSlider.length - 1} min={1} step={1} setValues={setStepSizeValue}  values={stepSizeValue}/>
 
                     <Button variant="secondary" onClick={()=>props.setCurrentStep(props.currentStep - 1)}>Previous </Button>{' '}
                     <Button variant="primary" onClick={()=>confirmDayInterval()}>Next</Button>

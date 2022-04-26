@@ -42,7 +42,6 @@ HOST = "127.0.0.1" if DEBUG else "0.0.0.0"
 def getUserInformation():
     user = User(app)
     back = user.checkTokenAndLoadData(request)
-    print(back)
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
     return make_response(*user.getUserInformationAsReturnRequest())
@@ -162,18 +161,22 @@ def create():
 
 @app.route('/api/createAbTest', methods=['GET', 'POST'])
 def createAbTest():
-    user = User(app)
-    back = user.checkTokenAndLoadData(request)
-    if not back:
-        return make_response('{"message": "User token wrong or missing"}', 401)
-    elif not user.admin:
-        return make_response('you must be admin to perform this action', 500)
-
-    period = json.loads(request.form.get("periodValues"))
-    algorithms = json.loads(request.form.get("algorithms"))
+    # user = User(app)
+    # back = user.checkTokenAndLoadData(request)
+    # if not back:
+    #     return make_response('{"message": "User token wrong or missing"}', 401)
+    # elif not user.admin:
+    #     return make_response('you must be admin to perform this action', 500)
+    #
+    # period = json.loads(request.form.get("periodValues"))
+    # algorithms = json.loads(request.form.get("algorithms"))
+    # abtest = ABTest()
+    # abtest.initialize(request.form.get("abTestName"), algorithms,request.form.get("dataSetId"), period[0], period[1], request.form.get("stepSizeValue"), request.form.get("topKValues"))
+    # abtest.create()
     abtest = ABTest()
-    abtest.initialize(request.form.get("abTestName"), algorithms,request.form.get("dataSetId"), period[0], period[1], request.form.get("stepSizeValue"), request.form.get("topKValues"))
+    abtest.initialize()
     abtest.create()
+
     return make_response('{"message": "Created."}', 201)
 
 @app.route('/api/changeDataset', methods=['POST'])
@@ -307,6 +310,28 @@ def getTimeStampList():
     returnValue = dataset.getTimeStampList(request.args.get("id"), json)
     return make_response(returnValue[0],returnValue[1])
 
+@app.route('/api/getArticleCount', methods=['GET'])
+def getArticleCount():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
+    dataset = Dataset()
+    returnValue = dataset.getArticleCount(request.args.get("id"))
+    return make_response(returnValue[0],returnValue[1])
+
+@app.route('/api/getCustomerCount', methods=['GET'])
+def getCustomerCount():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
+    dataset = Dataset()
+    returnValue = dataset.getCustomerCount(request.args.get("id"))
+    return make_response(returnValue[0],returnValue[1])
+
 
 @app.route('/api/getUsers', methods=['GET'])
 def getUsers():
@@ -349,6 +374,38 @@ def deleteUser():
     returnValue = user.deleteUser(request.args.get("userName"))
     return make_response(returnValue[0],returnValue[1])
 
+@app.route('/api/getUsersFromABTest', methods=['GET'])
+def getUsersFromABTest():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
+    abtest = ABTest()
+    returnValue = abtest.getUsersFromABTest(request.args.get("abTestId"),request.args.get("offset"), request.args.get("startDate"), request.args.get("endDate"))
+    return make_response(returnValue[0], returnValue[1])
+
+
+@app.route('/api/getItemsFromABTest', methods=['GET'])
+def getItemsFromABTest():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
+    abtest = ABTest()
+    returnValue = abtest.getItemsFromABTest(request.args.get("abTestId"),request.args.get("offset"), request.args.get("startDate"), request.args.get("endDate"))
+    return make_response(returnValue[0], returnValue[1])
+
+@app.route('/api/getDatasetIdFromABTest', methods=['GET'])
+def getDatasetIdFromABTest():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    abtest = ABTest()
+    returnValue = abtest.getDatasetIdFromABTest(request.args.get("abTestId"))
+    return make_response(returnValue[0], returnValue[1])
 
 # RUN DEV SERVER
 if __name__ == "__main__":
