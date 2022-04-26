@@ -21,7 +21,7 @@ class Dataset():
             purchaseConnections, userName):
 
         # customer table:
-
+        print("customers toevoegen")
         customerTableName = datasetName.lower() + '_customers'
         customerData = pd.read_csv(customerCSV)
         customerDf = pd.DataFrame(customerData)
@@ -63,8 +63,10 @@ class Dataset():
             procentString = procentString[:-1]
             createCustomerInsert = 'insert into ' + customerTableName + ' values (' + procentString + ' )'
             self.cursor.execute(createCustomerInsert, tuple(sortedData))
+        print("customers toegevoegd")
 
         # article table:
+        print("articles toevoegen")
         articleTableName = datasetName + '_articles'
         articleData = pd.read_csv(articleCSV)
         articleDf = pd.DataFrame(articleData)
@@ -111,8 +113,10 @@ class Dataset():
             procentString = procentString[:-1]
             createArticleInsert = 'insert into ' + articleTableName + ' values (' + procentString + ' )'
             self.cursor.execute(createArticleInsert, tuple(sortedData))
+        print("articles toegevoegd")
 
         # purchase table:
+        print("purchases toevoegen")
         purchaseTableName = datasetName + '_purchases'
         purchaseData = pd.read_csv(purchasesCSV)
         purchaseDf = pd.DataFrame(purchaseData)
@@ -141,10 +145,8 @@ class Dataset():
             procentString = procentString[:-1]
             createPurchaseInsert = 'insert into ' + purchaseTableName + ' values (' + procentString + ' )'
             self.cursor.execute(createPurchaseInsert, tuple(sortedData))
-
-
-
         self.cursor.execute(sql.SQL('insert into "datasets" ("name","createdBy") values (%s,%s)'),[datasetName.lower(), userName])
+        print("purchases toegevoegd")
 
         self.connection.commit()
         self.connection.close()
@@ -203,7 +205,6 @@ class Dataset():
         self.connection.close()
         return (json.dumps(returnObject), 200)
 
-
     def getColumnNames(self, table):
         select = 'SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N%s;'
         self.cursor.execute(sql.SQL(select).format(), [table])
@@ -212,7 +213,6 @@ class Dataset():
         for row in allrows:
             returnList.append(row[0])
         return returnList
-
 
     def getDatasets(self):
         self.cursor.execute(sql.SQL('SELECT * FROM "datasets"'))
@@ -258,7 +258,6 @@ class Dataset():
         self.cursor.close()
         return (message, errorCode)
 
-
     def getItemList(self, datasetName, offset):
         query = 'SELECT id,title,description FROM '+ datasetName +'_articles LIMIT 40 OFFSET '+offset
         self.cursor.execute(sql.SQL(query))
@@ -289,18 +288,32 @@ class Dataset():
             returnItem = {}
             for i in range(len(row)):
                 if type(row[i]) is datetime:
-                    returnItem[columnNames[i]] = row[i].strftime("%m/%d/%Y %H:%M:%S")
+                    returnItem[columnNames[i]] = row[i].strftime("%s/%m/%Y %H:%M:%S")
                 else:
                     returnItem[columnNames[i]] = row[i]
             returnList.append(returnItem)
         return (json.dumps(returnList), 200)
+
+    def getTimeStampList(self, dataset):
+        #if dataset != None and not dataset.isalnum():
+           # return ('"message":{"Wrong dataset name"}', 412)
+
+        try:
+            selectTimeStamps = 'SELECT DISTINCT timestamp FROM {table}_purchases ORDER BY timestamp ASC'.format(table=dataset)
+            self.cursor.execute(sql.SQL(selectTimeStamps))
+            data = self.cursor.fetchall()
+            returnList = []
+            for row in data:
+                returnList.append(row[0].strftime("%d/%m/%Y %H:%M:%S"))
+            return (json.dumps(returnList), 200)
+        except:
+            return ('"message":{"Wrong dataset name"}', 412)
 
     def addapt_numpy_float64(numpy_float64):
         return AsIs(numpy_float64)
 
     def addapt_numpy_int64(numpy_int64):
         return AsIs(numpy_int64)
-
 
     register_adapter(numpy.float64, addapt_numpy_float64)
     register_adapter(numpy.int64, addapt_numpy_int64)
