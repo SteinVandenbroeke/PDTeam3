@@ -41,6 +41,7 @@ HOST = "127.0.0.1" if DEBUG else "0.0.0.0"
 def getUserInformation():
     user = User(app)
     back = user.checkTokenAndLoadData(request)
+    print(back)
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
     return make_response(*user.getUserInformationAsReturnRequest())

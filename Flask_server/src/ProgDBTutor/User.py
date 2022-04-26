@@ -114,7 +114,7 @@ class User():
                 'exp' : datetime.utcnow() + timedelta(minutes = 240)
             }, self.app.config['SECRET_KEY'])
 
-            return (jsonify({'token' : token, 'admin': isAdmin}), 201)
+            return (jsonify({'token' : token}), 201)
         # returns 403 if password is wrong
         return ('Could not verify', 403, {'WWW-Authenticate' : 'Basic realm ="Wrong Password !!"'})
 
