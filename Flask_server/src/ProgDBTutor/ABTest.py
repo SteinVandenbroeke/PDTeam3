@@ -5,15 +5,19 @@ import pandas as pd
 from collections import Counter
 from iknn import ItemKNNIterative
 from typing import List
+from psycopg2 import sql
+from Dataset import Dataset
+
 
 class ABTest():
-    def __init__(self):
+    def __init__(self, abTestId=None):
         database = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'],
                                 userPassword=config_data['password'], dbhost=config_data['host'],
                                 dbport=config_data['port'])
         connection = database.get_connection()
         self.cursor = connection.cursor()
-    
+        self.abTestId = abTestId
+
     def history_from_subset_interactions(self, interactions, amt_users=5) -> List[List]:
         """ Take the history of the first users in the dataset and return as list of lists"""
         user_histories = dict()
@@ -68,6 +72,9 @@ class ABTest():
         """
         overviewPageData: gives a json format for the overview page in the interface
         """
+        ABTestInformation = self._getAbTestInformation()
+        dataSet = Dataset()
+        allPoints = dataSet.getTimeStampList(dataSet, list)
         print("Data for overview page")#TODO
 
     def userOverviewData(self, min=None, max=None):
@@ -87,3 +94,12 @@ class ABTest():
         @return:json for all items in ABTest
         """
         print("item data in ABtest")
+
+    def _getAbTestInformation(self):
+        if self.abTestId == None:
+            exit("Wrong abtestId")
+        print(self.abTestId)
+        select = 'SELECT * FROM abtest WHERE test_name = %s;'
+        self.cursor.execute(sql.SQL(select).format(), [self.abTestId])
+        data = self.cursor.fetchone()
+        return {"test_name": data[0],"algorithms": data[1],"dataset": data[2],"begin_ts": data[3],"end_ts": data[4], "stepsize": data[5]}
