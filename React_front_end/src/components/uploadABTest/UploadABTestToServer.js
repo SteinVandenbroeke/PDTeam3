@@ -25,6 +25,10 @@ const UploadABTestToServer = (props) => {
         formData.append('stepSizeValue', stepSizeValue);
         formData.append('algorithms', JSON.stringify(algorithms));
         request.sendPost("uploadAB", formData, true).then(message => { toast.success(message.message); setUploading(2) }).catch(error => { toast.error(error.message); setUploading(3) });
+        formData.append("periodValues", JSON.stringify(periodValues));
+        formData.append("topKValues", topKValues[0]);
+        formData.append('stepSizeValue', stepSizeValue[0]);
+        formData.append('algorithms', JSON.stringify(algorithms));
         request.sendPost("createAbTest",formData, true).then(message => {toast.success(message.message); setUploading(2)}).catch(error => {toast.error(error.message); setUploading(3)});
     }
 

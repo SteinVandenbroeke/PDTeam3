@@ -7,6 +7,7 @@ from iknn import ItemKNNIterative
 from typing import List
 from psycopg2 import sql
 from Dataset import Dataset
+import json
 
 
 class ABTest():
@@ -103,6 +104,32 @@ class ABTest():
         @return:json for all items in ABTest
         """
         print("item data in ABtest")
+
+    def getABtests(self):
+        self.cursor.execute(sql.SQL('SELECT * FROM "abtest"'))
+        data = self.cursor.fetchall()
+        returnList = []
+        max_alg_count = 0
+        for row in data:
+            alg_count = 0
+            item = [row[0], row[1], row[4]]
+            query = 'SELECT * FROM "abtest_algorithms" WHERE test_name=%s'
+            self.cursor.execute(sql.SQL(query), [row[0]])
+            alg_data = self.cursor.fetchall()
+            for alg_row in alg_data:
+                alg_count += 1
+                query = 'SELECT name FROM "algorithms" WHERE id=%s'
+                self.cursor.execute(sql.SQL(query), [alg_row[1]])
+                alg_name = self.cursor.fetchall()[0][0]
+                alg_object = alg_name + ", interval: " + str(alg_row[2])
+                if alg_row[3] > 0:
+                    alg_object += ", K: " + str(alg_row[3])
+                item.append(alg_object)
+            if alg_count > max_alg_count:
+                max_alg_count = alg_count
+            returnList.append(item)
+        returnList.append(max_alg_count)
+        return (json.dumps(returnList), 200)
 
     def initialize(self, abTestId=None, algorithms = None, dataset = None, beginTs = None, endTs = None, stepSize = None, topK = None):
         """

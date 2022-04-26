@@ -11,7 +11,7 @@ from flask.templating import render_template
 import uuid # for public id
 
 from sqlalchemy.sql.functions import current_user
-from  werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from config import config_data
 from quote_data_access import Quote, DBConnection, QuoteDataAccess
@@ -145,7 +145,6 @@ def uploadDataset():
 
     return make_response('{"message": "File successfully uploaded."}', 201)
 
-
 @app.route('/api/uploadAB', methods=['GET', 'POST'])
 def uploadABTest():
     algorithms = json.load(request.form.get('algorithms'))
@@ -155,6 +154,7 @@ def uploadABTest():
         print("\ntest")
 
     return make_response('{"message": "AB test successfully uploaded."}', 201)
+
 
 @app.route('/api/create', methods=['GET', 'POST'])
 def create():
@@ -273,6 +273,17 @@ def getPeopleList():
     returnValue = dataset.getPeopleList(request.args.get("dataSet"), request.args.get("offset"))
     return make_response(returnValue[0],returnValue[1])
 
+@app.route('/api/getABtests', methods=['GET'])
+def getABtests():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
+    abtest = ABTest()
+    returnValue = abtest.getABtests()
+    return make_response(returnValue[0],returnValue[1])
+
 
 @app.route('/api/getPurchases', methods=['GET'])
 def getPurchases():
@@ -310,9 +321,9 @@ def getUsers():
     returnValue = user.getUsers()
     return make_response(returnValue[0],returnValue[1])
 
+
 # React interface, alle niet verwezen app.route's worden doorverwezen naar react interface in de react_build folder
 @app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
 @app.route('/<path:path>')
 def reactApp(path):
     if not os.path.exists("react_build/" + path) or path == "":

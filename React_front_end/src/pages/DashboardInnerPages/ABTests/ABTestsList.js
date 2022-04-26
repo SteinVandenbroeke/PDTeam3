@@ -1,15 +1,43 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Col, Row, Table, Button} from "react-bootstrap";
 import Icon from 'react-eva-icons';
 import LogicTable from "../../../components/logicTable"
 import {Link, useNavigate} from "react-router-dom";
+import {ServerRequest} from "../../../logic/ServerCommunication";
+import {toast} from "react-toastify";
 
 const ABTestsList = () => {
     const navigation = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [header, setHeader] = useState([[]]);
     function openAbTest(id){
         navigation("/dashboard/abTests/overview/" + id);
     }
+
+    function handleRequestData(data){
+        let list = ["name", "dataset", "stepsize"]
+        let count = data.at(-1)
+        for (let i=1; i < count + 1; i++) {
+            // console.log("test")
+            list.push("algorithm" + i)
+        }
+        setHeader([list])
+        for(let i=0; i<data.length-1; i++) {
+            setHeader(oldData=>[...oldData,data[i]])
+            // header.push(data[i])
+        }
+    }
+
+    function loadABtests(){
+        setLoading(true);
+        let request = new ServerRequest();
+        request.sendGet("getABtests").then(requestData => {handleRequestData(requestData); setLoading(false);}).catch(error => {toast.error(error.message); setLoading(false)});
+    }
+
+    useEffect(() => {
+        loadABtests()
+    },[]);
 
     return (
         <div>
@@ -18,7 +46,7 @@ const ABTestsList = () => {
                     <Button variant="primary">Add new <Icon name="plus-circle-outline"/></Button>
                 </Link>
             </div>
-            <LogicTable action={openAbTest} data={[["id", "name","time interval", "algoritme A", "algoritme B"], ["1", "H&M AB test 1",7+" days", "Popularity", "Recency"]]}/>
+            <LogicTable action={openAbTest} data={header}/>
         </div>
     );
 };

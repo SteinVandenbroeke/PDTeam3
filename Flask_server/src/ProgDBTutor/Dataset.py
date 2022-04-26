@@ -231,7 +231,7 @@ class Dataset():
             self.cursor.execute(sql.SQL(query))
             self.connection.commit()
         except:
-            message =  '{"message": "Dataset Table '+datasetName+'_articles was not found."}'
+            message = '{"message": "Dataset Table '+datasetName+'_articles was not found."}'
             errorCode = 500
         try:
             query = 'DROP TABLE ' + datasetName + '_customers CASCADE'
