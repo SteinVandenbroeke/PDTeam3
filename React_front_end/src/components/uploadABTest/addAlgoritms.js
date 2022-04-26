@@ -13,7 +13,7 @@ const AddAlgoritms = (props) => {
     const [trainingIntervalvalue, setTrainingIntervalvalue] = React.useState([1]);
     const [valueSelect, setValueSelect] = React.useState(0);
     const [algorithms,setAlgorithms] = React.useState([[]]);
-    const [k, setK] = React.useState([0]);
+    const [k, setK] = React.useState([1]);
 
 
     function finish(){
@@ -24,9 +24,10 @@ const AddAlgoritms = (props) => {
         props.setCurrentStep(props.currentStep + 1)
         props.setAlgorithms(algorithms.slice(1))
     }
-    function checkExistingCombination(){
+    function checkExistingCombination(tempK){
         for (var i = 1; i < algorithms.length; i++) {
-            if(algorithms[i][0] === valueSelect && parseInt(algorithms[i][1]) === parseInt(trainingIntervalvalue)){
+            console.log(algorithms[i][0]  , valueSelect , parseInt(algorithms[i][1]) , parseInt(trainingIntervalvalue) , parseInt(algorithms[i][2]) ,  tempK)
+            if(algorithms[i][0] === valueSelect && parseInt(algorithms[i][1]) === parseInt(trainingIntervalvalue) && parseInt(algorithms[i][2]) ===  tempK){
                 return true;
             }
         }
@@ -34,22 +35,25 @@ const AddAlgoritms = (props) => {
     }
 
     function addAlgorithm(){
+        let tempK = k[0];
+        if(valueSelect != 3){
+            tempK = 0;
+        }
         if(valueSelect == "0"){
             toast.error("You need to select an algorithm.");
             return
         }
-        if(checkExistingCombination()){
+        if(checkExistingCombination(tempK)){
             toast.error("You cannot add an algorithm with the same parameters twice.");
             return
         }
-        setAlgorithms(algorithms => [...algorithms, [valueSelect,trainingIntervalvalue, k]]);
+
+        setAlgorithms(algorithms => [...algorithms, [valueSelect,trainingIntervalvalue, tempK]]);
         setValueSelect("0")
+        setK([1])
         setTrainingIntervalvalue([1])
     }
     function setAlgo(id){
-        if(id != 3){
-            setK([0])
-        }
         setValueSelect(id)
     }
 

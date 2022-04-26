@@ -48,7 +48,7 @@ const UploadABTestToServer = (props) => {
                                                     <h6>Stepsize: {props.stepSizeValue}</h6>
                                                 </Col>
                                                 <Col sm={8}>
-                                                    <LogicTable data={[["Algorithms", "Training interval"]].concat(props.algorithms)} />
+                                                    <LogicTable data={[["Algorithms", "Training interval", "k"]].concat(props.algorithms)} />
                                                 </Col>
                                             </Row>
                                         </Card.Body>
