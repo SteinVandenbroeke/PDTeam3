@@ -319,18 +319,25 @@ class Dataset():
             returnList.append(returnItem)
         return (json.dumps(returnList), 200)
 
-    def getTimeStampList(self, dataset):
+    def getTimeStampList(self, dataset, format=list, fromDate = None, toDate = None):
         #if dataset != None and not dataset.isalnum():
            # return ('"message":{"Wrong dataset name"}', 412)
 
         try:
-            selectTimeStamps = 'SELECT DISTINCT timestamp FROM {table}_purchases ORDER BY timestamp ASC'.format(table=dataset)
-            self.cursor.execute(sql.SQL(selectTimeStamps))
+            if fromDate == None:
+                selectTimeStamps = 'SELECT DISTINCT timestamp FROM {table}_purchases ORDER BY timestamp ASC'.format(table=dataset)
+                self.cursor.execute(sql.SQL(selectTimeStamps))
+            else:
+                selectTimeStamps = 'SELECT DISTINCT timestamp FROM {table}_purchases WHERE "timestamp" >= %s  AND "timestamp" <= %s ORDER BY timestamp ASC'.format(table=dataset)
+                self.cursor.execute(sql.SQL(selectTimeStamps), [fromDate, toDate])
             data = self.cursor.fetchall()
             returnList = []
             for row in data:
                 returnList.append(row[0].strftime("%d/%m/%Y %H:%M:%S"))
-            return (json.dumps(returnList), 200)
+            if format == json:
+                return (json.dumps(returnList), 200)
+            elif format == list:
+                return returnList
         except:
             return ('"message":{"Wrong dataset name"}', 412)
 
