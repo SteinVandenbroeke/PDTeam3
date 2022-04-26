@@ -143,6 +143,22 @@ def uploadDataset():
 
     return make_response('{"message": "File successfully uploaded."}', 201)
 
+@app.route('/api/createAbTest', methods=['GET', 'POST'])
+def createAbTest():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    elif not user.admin:
+        return make_response('you must be admin to perform this action', 500)
+
+    print(json.loads(request.form.get("algorithms")))
+    print(json.loads(request.form.get("periodValues")))
+    print(request.form.get("dataSetId"))
+    print(request.form.get("topKValues"))
+    print(request.form.get("stepSizeValue"))
+    return make_response('{"message": "Created."}', 201)
+
 @app.route('/api/changeDataset', methods=['POST'])
 def changeDataset():
     user = User(app)
@@ -252,6 +268,7 @@ def getUsers():
 
 # React interface, alle niet verwezen app.route's worden doorverwezen naar react interface in de react_build folder
 @app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
 @app.route('/<path:path>')
 def reactApp(path):
     if not os.path.exists("react_build/" + path) or path == "":
