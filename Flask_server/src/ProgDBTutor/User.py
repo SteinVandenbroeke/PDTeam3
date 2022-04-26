@@ -95,13 +95,14 @@ class User():
     # route for logging user in
     # @app.route('/api/login', methods =['POST'])
     def login(self, email, password):
-        select = 'SELECT users.email, users.password, users.public_id, users."profilePicture"  FROM users WHERE email=%s;'
+        select = 'SELECT users.email, users.password, users.public_id, users."profilePicture", users."admin"  FROM users WHERE email=%s;'
         self.cursor.execute(sql.SQL(select), [email])
         data = self.cursor.fetchone()
         userCount = data[0]
         dbPassword = data[1]
         public_id = data[2]
         profileImage = data[3]
+        isAdmin = data[4]
 
         if not userCount:
             return ('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm ="User does not exist !!"'})
@@ -113,7 +114,7 @@ class User():
                 'exp' : datetime.utcnow() + timedelta(minutes = 240)
             }, self.app.config['SECRET_KEY'])
 
-            return (jsonify({'token' : token, 'profileImage': profileImage}), 201)
+            return (jsonify({'token' : token}), 201)
         # returns 403 if password is wrong
         return ('Could not verify', 403, {'WWW-Authenticate' : 'Basic realm ="Wrong Password !!"'})
 
