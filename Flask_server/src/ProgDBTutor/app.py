@@ -26,6 +26,7 @@ from flask_sqlalchemy import SQLAlchemy
 from User import User
 
 from Dataset import Dataset
+from ABTest import *
 
 # INITIALIZE SINGLETON SERVICES
 app = Flask('Tutorial ', static_url_path="/stop/", static_folder="react_build/")
@@ -152,6 +153,10 @@ def uploadABTest():
         print("\ntest")
     
     return make_response('{"message": "AB test successfully uploaded."}', 201)
+
+@app.route('/api/create', methods=['GET', 'POST'])
+def create():
+    ABTest().execute(2, "2019-01-01", "2021-01-01", 2, "data")
 
 @app.route('/api/changeDataset', methods=['POST'])
 def changeDataset():

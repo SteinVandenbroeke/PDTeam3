@@ -1,29 +1,68 @@
-from Flask_server.src.ProgDBTutor.config import config_data
-from Flask_server.src.ProgDBTutor.quote_data_access import DBConnection
-
+from config import config_data
+from quote_data_access import Quote, DBConnection, QuoteDataAccess
+from psycopg2 import sql
+import pandas as pd
+from collections import Counter
+from iknn import ItemKNNIterative
+from typing import List
 
 class ABTest():
-    def __init__(self, abTestId=None):
-        if abTestId != None:
-            database = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'],
-                                    userPassword=config_data['password'], dbhost=config_data['host'],
-                                    dbport=config_data['port'])
-            connection = database.get_connection()
-            cursor = connection.cursor()
+    def __init__(self):
+        database = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'],
+                                userPassword=config_data['password'], dbhost=config_data['host'],
+                                dbport=config_data['port'])
+        connection = database.get_connection()
+        self.cursor = connection.cursor()
+    
+    def history_from_subset_interactions(self, interactions, amt_users=5) -> List[List]:
+        """ Take the history of the first users in the dataset and return as list of lists"""
+        user_histories = dict()
+        for user_id, item_id in interactions:
+            if len(user_histories) < amt_users:
+                user_histories[user_id] = list()
 
-    def create(self, topKItemsCount, startDate, endDate, stepSize, trainingInterval, algoritmes, datasets):
+            if user_id in user_histories:
+                user_histories[user_id].append(item_id)
+
+        return list(user_histories.values())
+
+    def execute(self, topKItemsCount, startDate, endDate, algorithm, datasets, users=1, k=1):
         """
         Create: function to create a new ABTest, and wil make the current ABTest te created ABTest
         @param topKItemsCount: top k items
         @param startDate: start date of the ABTest (must be between the dates of the Dataset)
         @param endDate: end date of ABTest (ust be between the dates of the Dataset and be larger than the startDate)
-        @param stepSize: how often must the data be safed in the db
-        @param trainingInterval: how often the algorithm must be trained
-        @param algoritmes: list of all used algoritmes id's
+        @param algoritmes: algorithm id
         @param datasets: list of all used dataset id's
         """
-        
-        print("aanmaken ABTest")#TODO
+        query = 'SELECT name FROM algorithms WHERE id = ' + str(algorithm)
+        self.cursor.execute(sql.SQL(query))
+        algoname = self.cursor.fetchall()[0][0]
+
+        if (algoname == "Popularity"):
+            query = 'SELECT item_id FROM data_purchases WHERE "timestamp" > \'' + startDate + '\' AND "timestamp" < \''+ endDate +"\'"
+            self.cursor.execute(sql.SQL(query))
+            items = [r[0] for r in self.cursor.fetchall()]
+            result = [item for items, c in Counter(interactions).most_common()
+                                    for item in [items] * c]
+            return result[:topKItemsCount]
+        elif (algoname == "Recency"):
+            query = 'SELECT timestamp, item_id FROM data_purchases WHERE "timestamp" > \'' + startDate + '\' AND "timestamp" < \''+ endDate +"\'"
+            self.cursor.execute(sql.SQL(query))
+            items = self.cursor.fetchall()
+            sorted_result = sorted(items, key=lambda tup: tup[0])
+            result = list(dict.fromkeys([x[1] for x in sorted_result]))
+            result.reverse()
+            return result[:topKItemsCount]
+        elif (algoname == "ItemKNN"):
+            alg = ItemKNNIterative(k=k, normalize=False)
+            query = 'SELECT user_id, item_id FROM data_purchases WHERE "timestamp" > \'' + startDate + '\' AND "timestamp" < \''+ endDate +"\'"
+            self.cursor.execute(sql.SQL(query))
+            items = self.cursor.fetchall()
+            alg.train(items)
+            histories = self.history_from_subset_interactions(items, amt_users=users)
+            recommendations = alg.recommend_all(histories, topKItemsCount)
+            return recommendations
 
     def overviewPageData(self):
         """
