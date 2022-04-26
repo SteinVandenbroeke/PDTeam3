@@ -162,18 +162,22 @@ def create():
 
 @app.route('/api/createAbTest', methods=['GET', 'POST'])
 def createAbTest():
-    user = User(app)
-    back = user.checkTokenAndLoadData(request)
-    if not back:
-        return make_response('{"message": "User token wrong or missing"}', 401)
-    elif not user.admin:
-        return make_response('you must be admin to perform this action', 500)
-
-    period = json.loads(request.form.get("periodValues"))
-    algorithms = json.loads(request.form.get("algorithms"))
+    # user = User(app)
+    # back = user.checkTokenAndLoadData(request)
+    # if not back:
+    #     return make_response('{"message": "User token wrong or missing"}', 401)
+    # elif not user.admin:
+    #     return make_response('you must be admin to perform this action', 500)
+    #
+    # period = json.loads(request.form.get("periodValues"))
+    # algorithms = json.loads(request.form.get("algorithms"))
+    # abtest = ABTest()
+    # abtest.initialize(request.form.get("abTestName"), algorithms,request.form.get("dataSetId"), period[0], period[1], request.form.get("stepSizeValue"), request.form.get("topKValues"))
+    # abtest.create()
     abtest = ABTest()
-    abtest.initialize(request.form.get("abTestName"), algorithms,request.form.get("dataSetId"), period[0], period[1], request.form.get("stepSizeValue"), request.form.get("topKValues"))
+    abtest.initialize()
     abtest.create()
+
     return make_response('{"message": "Created."}', 201)
 
 @app.route('/api/changeDataset', methods=['POST'])

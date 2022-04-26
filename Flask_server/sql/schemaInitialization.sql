@@ -84,3 +84,14 @@ ALTER TABLE "abreclist" ADD FOREIGN KEY ("itemId") REFERENCES "setname_items" ("
 ALTER TABLE "abrecid_personrecid" ADD FOREIGN KEY ("test_name") REFERENCES "abtest" ("test_name");
 
 ALTER TABLE "abrecid_personrecid" ADD FOREIGN KEY ("personid") REFERENCES "setname_people" ("person_id");
+
+create sequence "abrec_idAbRec_seq"
+	as integer;
+
+alter table abrec alter column "idAbRec" set default nextval('public."abrec_idAbRec_seq"'::regclass);
+
+alter sequence "abrec_idAbRec_seq" owned by abrec."idAbRec";
+
+INSERT INTO public.algorithms (id) VALUES (0);
+INSERT INTO public.algorithms (id) VALUES (1);
+INSERT INTO public.algorithms (id) VALUES (2);

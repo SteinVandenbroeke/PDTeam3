@@ -1,3 +1,5 @@
+import datetime
+
 from config import config_data
 from quote_data_access import Quote, DBConnection, QuoteDataAccess
 from psycopg2 import sql
@@ -42,19 +44,21 @@ class ABTest():
     def create(self):
         for algo in self.algorithms:
             time = self.beginTs
+            print(self.topK)
             while(time < self.endTs):
-                results = self.execute(self.topK, self.beginTs, time, algo[0])
-                if(algo[0] == "Popularity" || algo[0] == "Recency"):
-                    self.cursor.execute(sql.SQL('insert into "abrec" ("algorithm","timestamp") values (%s,%s)'),[algo[0], time])
+                results = self.execute(self.topK, time, time + datetime.timedelta(days=algo[1]), algo[0])
+                if(algo[0] == 0 or algo[0] == 1) and len(results) != 0:
+                    print(results)
+                    self.cursor.execute(sql.SQL('insert into "abrec" ("algorithm","timestamp") values (%s,%s) RETURNING "idAbRec"'),[algo[0], time + datetime.timedelta(days=algo[1])])
                     idAbRec = self.cursor.fetchone()[0]
                     query = 'SELECT id FROM {table}_customers'.format(table=self.dataset)
                     self.cursor.execute(sql.SQL(query))
-                    customers = self.fetchall()
+                    customers = self.cursor.fetchall()
                     for customer in customers:
                         self.cursor.execute(sql.SQL('insert into "abrecid_personrecid" ("idAbRec","personid","test_name") values (%s,%s,%s)'),[idAbRec, customer[0], self.abTestId])
                     for item in results:
                         self.cursor.execute(sql.SQL('insert into "abreclist" ("idAbRec","itemId") values (%s,%s)'),[idAbRec, item])
-                time += self.datetime.timedelta(days=stepSize)
+                time += datetime.timedelta(days=self.stepSize)
         self.connection.commit()
 
     def execute(self, topKItemsCount, startDate, endDate, algorithm, users=1, k=1):
@@ -66,27 +70,25 @@ class ABTest():
         @param algoritmes: algorithm id
         @param datasets: list of all used dataset id's
         """
-
-
         if (algorithm == 0):
-            query = 'SELECT item_id FROM data_purchases WHERE "timestamp" > \'' + startDate + '\' AND "timestamp" < \''+ endDate +"\'"
-            self.cursor.execute(sql.SQL(query))
+            query = 'SELECT item_id FROM {table}_purchases WHERE "timestamp" > %s AND "timestamp" < %s'.format(table=self.dataset)
+            self.cursor.execute(sql.SQL(query), [startDate, endDate])
             interactions = [r[0] for r in self.cursor.fetchall()]
             result = [item for items, c in Counter(interactions).most_common()
                                             for item in [items] * c]
-            return result[:topKItemsCount]
+            return result[0:topKItemsCount]
         elif (algorithm == 1):
-            query = 'SELECT timestamp, item_id FROM data_purchases WHERE "timestamp" > \'' + startDate + '\' AND "timestamp" < \''+ endDate +"\'"
-            self.cursor.execute(sql.SQL(query))
+            query = 'SELECT timestamp, item_id FROM {table}_purchases WHERE "timestamp" > %s AND "timestamp" < %s'.format(table=self.dataset)
+            self.cursor.execute(sql.SQL(query), [startDate, endDate])
             items = self.cursor.fetchall()
             sorted_result = sorted(items, key=lambda tup: tup[0])
             result = list(dict.fromkeys([x[1] for x in sorted_result]))
             result.reverse()
-            return result[:topKItemsCount]
+            return result[0:topKItemsCount]
         elif (algorithm == 2):
             alg = ItemKNNIterative(k=k, normalize=False)
-            query = 'SELECT user_id, item_id FROM data_purchases WHERE "timestamp" > \'' + startDate + '\' AND "timestamp" < \''+ endDate +"\'"
-            self.cursor.execute(sql.SQL(query))
+            query = 'SELECT user_id, item_id FROM {table}_purchases WHERE "timestamp" > %s AND "timestamp" < %s'.format(table=self.dataset)
+            self.cursor.execute(sql.SQL(query), [startDate, endDate])
             items = self.cursor.fetchall()
             alg.train(items)
             histories = self.history_from_subset_interactions(items, amt_users=users)
@@ -178,8 +180,9 @@ class ABTest():
         algorithms = data[1]
         self.algorithms = []
         for algorithm in algorithms:
-            self.algorithms.append([algorithm[0], algorithm[1][0]])
+            self.algorithms.append([algorithm, 2])
         self.dataset = data[2]
         self.beginTs = data[3]
         self.endTs = data[4]
-        self.stepSize = data[5]
+        self.topK = data[5]
+        self.stepSize = data[6]
