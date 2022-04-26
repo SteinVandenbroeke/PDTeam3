@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, {useEffect} from 'react';
-import {Link, Outlet, Route, Router, useNavigate} from "react-router-dom";
+import {Link, Outlet, Route, Router, useNavigate, useParams} from "react-router-dom";
 import BackButton from "../../../components/backButton"
 import ItemCard from "../../../components/itemCard";
 import LogicTable from "../../../components/logicTable";
@@ -8,6 +8,7 @@ import Slider from "../../../components/slider"
 import {Row,Col} from "react-bootstrap";
 
 const ABTestItems = (props) => {
+    const {abTestId} = useParams()
     const navigation = useNavigate();
     function openUser(id){
         navigation("/dashboard/dataSets/overview/"+ abTestId + "/item/"+ id);
