@@ -104,10 +104,19 @@ class ABTest():
         print("item data in ABtest")
 
     def initialize(self, abTestId=None, algorithms = None, dataset = None, beginTs = None, endTs = None, stepSize = None):
+        """
+        initializes the ABTest information, by default it will load the date on abTestId from the database
+        @param abTestId: the id (name) of the ABTest
+        @param algorithms: list of algoritmhs ([["name",[k]],["name",[k]]])
+        @param dataset: the dataset id (name)
+        @param beginTs: startdate
+        @param endTs: endDate
+        @param stepSize: the stepsize
+        @return:
+        """
         if self.abTestId == None and abTestId != None:
             self.abTestId = abTestId
             self.algorithms = []
-
             for algorithm in algorithms:
                 self.algorithms.append([algorithm[0], algorithm[1][0]])
             self.dataset = dataset
