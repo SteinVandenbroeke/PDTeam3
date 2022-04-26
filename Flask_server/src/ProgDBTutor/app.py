@@ -146,8 +146,6 @@ def uploadDataset():
 
     return make_response('{"message": "File successfully uploaded."}', 201)
 
-<<<<<<< HEAD
-=======
 
 @app.route('/api/uploadAB', methods=['GET', 'POST'])
 def uploadABTest():
@@ -163,7 +161,6 @@ def uploadABTest():
 def create():
     ABTest().execute(2, "2019-01-01", "2021-01-01", 2, "data")
 
->>>>>>> 35eb7e0da4cc763071c0de44080bf11d162cf8d7
 @app.route('/api/createAbTest', methods=['GET', 'POST'])
 def createAbTest():
     user = User(app)
@@ -181,13 +178,6 @@ def createAbTest():
     abtest = ABTest("HM")
     abtest._getAbTestInformation()
     return make_response('{"message": "Created."}', 201)
-<<<<<<< HEAD
-
-@app.route('/api/create', methods=['GET', 'POST'])
-def create():
-    ABTest().create(2, "2019-01-01", "2021-01-01", 1, "data")
-=======
->>>>>>> 35eb7e0da4cc763071c0de44080bf11d162cf8d7
 
 @app.route('/api/changeDataset', methods=['POST'])
 def changeDataset():

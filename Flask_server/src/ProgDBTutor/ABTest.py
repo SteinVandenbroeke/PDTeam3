@@ -46,9 +46,9 @@ class ABTest():
         if (algoname == "Popularity"):
             query = 'SELECT item_id FROM data_purchases WHERE "timestamp" > \'' + startDate + '\' AND "timestamp" < \''+ endDate +"\'"
             self.cursor.execute(sql.SQL(query))
-            items = [r[0] for r in self.cursor.fetchall()]
+            interactions = [r[0] for r in self.cursor.fetchall()]
             result = [item for items, c in Counter(interactions).most_common()
-                                    for item in [items] * c]
+                                            for item in [items] * c]
             return result[:topKItemsCount]
         elif (algoname == "Recency"):
             query = 'SELECT timestamp, item_id FROM data_purchases WHERE "timestamp" > \'' + startDate + '\' AND "timestamp" < \''+ endDate +"\'"
