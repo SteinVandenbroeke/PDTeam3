@@ -11,8 +11,9 @@ import { toast } from 'react-toastify';
 
 const AddAlgoritms = (props) => {
     const [trainingIntervalvalue, setTrainingIntervalvalue] = React.useState([1]);
-    const [valueSelect, setValueSelect] = React.useState("0");
+    const [valueSelect, setValueSelect] = React.useState(0);
     const [algorithms,setAlgorithms] = React.useState([[]]);
+    const [k, setK] = React.useState([1]);
 
 
     function finish(){
@@ -23,9 +24,10 @@ const AddAlgoritms = (props) => {
         props.setCurrentStep(props.currentStep + 1)
         props.setAlgorithms(algorithms.slice(1))
     }
-    function checkExistingCombination(){
+    function checkExistingCombination(tempK){
         for (var i = 1; i < algorithms.length; i++) {
-            if(algorithms[i][0] === valueSelect && parseInt(algorithms[i][1]) === parseInt(trainingIntervalvalue)){
+            console.log(algorithms[i][0]  , valueSelect , parseInt(algorithms[i][1]) , parseInt(trainingIntervalvalue) , parseInt(algorithms[i][2]) ,  tempK)
+            if(algorithms[i][0] === valueSelect && parseInt(algorithms[i][1]) === parseInt(trainingIntervalvalue) && parseInt(algorithms[i][2]) ===  tempK){
                 return true;
             }
         }
@@ -33,21 +35,29 @@ const AddAlgoritms = (props) => {
     }
 
     function addAlgorithm(){
+        let tempK = k[0];
+        if(valueSelect != 3){
+            tempK = 0;
+        }
         if(valueSelect == "0"){
             toast.error("You need to select an algorithm.");
             return
         }
-        if(checkExistingCombination()){
+        if(checkExistingCombination(tempK)){
             toast.error("You cannot add an algorithm with the same parameters twice.");
             return
         }
-        setAlgorithms(algorithms => [...algorithms, [valueSelect,trainingIntervalvalue]]);
+
+        setAlgorithms(algorithms => [...algorithms, [valueSelect,trainingIntervalvalue, tempK]]);
         setValueSelect("0")
+        setK([1])
         setTrainingIntervalvalue([1])
     }
     function setAlgo(id){
         setValueSelect(id)
     }
+
+
 
     return (
         <div style={{textAlign: "left"}}>
@@ -59,10 +69,16 @@ const AddAlgoritms = (props) => {
                     <Form.Label style={{paddingBottom:10}}>Algorithms:</Form.Label>
                     <Form.Select onChange={(e)=>setAlgo(e.target.value)} value={valueSelect}>
                       <option value="0" className={"disabled"}> empty Alogithm</option>
-                      <option value="Popularity">Popularity</option>
-                      <option value="Recency">Recency</option>
-                      <option value="ItemKNN">ItemKNN</option>
+                      <option value="1">Popularity</option>
+                      <option value="2">Recency</option>
+                      <option value="3">ItemKNN</option>
                     </Form.Select>
+                    {valueSelect == 3 && (
+                        <div>
+                            <Form.Label style={{paddingBottom:20}}>K:</Form.Label>
+                            <Slider max={20} min={1} step={1} setValues={setK} values={k}/>
+                        </div>
+                    )}
                 </Col>
                 <Col xs lg="3">
                     <Form.Label style={{paddingBottom:20}}>Training interval:</Form.Label>
@@ -75,7 +91,7 @@ const AddAlgoritms = (props) => {
                     <Form.Label style={{paddingBottom:10}}>Added algorithms:</Form.Label>
                     <Card className={"shadow-lg"}>
                       <Card.Body>
-                          <LogicTable data={[["Algoriths","Training interval"]].concat(algorithms)}/>
+                          <LogicTable data={[["Algoriths","Training interval","k"]].concat(algorithms)}/>
                       </Card.Body>
                     </Card>
                 </Col>

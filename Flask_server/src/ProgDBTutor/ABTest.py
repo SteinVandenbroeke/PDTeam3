@@ -17,6 +17,14 @@ class ABTest():
         connection = database.get_connection()
         self.cursor = connection.cursor()
         self.abTestId = abTestId
+        self.algorithms = []
+        self.dataset = None
+        self.beginTs = None
+        self.endTs = None
+        self.stepSize = None
+        self.topK = None
+        if abTestId != None:
+            self.initialize()
 
     def history_from_subset_interactions(self, interactions, amt_users=5) -> List[List]:
         """ Take the history of the first users in the dataset and return as list of lists"""
@@ -46,9 +54,9 @@ class ABTest():
         if (algoname == "Popularity"):
             query = 'SELECT item_id FROM data_purchases WHERE "timestamp" > \'' + startDate + '\' AND "timestamp" < \''+ endDate +"\'"
             self.cursor.execute(sql.SQL(query))
-            items = [r[0] for r in self.cursor.fetchall()]
+            interactions = [r[0] for r in self.cursor.fetchall()]
             result = [item for items, c in Counter(interactions).most_common()
-                                    for item in [items] * c]
+                                            for item in [items] * c]
             return result[:topKItemsCount]
         elif (algoname == "Recency"):
             query = 'SELECT timestamp, item_id FROM data_purchases WHERE "timestamp" > \'' + startDate + '\' AND "timestamp" < \''+ endDate +"\'"
@@ -74,6 +82,7 @@ class ABTest():
         """
         ABTestInformation = self._getAbTestInformation()
         dataSet = Dataset()
+        dataSet.getPeopleList()
         allPoints = dataSet.getTimeStampList(dataSet, list)
         print("Data for overview page")#TODO
 
@@ -95,11 +104,37 @@ class ABTest():
         """
         print("item data in ABtest")
 
-    def _getAbTestInformation(self):
-        if self.abTestId == None:
-            exit("Wrong abtestId")
-        print(self.abTestId)
-        select = 'SELECT * FROM abtest WHERE test_name = %s;'
-        self.cursor.execute(sql.SQL(select).format(), [self.abTestId])
-        data = self.cursor.fetchone()
-        return {"test_name": data[0],"algorithms": data[1],"dataset": data[2],"begin_ts": data[3],"end_ts": data[4], "stepsize": data[5]}
+    def initialize(self, abTestId=None, algorithms = None, dataset = None, beginTs = None, endTs = None, stepSize = None, topK = None):
+        """
+        initializes the ABTest information, by default it will load the date on abTestId from the database
+        @param abTestId: the id (name) of the ABTest
+        @param algorithms: list of algoritmhs ([["name",[k]],["name",[k]]])
+        @param dataset: the dataset id (name)
+        @param beginTs: startdate
+        @param endTs: endDate
+        @param stepSize: the stepsize
+        @return:
+        """
+
+        if self.abTestId == None and abTestId != None:
+            self.abTestId = abTestId
+            self.algorithms = []
+            for algorithm in algorithms:
+                self.algorithms.append([algorithm[0], algorithm[1][0]])
+            self.dataset = dataset
+            self.beginTs = beginTs
+            self.endTs = endTs
+            self.stepSize = stepSize
+            self.topK = topK
+        elif self.abTestId == None and abTestId == None:
+            exit("No data to initialize")
+        else:
+            print(self.abTestId)
+            select = 'SELECT * FROM abtest WHERE test_name = %s;'
+            self.cursor.execute(sql.SQL(select).format(), [self.abTestId])
+            data = self.cursor.fetchone()
+            self.algorithms = data[1]
+            self.dataset = data[2]
+            self.beginTs = data[3]
+            self.endTs = data[4]
+            self.stepSize = data[5]
