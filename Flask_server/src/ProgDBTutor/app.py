@@ -142,6 +142,16 @@ def uploadDataset():
 
     return make_response('{"message": "File successfully uploaded."}', 201)
 
+@app.route('/api/uploadAB', methods=['GET', 'POST'])
+def uploadABTest():
+    algorithms = json.load(request.form.get('algorithms'))
+
+    for algo in algorithms:
+        print(algo)
+        print("\ntest")
+    
+    return make_response('{"message": "AB test successfully uploaded."}', 201)
+
 @app.route('/api/changeDataset', methods=['POST'])
 def changeDataset():
     user = User(app)

@@ -55,7 +55,7 @@ class User():
         try:
             # decoding the payload to fetch the stored details
             data = jwt.decode(token, self.app.config['SECRET_KEY'], algorithms=['HS256'])
-            select = 'SELECT users.email, users.public_id, users."profilePicture", users."admin", users."username", users."dateOfBirth", users."fistName", users."lastName"  FROM users WHERE public_id=%s;'
+            select = 'SELECT users.email, users.public_id, users."profilePicture", users."admin", users."username", users."dateOfBirth", users."firstName", users."lastName"  FROM users WHERE public_id=%s;'
             self.cursor.execute(sql.SQL(select), [data['public_id']])
             userData = self.cursor.fetchone()
             self.email = userData[0]
@@ -138,7 +138,7 @@ class User():
         if not userNameCount and not emailCount:
             publicId = str(uuid.uuid4())
             passwordHash = generate_password_hash(password)
-            insert = 'INSERT INTO users ("username", "password", "admin", "email", "public_id", "dateOfBirth", "fistName", "lastName", "profilePicture") VALUES (%s,%s,%s,%s,%s,%s, %s, %s, %s)';
+            insert = 'INSERT INTO users ("username", "password", "admin", "email", "public_id", "dateOfBirth", "firstName", "lastName", "profilePicture") VALUES (%s,%s,%s,%s,%s,%s, %s, %s, %s)';
             self.cursor.execute(sql.SQL(insert), [userName, passwordHash, admin, email, publicId, date,firstName,lastName, userName + "." + profileImage.filename.split('.')[1] ])
             self.connection.commit()
             self.uploadProfileImage(profileImage, userName)
