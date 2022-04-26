@@ -12,12 +12,18 @@ const UploadABTestToServer = (props) => {
         setUploading(1);
         let request = new ServerRequest();
         var formData = new FormData();
+        /*
+        console.log(dataSetId)
+        console.log(JSON.stringify(periodValues))
+        console.log(topKValues[0])
+        console.log(stepSizeValue[0])
+        console.log(JSON.stringify(algorithms))*/
         formData.append("dataSetId", dataSetId);
-        formData.append("periodValues", periodValues);
-        formData.append("topKValues", topKValues);
-        formData.append('stepSizeValue', stepSizeValue);
-        formData.append('algorithms', algorithms);
-        request.sendPost("upload",formData, true).then(message => {toast.success(message.message); setUploading(2)}).catch(error => {toast.error(error.message); setUploading(3)});
+        formData.append("periodValues", JSON.stringify(periodValues));
+        formData.append("topKValues", topKValues[0]);
+        formData.append('stepSizeValue', stepSizeValue[0]);
+        formData.append('algorithms', JSON.stringify(algorithms));
+        request.sendPost("createAbTest",formData, true).then(message => {toast.success(message.message); setUploading(2)}).catch(error => {toast.error(error.message); setUploading(3)});
     }
 
     return (
