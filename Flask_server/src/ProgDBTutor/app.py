@@ -42,7 +42,6 @@ HOST = "127.0.0.1" if DEBUG else "0.0.0.0"
 def getUserInformation():
     user = User(app)
     back = user.checkTokenAndLoadData(request)
-    print(back)
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
     return make_response(*user.getUserInformationAsReturnRequest())
@@ -352,6 +351,41 @@ def deleteUser():
         return make_response('{"message": Cannot delete user u are logged in with."}', 500)
     returnValue = user.deleteUser(request.args.get("userName"))
     return make_response(returnValue[0],returnValue[1])
+
+@app.route('/api/getUsersFromABTest', methods=['GET'])
+def getUsersFromABTest():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
+    abtest = ABTest()
+    returnValue = abtest.getUsersFromABTest(request.args.get("abTestId"),request.args.get("offset"))
+    return make_response(returnValue[0], returnValue[1])
+
+
+@app.route('/api/getDatasetIdFromABTest', methods=['GET'])
+def getDatasetIdFromABTest():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    abtest = ABTest()
+    returnValue = abtest.getDatasetIdFromABTest(request.args.get("abTestId"))
+    return make_response(returnValue[0], returnValue[1])
+
+
+@app.route('/api/getItemsFromABTest', methods=['GET'])
+def getItemsFromABTest():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
+    abtest = ABTest()
+    returnValue = abtest.getItemsFromABTest(request.args.get("abTestId"),request.args.get("offset"))
+    return make_response(returnValue[0], returnValue[1])
+
 
 
 # RUN DEV SERVER

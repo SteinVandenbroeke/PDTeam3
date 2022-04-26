@@ -149,6 +149,37 @@ class ABTest():
         returnList.append(max_alg_count)
         return (json.dumps(returnList), 200)
 
+    def getUsersFromABTest(self, abTestId, offset):
+        self.cursor.execute(sql.SQL('SELECT dataset FROM "abtest" WHERE test_name=%s'),[abTestId])
+        setId = self.cursor.fetchall()[0][0]
+        query = 'SELECT id FROM '+ setId +'_customers LIMIT 40 OFFSET '+offset
+        self.cursor.execute(sql.SQL(query))
+        users = self.cursor.fetchall()
+        returnList = []
+        for row in users:
+            item = {"personid":row[0]}
+            returnList.append(item)
+        return (json.dumps(returnList), 200)
+
+    def getItemsFromABTest(self, abTestId, offset):
+        self.cursor.execute(sql.SQL('SELECT dataset FROM "abtest" WHERE test_name=%s'),[abTestId])
+        setId = self.cursor.fetchall()[0][0]
+        query = 'SELECT id FROM '+ setId +'_articles LIMIT 40 OFFSET '+offset
+        self.cursor.execute(sql.SQL(query))
+        users = self.cursor.fetchall()
+
+        returnList = []
+        for row in users:
+            item = {"personid":row[0]}
+            returnList.append(item)
+        return (json.dumps(returnList), 200)
+
+    def getDatasetIdFromABTest(self, abTestId):
+        self.cursor.execute(sql.SQL('SELECT dataset FROM "abtest" WHERE test_name=%s'), [abTestId])
+        setId = self.cursor.fetchall()[0][0]
+        return (json.dumps(setId), 200)
+
+
     def initialize(self, abTestId=None, algorithms = None, dataset = None, beginTs = None, endTs = None, stepSize = None, topK = None):
         """
         initializes the ABTest information, by default it will load the date on abTestId from the database
@@ -173,7 +204,6 @@ class ABTest():
         elif self.abTestId == None and abTestId == None:
             exit("No data to initialize")
 
-        print(self.abTestId)
         select = 'SELECT * FROM abtest WHERE test_name = %s;'
         self.cursor.execute(sql.SQL(select).format(), [self.abTestId])
         data = self.cursor.fetchone()

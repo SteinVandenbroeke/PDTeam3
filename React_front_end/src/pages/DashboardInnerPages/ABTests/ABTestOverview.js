@@ -6,7 +6,7 @@ import LogicTable from "../../../components/logicTable"
 import SmallInformationCard from "../../../components/smallInformationCard"
 import LargeInformationCard from "../../../components/largeInformationCard"
 import Slider from "../../../components/slider"
-import {Link} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import { Line } from 'react-chartjs-2';
 import {
 Chart as ChartJS,
@@ -38,6 +38,7 @@ Legend
 );
 
 const ABTestOverview = () => {
+    const {abTestId} = useParams()
     const [values, setValues] = React.useState([0, 1]);
     const [abTestData, setAbTestData] = React.useState({
             "algorithms": [],
@@ -228,10 +229,19 @@ const ABTestOverview = () => {
                         <MostRecomendedItems abTestData={abTestData} startDate={values[0]} endDate={values[1]}/>
                     </Col>
                     <Col xs={2}>
-                        <SmallInformationCard title={"Most buyed items"} value={<Button>Full list</Button>} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
+                            <SmallInformationCard title={"Most buyed items"} value={
+                                <Link to={"/dashboard/abTests/overview/" + abTestId + "/items"} class={"btn"}>
+                                    <Button>Full list</Button>
+                                </Link>
+                            } tooltip={"Purchases from day x to day y"}/>
+
                     </Col>
                     <Col xs={2}>
-                        <SmallInformationCard title={"Most active users"} value={<Button>Full list</Button>} tooltip={"Purchases from day x to day y"}></SmallInformationCard>
+                        <SmallInformationCard title={"Most active users"} value={
+                            <Link to={"/dashboard/abTests/overview/" + abTestId + "/persons"} class={"btn"}>
+                                <Button>Full list</Button>
+                            </Link>
+                        } tooltip={"Purchases from day x to day y"}/>
                     </Col>
                 </Row>
 
