@@ -17,12 +17,13 @@ class ABTest():
         connection = database.get_connection()
         self.cursor = connection.cursor()
         self.abTestId = abTestId
-        self.testName
-        self.algorithms
-        self.dataset
-        self.beginTs
-        self.endTs
-        self.stepSize
+        self.algorithms = []
+        self.dataset = None
+        self.beginTs = None
+        self.endTs = None
+        self.stepSize = None
+        if abTestId != None:
+            self.initialize()
 
     def history_from_subset_interactions(self, interactions, amt_users=5) -> List[List]:
         """ Take the history of the first users in the dataset and return as list of lists"""
@@ -80,6 +81,7 @@ class ABTest():
         """
         ABTestInformation = self._getAbTestInformation()
         dataSet = Dataset()
+        dataSet.getPeopleList()
         allPoints = dataSet.getTimeStampList(dataSet, list)
         print("Data for overview page")#TODO
 
@@ -101,16 +103,26 @@ class ABTest():
         """
         print("item data in ABtest")
 
-    def initialize(self):
-        if self.abTestId == None:
-            exit("Wrong abtestId")
-        print(self.abTestId)
-        select = 'SELECT * FROM abtest WHERE test_name = %s;'
-        self.cursor.execute(sql.SQL(select).format(), [self.abTestId])
-        data = self.cursor.fetchone()
-        self.testName = data[0]
-        self.algorithms = data[1]
-        self.dataset = data[2]
-        self.beginTs = data[3]
-        self.endTs = data[4]
-        self.stepSize = data[5]
+    def initialize(self, abTestId=None, algorithms = None, dataset = None, beginTs = None, endTs = None, stepSize = None):
+        if self.abTestId == None and abTestId != None:
+            self.abTestId = abTestId
+            self.algorithms = []
+
+            for algorithm in algorithms:
+                self.algorithms.append([algorithm[0], algorithm[1][0]])
+            self.dataset = dataset
+            self.beginTs = beginTs
+            self.endTs = endTs
+            self.stepSize = stepSize
+        elif self.abTestId == None and abTestId == None:
+            exit("No data to initialize")
+        else:
+            print(self.abTestId)
+            select = 'SELECT * FROM abtest WHERE test_name = %s;'
+            self.cursor.execute(sql.SQL(select).format(), [self.abTestId])
+            data = self.cursor.fetchone()
+            self.algorithms = data[1]
+            self.dataset = data[2]
+            self.beginTs = data[3]
+            self.endTs = data[4]
+            self.stepSize = data[5]
