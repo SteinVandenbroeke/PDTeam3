@@ -121,7 +121,7 @@ class Dataset():
         purchaseData = pd.read_csv(purchasesCSV)
         purchaseDf = pd.DataFrame(purchaseData)
         purchaseConnections = json.loads(purchaseConnections)
-        createCustomersTable = 'CREATE TABLE ' + purchaseTableName + '(timestamp timestamp, user_id int, item_id int, parameter int, FOREIGN KEY (user_id) REFERENCES ' + customerTableName + '(id) ON UPDATE CASCADE, FOREIGN KEY (item_id) REFERENCES ' + articleTableName + '(id) ON UPDATE CASCADE);'
+        createCustomersTable = 'CREATE TABLE ' + purchaseTableName + '(timestamp timestamp, user_id int, item_id int, parameter int, FOREIGN KEY (user_id) REFERENCES ' + customerTableName + '(id) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (item_id) REFERENCES ' + articleTableName + '(id) ON UPDATE CASCADE ON DELETE CASCADE);'
         self.cursor.execute(sql.SQL(createCustomersTable))
 
         purchaseDataOrder = {}
@@ -257,6 +257,31 @@ class Dataset():
         self.connection.close()
         self.cursor.close()
         return (message, errorCode)
+
+    def deletePerson(self, personId, setId):
+        query = 'DELETE FROM '+setId+'_customers WHERE id='+ personId
+        try:
+            self.cursor.execute(sql.SQL(query))
+            self.connection.commit()
+        except:
+            return ('{"message": "Could not delete user: "'+personId+'}', 500)
+        finally:
+            self.connection.close()
+            self.cursor.close()
+        return ('{"message": "User succesfully deleted"}', 201)
+
+    def deleteItem(self, itemId, setId):
+        query = 'DELETE FROM '+setId+'_articles WHERE id='+ itemId
+        try:
+            self.cursor.execute(sql.SQL(query))
+            self.connection.commit()
+        except:
+            return ('{"message": "Could not delete item: "'+itemId+'}', 500)
+        finally:
+            self.connection.close()
+            self.cursor.close()
+        return ('{"message": "User succesfully deleted"}', 201)
+
 
     def getItemList(self, datasetName, offset):
         query = 'SELECT id,title,description FROM '+ datasetName +'_articles LIMIT 40 OFFSET '+offset

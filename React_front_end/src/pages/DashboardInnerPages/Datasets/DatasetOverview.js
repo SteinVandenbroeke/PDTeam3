@@ -8,9 +8,10 @@ import {Button, Row, Col, Card, Spinner} from "react-bootstrap";
 import Icon from "react-eva-icons";
 import {toast} from "react-toastify";
 import {ServerRequest} from "../../../logic/ServerCommunication";
+import {useNavigate } from "react-router-dom";
 
 const DataSetOverview = () => {
-
+    const navigation = useNavigate();
     const {setid} = useParams()
 
     const [loading, setLoading] = useState(false);
@@ -50,7 +51,8 @@ const DataSetOverview = () => {
         let getData = {
             "dataSet": setid,
         }
-        request.sendGet("deleteDataset",getData).then(message => {toast.success(message.message); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+        request.sendGet("deleteDataset",getData).then(message => {toast.success(message.message); navigation('/dashboard/dataSets', { replace: true }); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+
     }
 
     useEffect(() => {
@@ -64,9 +66,7 @@ const DataSetOverview = () => {
                  <Link to={"/dashboard/dataSets/overview/" + setid + "/edit"} class={"btn"}>
                      <Button variant="primary">Edit Data<Icon name="edit-outline"/></Button>
                  </Link>
-                 <Link to={"/dashboard/dataSets"} class={"btn"}>
-                    <Button onClick={()=>deleteDataset()} variant="danger">Delete Dataset</Button>
-                 </Link>
+                 <Button onClick={()=>deleteDataset()} variant="danger">Delete Dataset</Button>
             </div>
             <div>
                 <h2> This is dataset {setid} </h2>

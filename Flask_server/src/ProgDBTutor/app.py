@@ -130,6 +130,7 @@ def uploadDataset():
             return make_response('No viable connections.', 400)
         interactionConnections = request.form.get('interactionConnections')
         usersConnections = request.form.get('usersConnections')
+        usersConnections = request.form.get('usersConnections')
         itemConnections = request.form.get('itemConnections')
 
         if interactionCsv.filename == '' or userCsv.filename == '' or itemCsv.filename == '': # indien geen bestand geselecteerd
@@ -205,6 +206,33 @@ def deleteDataset():
 
     dataset = Dataset()
     returnValue = dataset.deleteDataset(request.args.get("dataSet"))
+    return make_response(returnValue[0],returnValue[1])
+
+@app.route('/api/deletePerson', methods=['GET'])
+def deletePerson():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    elif not user.admin:
+        return make_response('you must be admin to perform this action', 500)
+
+    dataset = Dataset()
+    returnValue = dataset.deletePerson(request.args.get("personId"), request.args.get("setId"))
+    return make_response(returnValue[0],returnValue[1])
+
+
+@app.route('/api/deleteItem', methods=['GET'])
+def deleteItem():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    elif not user.admin:
+        return make_response('you must be admin to perform this action', 500)
+
+    dataset = Dataset()
+    returnValue = dataset.deleteItem(request.args.get("itemId"), request.args.get("setId"))
     return make_response(returnValue[0],returnValue[1])
 
 @app.route('/api/getItemList', methods=['GET'])
