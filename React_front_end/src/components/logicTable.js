@@ -12,11 +12,12 @@ import User from "../logic/User";
  */
 const LogicTable = (props) => {
     let tableData = Array.from(props.data);
-    tableData.shift();
-    let header = props.data[0];
+    let header = tableData.shift();
+    //let header = props.data[0];
     let action = props.action;
+
     return (
-        <Table hover responsive>
+        <Table hover responsive striped>
           <thead>
                 <tr>
                   {header.map((value, index) => {
