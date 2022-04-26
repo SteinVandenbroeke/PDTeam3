@@ -5,7 +5,7 @@ import {Button} from "react-bootstrap";
 import Login from "./Login";
 import NavbarComp from "../components/Navbar";
 import {Link, Outlet, Route, Router} from "react-router-dom";
-import Page2 from "./Page2";
+import Welcome from "./Welcome";
 import Icon from 'react-eva-icons';
 
 const Dashboard = () => {
