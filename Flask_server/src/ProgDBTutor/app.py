@@ -131,6 +131,7 @@ def uploadDataset():
             return make_response('No viable connections.', 400)
         interactionConnections = request.form.get('interactionConnections')
         usersConnections = request.form.get('usersConnections')
+        usersConnections = request.form.get('usersConnections')
         itemConnections = request.form.get('itemConnections')
 
         if interactionCsv.filename == '' or userCsv.filename == '' or itemCsv.filename == '': # indien geen bestand geselecteerd
@@ -144,6 +145,7 @@ def uploadDataset():
 
     return make_response('{"message": "File successfully uploaded."}', 201)
 
+<<<<<<< HEAD
 @app.route('/api/uploadAB', methods=['GET', 'POST'])
 def uploadABTest():
     algorithms = json.load(request.form.get('algorithms'))
@@ -157,6 +159,23 @@ def uploadABTest():
 @app.route('/api/create', methods=['GET', 'POST'])
 def create():
     ABTest().execute(2, "2019-01-01", "2021-01-01", 2, "data")
+=======
+@app.route('/api/createAbTest', methods=['GET', 'POST'])
+def createAbTest():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    elif not user.admin:
+        return make_response('you must be admin to perform this action', 500)
+
+    print(json.loads(request.form.get("algorithms")))
+    print(json.loads(request.form.get("periodValues")))
+    print(request.form.get("dataSetId"))
+    print(request.form.get("topKValues"))
+    print(request.form.get("stepSizeValue"))
+    return make_response('{"message": "Created."}', 201)
+>>>>>>> e9872084096331421872d535c76c0d2e327010fa
 
 @app.route('/api/changeDataset', methods=['POST'])
 def changeDataset():
@@ -204,6 +223,33 @@ def deleteDataset():
 
     dataset = Dataset()
     returnValue = dataset.deleteDataset(request.args.get("dataSet"))
+    return make_response(returnValue[0],returnValue[1])
+
+@app.route('/api/deletePerson', methods=['GET'])
+def deletePerson():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    elif not user.admin:
+        return make_response('you must be admin to perform this action', 500)
+
+    dataset = Dataset()
+    returnValue = dataset.deletePerson(request.args.get("personId"), request.args.get("setId"))
+    return make_response(returnValue[0],returnValue[1])
+
+
+@app.route('/api/deleteItem', methods=['GET'])
+def deleteItem():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    elif not user.admin:
+        return make_response('you must be admin to perform this action', 500)
+
+    dataset = Dataset()
+    returnValue = dataset.deleteItem(request.args.get("itemId"), request.args.get("setId"))
     return make_response(returnValue[0],returnValue[1])
 
 @app.route('/api/getItemList', methods=['GET'])
@@ -267,6 +313,7 @@ def getUsers():
 
 # React interface, alle niet verwezen app.route's worden doorverwezen naar react interface in de react_build folder
 @app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
 @app.route('/<path:path>')
 def reactApp(path):
     if not os.path.exists("react_build/" + path) or path == "":

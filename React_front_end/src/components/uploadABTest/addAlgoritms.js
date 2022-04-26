@@ -21,7 +21,7 @@ const AddAlgoritms = (props) => {
             return
         }
         props.setCurrentStep(props.currentStep + 1)
-        props.setAlgorithms(algorithms)
+        props.setAlgorithms(algorithms.slice(1))
     }
     function checkExistingCombination(){
         for (var i = 1; i < algorithms.length; i++) {

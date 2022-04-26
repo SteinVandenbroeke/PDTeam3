@@ -1,11 +1,11 @@
 import React, {useState, useEffect} from 'react';
-import {useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import Accordion from "../../../components/Accordion";
 import ItemCard from "../../../components/itemCard";
 import LogicTable from "../../../components/logicTable";
 import {toast} from "react-toastify";
 import {ServerRequest} from "../../../logic/ServerCommunication";
-import {Row, Spinner} from "react-bootstrap";
+import {Button, Row, Col, Spinner} from "react-bootstrap";
 
 const ItemOverview = () => {
     const {setid, itemid} = useParams()
@@ -30,6 +30,16 @@ const ItemOverview = () => {
         request.sendGet("getRecordById",getData).then(requestData => {setItemData(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
     }
 
+
+    function deleteItem(){
+        setLoading(true);
+        let request = new ServerRequest();
+        let getData = {
+            "itemId": itemid,
+            'setId' : setid
+        }
+        request.sendGet("deleteItem",getData).then(message => {toast.success(message.message); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+    }
 
     useEffect(()=>{
 
@@ -57,28 +67,41 @@ const ItemOverview = () => {
 
     return (
         <div>
-            <div style={{padding: 10, textAlign:"left"}}>
-                <div>
-                        <img src={image} alt={itemTitle} />
-                </div>
+            <div style={{width: "100%", textAlign: "right", paddingBottom: "10px"}}>
+                <Link to={"/dashboard/dataSets/overview/" + setid} class={"btn"}>
+                    <Button onClick={()=>deleteItem()} variant="danger">Delete Item</Button>
+                </Link>
             </div>
-                <Row>
-                    <b>Name:</b> {itemTitle}
-                </Row>
-                <Row>
-                    <b>Description:</b> {itemDescription}
-                </Row>
-            <div>
-                <Accordion title={"MetaData"} data={<LogicTable data={metaDataList} />}>
-                    <Spinner
-                        className={!loading? "visually-hidden": ""}
-                        as="span"
-                        animation="border"
-                        size="sm"
-                        role="status"
-                        aria-hidden="true"
-                    />
-                </Accordion>
+            <div style={{padding: 10, textAlign:"left"}}>
+                <Col>
+                    <img src={image} alt={itemTitle} />
+                </Col>
+                <Col>
+                    <Row>
+                        <Col>
+                            <b>Name:</b> {itemTitle}
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <b>Description:</b> {itemDescription}
+                        </Col>
+                    </Row>
+                    <Row>
+                        <div>
+                            <Accordion title={"MetaData"} data={<LogicTable data={metaDataList} />}>
+                                <Spinner
+                                    className={!loading? "visually-hidden": ""}
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                />
+                            </Accordion>
+                        </div>
+                    </Row>
+                </Col>
             </div>
         </div>
     )

@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import Accordion from "../../../components/Accordion";
 import ItemCard from "../../../components/itemCard";
 import {toast} from "react-toastify";
 import {ServerRequest} from "../../../logic/ServerCommunication";
 import LogicTable from "../../../components/logicTable";
-import {Spinner} from "react-bootstrap";
+import {Button, Row, Col, Spinner} from "react-bootstrap";
 
 const PersonOverview = () => {
     const {setid, personid} = useParams();
@@ -48,7 +48,15 @@ const PersonOverview = () => {
     */
 
 
-
+    function deleteUser(){
+        setLoading(true);
+        let request = new ServerRequest();
+        let getData = {
+            "personId": personid,
+            "setId" : setid
+        }
+        request.sendGet("deletePerson",getData).then(message => {toast.success(message.message); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+    }
 
     function loadId(){
         setPurchaseData([])
@@ -91,6 +99,11 @@ const PersonOverview = () => {
 
     return (
         <div>
+            <div style={{width: "100%", textAlign: "right", paddingBottom: "10px"}}>
+                <Link to={"/dashboard/dataSets/overview/" + setid} class={"btn"}>
+                    <Button onClick={()=>deleteUser()} variant="danger">Delete Person</Button>
+                </Link>
+            </div>
             <div style={{display: "flex", flexDirection: "row", padding: 20}}>
                 <div style={{paddingLeft: 20, flex:0.1, textAlign:"left"}}>
                     <b>ID:</b> {personid}
