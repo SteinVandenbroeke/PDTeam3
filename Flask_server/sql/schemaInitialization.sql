@@ -16,7 +16,7 @@ CREATE TABLE abtest(
   "dataset" varchar REFERENCES datasets(name) ON DELETE CASCADE,
   "begin_ts" TIMESTAMP,
   "end_ts" TIMESTAMP,
-  "stepsize" TIMESTAMP
+  "stepsize" int
 );
 
 CREATE TABLE "abtestsitems" (
