@@ -25,6 +25,10 @@ const SelectABSettings = (props) => {
     }
 
     function confirmDayInterval(){
+        if(abTestName === ""){
+            toast.error("You need to give your AB-test a name.");
+            return
+        }
         props.setCurrentStep(props.currentStep + 1);
         props.setTopKValue(topKValue);
         props.setPeriodValues(periodValues);
