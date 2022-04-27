@@ -4,7 +4,7 @@ import {React, createContext , useState} from 'react';
 import NavbarComp from "./components/Navbar";
 import Home from "./pages/Home"
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-import Page2 from "./pages/Page2";
+import Welcome from "./pages/Welcome";
 import Login from "./pages/Login"
 import Page404 from "./pages/Page404";
 import {User} from "./logic/User"
@@ -57,7 +57,7 @@ function App() {
           <BrowserRouter>
               <Routes>
                   <Route path="/" element={<NavbarComp />}>
-                      <Route index element={<Page2 />} />
+                      <Route index element={<Welcome />} />
 
                       <Route path="dashboard" element={<Dashboard />}>
                           <Route index element={<HomeDashboardPage />} />
@@ -65,8 +65,8 @@ function App() {
                           <Route path="abTests" element={<ABTestsIndex />}>
                               <Route index element={<ABTestsList />}/>
                               <Route path="add" element={<AddABTest />}/>
-                              <Route path="overview/:abTestId/items" element={<ABTestItems />}/>
-                              <Route path="overview/:abTestId/persons" element={<ABTestPersons />}/>
+                              <Route path="overview/:abTestId/items/:startDate&:endDate" element={<ABTestItems />}/>
+                              <Route path="overview/:abTestId/persons/:startDate&:endDate" element={<ABTestPersons />}/>
                               <Route path="overview/:abTestId" element={<ABTestOverview />}/>
                           </Route>
 

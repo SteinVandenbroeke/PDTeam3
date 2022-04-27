@@ -310,6 +310,28 @@ def getTimeStampList():
     returnValue = dataset.getTimeStampList(request.args.get("id"), json)
     return make_response(returnValue[0],returnValue[1])
 
+@app.route('/api/getArticleCount', methods=['GET'])
+def getArticleCount():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
+    dataset = Dataset()
+    returnValue = dataset.getArticleCount(request.args.get("id"))
+    return make_response(returnValue[0],returnValue[1])
+
+@app.route('/api/getCustomerCount', methods=['GET'])
+def getCustomerCount():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
+    dataset = Dataset()
+    returnValue = dataset.getCustomerCount(request.args.get("id"))
+    return make_response(returnValue[0],returnValue[1])
+
 
 @app.route('/api/getUsers', methods=['GET'])
 def getUsers():
@@ -360,18 +382,7 @@ def getUsersFromABTest():
         return make_response('{"message": "User token wrong or missing"}', 401)
 
     abtest = ABTest()
-    returnValue = abtest.getUsersFromABTest(request.args.get("abTestId"),request.args.get("offset"))
-    return make_response(returnValue[0], returnValue[1])
-
-
-@app.route('/api/getDatasetIdFromABTest', methods=['GET'])
-def getDatasetIdFromABTest():
-    user = User(app)
-    back = user.checkTokenAndLoadData(request)
-    if not back:
-        return make_response('{"message": "User token wrong or missing"}', 401)
-    abtest = ABTest()
-    returnValue = abtest.getDatasetIdFromABTest(request.args.get("abTestId"))
+    returnValue = abtest.getUsersFromABTest(request.args.get("abTestId"),request.args.get("offset"), request.args.get("startDate"), request.args.get("endDate"))
     return make_response(returnValue[0], returnValue[1])
 
 
@@ -383,10 +394,18 @@ def getItemsFromABTest():
         return make_response('{"message": "User token wrong or missing"}', 401)
 
     abtest = ABTest()
-    returnValue = abtest.getItemsFromABTest(request.args.get("abTestId"),request.args.get("offset"))
+    returnValue = abtest.getItemsFromABTest(request.args.get("abTestId"),request.args.get("offset"), request.args.get("startDate"), request.args.get("endDate"))
     return make_response(returnValue[0], returnValue[1])
 
-
+@app.route('/api/getDatasetIdFromABTest', methods=['GET'])
+def getDatasetIdFromABTest():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    abtest = ABTest()
+    returnValue = abtest.getDatasetIdFromABTest(request.args.get("abTestId"))
+    return make_response(returnValue[0], returnValue[1])
 
 # RUN DEV SERVER
 if __name__ == "__main__":

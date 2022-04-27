@@ -30,7 +30,7 @@ const AddABTest = () => {
                 currentStep === 1 && (<SelectABSettings setAbTestName={setAbTestName} datasetId={dataSetId} setPeriodValues={setPeriodValues} setTopKValue={setTopKValue} setStepSizeValue={setStepSizeValue} currentStep={currentStep} setCurrentStep={setCurrentStep} />)
             }
             {
-                currentStep === 2 && (<AddAlgoritms currentStep={currentStep} setCurrentStep={setCurrentStep} setAlgorithms={setAlgorithms}/>)
+                currentStep === 2 && (<AddAlgoritms currentStep={currentStep} setCurrentStep={setCurrentStep} setAlgorithms={setAlgorithms} datasetId={dataSetId}/>)
             }
             {
                 currentStep === 3 && (<UploadABTestToServer currentStep={currentStep}

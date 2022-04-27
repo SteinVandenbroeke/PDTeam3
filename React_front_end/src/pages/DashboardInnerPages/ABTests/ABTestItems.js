@@ -10,7 +10,7 @@ import {ServerRequest} from "../../../logic/ServerCommunication";
 import {toast} from "react-toastify";
 
 const ABTestItems = (props) => {
-    const {abTestId} = useParams()
+    const {abTestId, startDate, endDate} = useParams()
     const navigation = useNavigate();
     const [loading, setLoading] = useState(false);
     const [itemData, setItemData] = useState({});
@@ -59,10 +59,12 @@ const ABTestItems = (props) => {
 
     // function loadItems(){
     //     setItemData([[]])
-    //     setLoading(true)
+    //     setLoading(true);
     //     let getData = {
     //         "abTestId": abTestId,
     //         "offset": itemOffset,
+    //         "startDate":startDate,
+    //         "endDate": endDate
     //     }
     //     let request = new ServerRequest();
     //     request.sendGet("getItemsFromABTest",getData).then(requestData => {setItemData(itemData.concat(requestData)); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
@@ -81,7 +83,7 @@ const ABTestItems = (props) => {
     return (
         <div className="App">
             <BackButton/>
-            <Slider labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />
+            {/*<Slider labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />*/}
             <div className="container">
                 <Row>
                     {Object.entries(itemData).map(([key, value]) => {

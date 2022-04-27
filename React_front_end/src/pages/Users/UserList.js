@@ -25,11 +25,11 @@ const UserList = () => {
     />);
 
     const [userData,setUserData] = useState([])
-    const [TableData, setTableData] = useState([["UserName","Last Name", "First Name","Date of Birth", "Admin Permissions",""]])
+    const [TableData, setTableData] = useState([["UserName","First Name", "Last Name","Date of Birth", "Admin Permissions",""]])
 
 
     function loadUsers(){
-        setTableData([["UserName","Last Name", "First Name","Date of Birth", "Admin Permissions",""]])
+        setTableData([["UserName","First Name", "Last Name","Date of Birth", "Admin Permissions",""]])
         setUserData([])
         setLoading(true);
         let request = new ServerRequest();

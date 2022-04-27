@@ -230,7 +230,7 @@ const ABTestOverview = () => {
                     </Col>
                     <Col xs={2}>
                         <SmallInformationCard title={"Most buyed items"} value={
-                            <Link to={"/dashboard/abTests/overview/" + abTestId + "/items"} class={"btn"}>
+                            <Link to={"/dashboard/abTests/overview/" + abTestId + "/items/"+values[0]+"&"+values[1]} class={"btn"}>
                                 <Button>Full list</Button>
                             </Link>
                         } tooltip={"Purchases from day x to day y"}/>
@@ -238,7 +238,7 @@ const ABTestOverview = () => {
                     </Col>
                     <Col xs={2}>
                         <SmallInformationCard title={"Most active users"} value={
-                            <Link to={"/dashboard/abTests/overview/" + abTestId + "/persons"} class={"btn"}>
+                            <Link to={"/dashboard/abTests/overview/" + abTestId + "/persons/"+values[0]+"&"+values[1]} class={"btn"}>
                                 <Button>Full list</Button>
                             </Link>
                         } tooltip={"Purchases from day x to day y"}/>

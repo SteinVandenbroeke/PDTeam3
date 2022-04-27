@@ -7,6 +7,7 @@ import ConnectComponent from "../ConnectComponent";
 import {valueOrDefault} from "chart.js/helpers";
 import {ToastContainer} from "react-toastify";
 import Login from "../../pages/Login";
+import {ServerRequest} from "../../logic/ServerCommunication";
 import { toast } from 'react-toastify';
 
 const AddAlgoritms = (props) => {
@@ -14,7 +15,27 @@ const AddAlgoritms = (props) => {
     const [valueSelect, setValueSelect] = React.useState(0);
     const [algorithms,setAlgorithms] = React.useState([[]]);
     const [k, setK] = React.useState([1]);
+    const [maxK, setMaxK] = useState([1])
+    const [loading, setLoading] = useState(false);
+    const [periodSlider, setPeriodSlider] = React.useState([1, 10, 2,2,3,74,56,5,5,4,45,4545,45,45,5,445,74]);
 
+    function loadPeriod(){
+        setLoading(true)
+        let request = new ServerRequest();
+        let getData = {
+            "id": props.datasetId
+        }
+        request.sendGet("getTimeStampList",getData).then(requestData => {setPeriodSlider(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+    }
+
+    function loadCustomerCount(){
+        setLoading(true)
+        let request = new ServerRequest();
+        let getData = {
+            "id": props.datasetId
+        }
+        request.sendGet("getCustomerCount",getData).then(requestData => {setMaxK(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+    }
 
     function finish(){
         if(algorithms.length === 1){
@@ -57,6 +78,12 @@ const AddAlgoritms = (props) => {
         setValueSelect(id)
     }
 
+    useEffect(() => {
+        if(props.datasetId != null){
+            loadCustomerCount()
+            loadPeriod()
+        }
+    },[props.datasetId]);
 
 
     return (
@@ -76,13 +103,13 @@ const AddAlgoritms = (props) => {
                     {valueSelect == 3 && (
                         <div>
                             <Form.Label style={{paddingBottom:20}}>K:</Form.Label>
-                            <Slider max={20} min={1} step={1} setValues={setK} values={k}/>
+                            <Slider max={maxK-1} min={1} step={1} setValues={setK} values={k}/>
                         </div>
                     )}
                 </Col>
                 <Col xs lg="3">
                     <Form.Label style={{paddingBottom:20}}>Training interval:</Form.Label>
-                    <Slider max={20} min={0} step={1} setValues={setTrainingIntervalvalue} values={trainingIntervalvalue}/>
+                    <Slider max={periodSlider.length - 1} min={0} step={1} setValues={setTrainingIntervalvalue} values={trainingIntervalvalue}/>
                 </Col>
                 <Col xs lg="2" style={{ textAlign:"center", paddingTop:30}}>
                     <Button variant="success" onClick={()=>addAlgorithm()}>Add</Button>
