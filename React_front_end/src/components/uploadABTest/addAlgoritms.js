@@ -109,7 +109,7 @@ const AddAlgoritms = (props) => {
                 </Col>
                 <Col xs lg="3">
                     <Form.Label style={{paddingBottom:20}}>Training interval:</Form.Label>
-                    <Slider max={periodSlider.length - 1} min={0} step={1} setValues={setTrainingIntervalvalue} values={trainingIntervalvalue}/>
+                    <Slider max={periodSlider.length - 1} min={1} step={1} setValues={setTrainingIntervalvalue} values={trainingIntervalvalue}/>
                 </Col>
                 <Col xs lg="2" style={{ textAlign:"center", paddingTop:30}}>
                     <Button variant="success" onClick={()=>addAlgorithm()}>Add</Button>

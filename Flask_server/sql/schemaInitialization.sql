@@ -92,6 +92,6 @@ alter table abrec alter column "idAbRec" set default nextval('public."abrec_idAb
 
 alter sequence "abrec_idAbRec_seq" owned by abrec."idAbRec";
 
-INSERT INTO public.algorithms (id) VALUES (0);
-INSERT INTO public.algorithms (id) VALUES (1);
-INSERT INTO public.algorithms (id) VALUES (2);
+INSERT INTO public.algorithms (id,name) VALUES (0,'Popularity');
+INSERT INTO public.algorithms (id,name) VALUES (1,'Recency');
+INSERT INTO public.algorithms (id,name) VALUES (2, 'ItemKNN');
