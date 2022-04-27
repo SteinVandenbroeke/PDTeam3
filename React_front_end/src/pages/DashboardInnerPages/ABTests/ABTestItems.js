@@ -13,14 +13,14 @@ const ABTestItems = (props) => {
     const {abTestId} = useParams()
     const navigation = useNavigate();
     const [loading, setLoading] = useState(false);
-    const [itemData, setItemData] = useState([[]]);
+    const [itemData, setItemData] = useState({});
     const [itemOffset, setItemOffset] = useState(0);
-    const [values, setValues] = React.useState([0, 1]);
+    const [values, setValues] = useState([0, 1]);
     const [datasetId, setDatasetId] = useState(null)
 
 
     //static
-    const [abTestData, setAbTestData] = React.useState({
+    const [abTestData, setAbTestData] = useState({
             "algorithms": [],
             "points": [0,10],
             "parameters": {
@@ -30,7 +30,7 @@ const ABTestItems = (props) => {
             },
             "NotAlgDependent":[]
         });
-     const dataItems = {
+    const dataItems = {
          "popularity":{items: [
              {itemId: 1, Title: "titel1", recommendRate: 9, buyRate: 5},
                  {itemId: 2, Title: "titel2", recommendRate: 10,buyRate: 6}]
@@ -45,10 +45,11 @@ const ABTestItems = (props) => {
     //}
     //useEffect(()=>{loadData()}, [])
 
-
-     function getDataSetId(){
+    function getDataSetId(){
+        console.log("hello")
         setDatasetId(null)
         setLoading(true)
+        setItemData(dataItems)
         let getData = {
             "abTestId": abTestId,
         }
@@ -56,21 +57,26 @@ const ABTestItems = (props) => {
         request.sendGet("getDatasetIdFromABTest",getData).then(requestData => {setDatasetId(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
     }
 
-    function loadItems(){
-        setItemData([[]])
-        setLoading(true);
-        let getData = {
-            "abTestId": abTestId,
-            "offset": itemOffset,
-        }
-        let request = new ServerRequest();
-        request.sendGet("getItemsFromABTest",getData).then(requestData => {setItemData(itemData.concat(requestData)); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
-        setItemData(itemOffset+40)
-    }
+    // function loadItems(){
+    //     setItemData([[]])
+    //     setLoading(true)
+    //     let getData = {
+    //         "abTestId": abTestId,
+    //         "offset": itemOffset,
+    //     }
+    //     let request = new ServerRequest();
+    //     request.sendGet("getItemsFromABTest",getData).then(requestData => {setItemData(itemData.concat(requestData)); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+    //     setItemData(itemOffset+40)
+    // }
 
     function openUser(id){
-        navigation("/dashboard/dataSets/overview/"+ abTestId + "/item/"+ id);
+        navigation("/dashboard/dataSets/overview/"+ datasetId + "/item/"+ id);
     }
+
+    useEffect(() => {
+        getDataSetId()
+        // loadItems()
+    },[]);
 
     return (
         <div className="App">

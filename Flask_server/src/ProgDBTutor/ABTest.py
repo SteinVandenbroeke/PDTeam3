@@ -166,11 +166,11 @@ class ABTest():
         setId = self.cursor.fetchall()[0][0]
         query = 'SELECT id FROM '+ setId +'_articles LIMIT 40 OFFSET '+offset
         self.cursor.execute(sql.SQL(query))
-        users = self.cursor.fetchall()
+        items = self.cursor.fetchall()
 
         returnList = []
-        for row in users:
-            item = {"personid":row[0]}
+        for row in items:
+            item = {"itemid": row[0]}
             returnList.append(item)
         return (json.dumps(returnList), 200)
 

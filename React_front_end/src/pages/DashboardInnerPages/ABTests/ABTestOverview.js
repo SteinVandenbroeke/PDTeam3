@@ -229,11 +229,11 @@ const ABTestOverview = () => {
                         <MostRecomendedItems abTestData={abTestData} startDate={values[0]} endDate={values[1]}/>
                     </Col>
                     <Col xs={2}>
-                            <SmallInformationCard title={"Most buyed items"} value={
-                                <Link to={"/dashboard/abTests/overview/" + abTestId + "/items"} class={"btn"}>
-                                    <Button>Full list</Button>
-                                </Link>
-                            } tooltip={"Purchases from day x to day y"}/>
+                        <SmallInformationCard title={"Most buyed items"} value={
+                            <Link to={"/dashboard/abTests/overview/" + abTestId + "/items"} class={"btn"}>
+                                <Button>Full list</Button>
+                            </Link>
+                        } tooltip={"Purchases from day x to day y"}/>
 
                     </Col>
                     <Col xs={2}>
