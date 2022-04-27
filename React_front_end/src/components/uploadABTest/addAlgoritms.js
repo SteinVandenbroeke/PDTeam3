@@ -12,7 +12,7 @@ import { toast } from 'react-toastify';
 
 const AddAlgoritms = (props) => {
     const [trainingIntervalvalue, setTrainingIntervalvalue] = React.useState([1]);
-    const [valueSelect, setValueSelect] = React.useState(0);
+    const [valueSelect, setValueSelect] = React.useState(-1);
     const [algorithms,setAlgorithms] = React.useState([[]]);
     const [k, setK] = React.useState([1]);
     const [maxK, setMaxK] = useState([1])
@@ -57,10 +57,10 @@ const AddAlgoritms = (props) => {
 
     function addAlgorithm(){
         let tempK = k[0];
-        if(valueSelect != 3){
+        if(valueSelect != 2){
             tempK = 0;
         }
-        if(valueSelect == "0"){
+        if(valueSelect == "-1"){
             toast.error("You need to select an algorithm.");
             return
         }
@@ -70,7 +70,7 @@ const AddAlgoritms = (props) => {
         }
 
         setAlgorithms(algorithms => [...algorithms, [valueSelect,trainingIntervalvalue, tempK]]);
-        setValueSelect("0")
+        setValueSelect("-1")
         setK([1])
         setTrainingIntervalvalue([1])
     }
@@ -95,12 +95,12 @@ const AddAlgoritms = (props) => {
                 <Col xs lg="3">
                     <Form.Label style={{paddingBottom:10}}>Algorithms:</Form.Label>
                     <Form.Select onChange={(e)=>setAlgo(e.target.value)} value={valueSelect}>
-                      <option value="0" className={"disabled"}> empty Alogithm</option>
-                      <option value="1">Popularity</option>
-                      <option value="2">Recency</option>
-                      <option value="3">ItemKNN</option>
+                      <option value="-1" className={"disabled"}> empty Alogithm</option>
+                      <option value="0">Popularity</option>
+                      <option value="1">Recency</option>
+                      <option value="2">ItemKNN</option>
                     </Form.Select>
-                    {valueSelect == 3 && (
+                    {valueSelect == 2 && (
                         <div>
                             <Form.Label style={{paddingBottom:20}}>K:</Form.Label>
                             <Slider max={maxK-1} min={1} step={1} setValues={setK} values={k}/>
@@ -118,7 +118,7 @@ const AddAlgoritms = (props) => {
                     <Form.Label style={{paddingBottom:10}}>Added algorithms:</Form.Label>
                     <Card className={"shadow-lg"}>
                       <Card.Body>
-                          <LogicTable data={[["Algoriths","Training interval","k"]].concat(algorithms)}/>
+                          <LogicTable data={[["Algorithms","Training interval","k"]].concat(algorithms)}/>
                       </Card.Body>
                     </Card>
                 </Col>
