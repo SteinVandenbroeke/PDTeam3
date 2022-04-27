@@ -106,6 +106,9 @@ def signup_def():
 
 @app.route('/api/helloWorld')
 def helloWorld():
+    abtest = ABTest("hm")
+    abtest.initialize()
+    abtest.create()
     return "Hallo world"
 
 @app.route('/api/uploadDataset', methods=['GET', 'POST'])
@@ -144,16 +147,6 @@ def uploadDataset():
 
     return make_response('{"message": "File successfully uploaded."}', 201)
 
-@app.route('/api/uploadAB', methods=['GET', 'POST'])
-def uploadABTest():
-    algorithms = json.load(request.form.get('algorithms'))
-
-    for algo in algorithms:
-        print(algo)
-        print("\ntest")
-
-    return make_response('{"message": "AB test successfully uploaded."}', 201)
-
 
 @app.route('/api/create', methods=['GET', 'POST'])
 def create():
@@ -161,20 +154,18 @@ def create():
 
 @app.route('/api/createAbTest', methods=['GET', 'POST'])
 def createAbTest():
-    # user = User(app)
-    # back = user.checkTokenAndLoadData(request)
-    # if not back:
-    #     return make_response('{"message": "User token wrong or missing"}', 401)
-    # elif not user.admin:
-    #     return make_response('you must be admin to perform this action', 500)
-    #
-    # period = json.loads(request.form.get("periodValues"))
-    # algorithms = json.loads(request.form.get("algorithms"))
-    # abtest = ABTest()
-    # abtest.initialize(request.form.get("abTestName"), algorithms,request.form.get("dataSetId"), period[0], period[1], request.form.get("stepSizeValue"), request.form.get("topKValues"))
-    # abtest.create()
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    elif not user.admin:
+        return make_response('you must be admin to perform this action', 500)
+
+    period = json.loads(request.form.get("periodValues"))
+    print(request.form.get("algorithms"))
+    algorithms = json.loads(request.form.get("algorithms"))
     abtest = ABTest()
-    abtest.initialize()
+    abtest.initialize(request.form.get("abTestName"), algorithms,request.form.get("dataSetId"), period[0], period[1], request.form.get("stepSizeValue"), request.form.get("topKValues"))
     abtest.create()
 
     return make_response('{"message": "Created."}', 201)

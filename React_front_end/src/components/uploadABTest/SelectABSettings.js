@@ -41,7 +41,7 @@ const SelectABSettings = (props) => {
         }
         props.setCurrentStep(props.currentStep + 1);
         props.setTopKValue(topKValue);
-        props.setPeriodValues(periodValues);
+        props.setPeriodValues([periodSlider[periodValues[0]], periodSlider[periodValues[1]]]);
         props.setStepSizeValue(stepSizeValue);
         props.setAbTestName(abTestName);
     }

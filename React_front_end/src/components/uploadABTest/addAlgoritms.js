@@ -43,6 +43,8 @@ const AddAlgoritms = (props) => {
             return
         }
         props.setCurrentStep(props.currentStep + 1)
+        console.log(algorithms);
+        console.log(algorithms.slice(1));
         props.setAlgorithms(algorithms.slice(1))
     }
     function checkExistingCombination(tempK){

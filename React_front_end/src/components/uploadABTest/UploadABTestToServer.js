@@ -18,9 +18,10 @@ const UploadABTestToServer = (props) => {
         console.log(topKValues[0])
         console.log(stepSizeValue[0])
         console.log(JSON.stringify(algorithms))*/
+        console.log(algorithms)
         formData.append("abTestName", abTestName)
         formData.append("dataSetId", dataSetId);
-        formData.append("periodValues", periodValues);
+        formData.append("periodValues", JSON.stringify(periodValues));
         formData.append("topKValues", topKValues);
         formData.append('stepSizeValue', stepSizeValue);
         formData.append('algorithms', JSON.stringify(algorithms));
@@ -53,7 +54,7 @@ const UploadABTestToServer = (props) => {
                                         </Card.Body>
                                     </Card>
                                 </div>
-                                <Button variant="primary" onClick={() => upload(props.dataSetId, props.periodValues, props.topKValues, props.stepSizeValue, props.algorithms)}>Upload</Button>{' '}
+                                <Button variant="primary" onClick={() => upload(props.abTestName,props.dataSetId, props.periodValues, props.topKValues, props.stepSizeValue, props.algorithms)}>Upload</Button>{' '}
                             </Card.Body>
                         }
                         {uploading === 1 &&

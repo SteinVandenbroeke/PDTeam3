@@ -41,25 +41,30 @@ class ABTest():
 
         return list(user_histories.values())
 
+    def createItems(self):
+        print("nu aan het doen!")
+
     def create(self):
         for algo in self.algorithms:
             time = self.beginTs
             print(self.topK)
-            while(time < self.endTs):
+            while (time < self.endTs):
                 results = self.execute(self.topK, time, time + datetime.timedelta(days=algo[1]), algo[0])
-                if(algo[0] == 0 or algo[0] == 1) and len(results) != 0:
-                    print(results)
-                    self.cursor.execute(sql.SQL('insert into "abrec" ("algorithm","timestamp") values (%s,%s) RETURNING "idAbRec"'),[algo[0], time + datetime.timedelta(days=algo[1])])
+                if (algo[0] == 0 or algo[0] == 1) and len(results) != 0:
+                    self.cursor.execute(
+                        sql.SQL('insert into "abrec" ("algorithm","timestamp") values (%s,%s) RETURNING "idAbRec"'),
+                        [algo[0], time + datetime.timedelta(days=algo[1])])
                     idAbRec = self.cursor.fetchone()[0]
-                    query = 'SELECT id FROM {table}_customers'.format(table=self.dataset)
-                    self.cursor.execute(sql.SQL(query))
-                    customers = self.cursor.fetchall()
-                    for customer in customers:
-                        self.cursor.execute(sql.SQL('insert into "abrecid_personrecid" ("idAbRec","personid","test_name") values (%s,%s,%s)'),[idAbRec, customer[0], self.abTestId])
+                    self.cursor.execute(sql.SQL(
+                        'insert into abrecid_personrecid("idAbRec", personid, test_name) SELECT abrec."idAbRec" ,id AS userId, test_name FROM {table}_customers,abrec,abtest WHERE abrec."idAbRec"=%s AND abtest.test_name=%s'.format(table=self.dataset)),
+                                        [idAbRec, self.abTestId])
+
                     for item in results:
-                        self.cursor.execute(sql.SQL('insert into "abreclist" ("idAbRec","itemId") values (%s,%s)'),[idAbRec, item])
+                        self.cursor.execute(sql.SQL('insert into "abreclist" ("idAbRec","itemId") values (%s,%s)'),
+                                            [idAbRec, item])
                 time += datetime.timedelta(days=self.stepSize)
         self.connection.commit()
+        print("nice")
 
     def execute(self, topKItemsCount, startDate, endDate, algorithm, users=1, k=1):
         """
@@ -71,14 +76,19 @@ class ABTest():
         @param datasets: list of all used dataset id's
         """
         if (algorithm == 0):
-            query = 'SELECT item_id FROM {table}_purchases WHERE "timestamp" > %s AND "timestamp" < %s'.format(table=self.dataset)
-            self.cursor.execute(sql.SQL(query), [startDate, endDate])
-            interactions = [r[0] for r in self.cursor.fetchall()]
-            result = [item for items, c in Counter(interactions).most_common()
-                                            for item in [items] * c]
-            return result[0:topKItemsCount]
+            print("popularty start")
+            query = 'SELECT item_id, COUNT(item_id) AS itemIdCount FROM {table}_purchases WHERE "timestamp" >= %s AND "timestamp" <= %s GROUP BY item_id ORDER BY  itemIdCount DESC LIMIT %s;'.format(table=self.dataset)
+            self.cursor.execute(sql.SQL(query), [startDate, endDate, topKItemsCount])
+            sqlList = self.cursor.fetchall()
+            topKItems = []
+            for item in sqlList:
+                topKItems.append(item[0])
+            print("popularty end")
+            return topKItems
         elif (algorithm == 1):
-            query = 'SELECT timestamp, item_id FROM {table}_purchases WHERE "timestamp" > %s AND "timestamp" < %s'.format(table=self.dataset)
+            print("popularity")
+            query = 'SELECT timestamp, item_id FROM {table}_purchases WHERE "timestamp" >= %s AND "timestamp" <= %s'.format(
+                table=self.dataset)
             self.cursor.execute(sql.SQL(query), [startDate, endDate])
             items = self.cursor.fetchall()
             sorted_result = sorted(items, key=lambda tup: tup[0])
@@ -87,7 +97,8 @@ class ABTest():
             return result[0:topKItemsCount]
         elif (algorithm == 2):
             alg = ItemKNNIterative(k=k, normalize=False)
-            query = 'SELECT user_id, item_id FROM {table}_purchases WHERE "timestamp" > %s AND "timestamp" < %s'.format(table=self.dataset)
+            query = 'SELECT user_id, item_id FROM {table}_purchases WHERE "timestamp" >= %s AND "timestamp" <= %s'.format(
+                table=self.dataset)
             self.cursor.execute(sql.SQL(query), [startDate, endDate])
             items = self.cursor.fetchall()
             alg.train(items)
@@ -103,7 +114,7 @@ class ABTest():
         dataSet = Dataset()
         dataSet.getPeopleList()
         allPoints = dataSet.getTimeStampList(dataSet, list)
-        print("Data for overview page")#TODO
+        print("Data for overview page")  # TODO
 
     def userOverviewData(self, min=None, max=None):
         """
@@ -180,7 +191,8 @@ class ABTest():
         return (json.dumps(setId), 200)
 
 
-    def initialize(self, abTestId=None, algorithms = None, dataset = None, beginTs = None, endTs = None, stepSize = None, topK = None):
+    def initialize(self, abTestId=None, algorithms=None, dataset=None, beginTs=None, endTs=None, stepSize=None,
+                   topK=None):
         """
         initializes the ABTest information, by default it will load the date on abTestId from the database
         @param abTestId: the id (name) of the ABTest
@@ -193,26 +205,30 @@ class ABTest():
         """
 
         if self.abTestId == None and abTestId != None:
-            algorithmsTemp = []
+            self.abTestId = abTestId
+            select = 'INSERT INTO abtest VALUES (%s,%s,%s,%s,%s,%s);'
+            self.cursor.execute(sql.SQL(select), [abTestId, dataset, beginTs, endTs, stepSize, topK])
+
             for algorithm in algorithms:
-                algorithmsTemp.append([algorithm[0], algorithm[1][0]])
-
-            select = 'INSERT INTO abtest VALUE (%s,%s,%s,%s,%s,%s,%s);'
-            self.cursor.execute(sql.SQL(select), [abTestId, algorithmsTemp, dataset, beginTs, endTs, stepSize, topK])
+                select = 'INSERT INTO abtest_algorithms ("test_name", "algorithmid", "interval", "K") VALUES (%s,%s,%s,%s);'
+                self.cursor.execute(sql.SQL(select), [abTestId, algorithm[0], algorithm[1][0], algorithm[2]])
             self.connection.commit()
-
         elif self.abTestId == None and abTestId == None:
             exit("No data to initialize")
 
         select = 'SELECT * FROM abtest WHERE test_name = %s;'
         self.cursor.execute(sql.SQL(select).format(), [self.abTestId])
         data = self.cursor.fetchone()
-        algorithms = data[1]
+
         self.algorithms = []
-        for algorithm in algorithms:
-            self.algorithms.append([algorithm, 2])
-        self.dataset = data[2]
-        self.beginTs = data[3]
-        self.endTs = data[4]
-        self.topK = data[5]
-        self.stepSize = data[6]
+        select = 'SELECT algorithmid, "interval", "K" FROM abtest_algorithms WHERE test_name=%s;'
+        self.cursor.execute(sql.SQL(select).format(), [self.abTestId])
+        algdata = self.cursor.fetchall()
+        for item in algdata:
+            self.algorithms.append([item[0], item[1]])
+
+        self.dataset = data[1]
+        self.beginTs = data[2]
+        self.endTs = data[3]
+        self.topK = data[4]
+        self.stepSize = data[5]
