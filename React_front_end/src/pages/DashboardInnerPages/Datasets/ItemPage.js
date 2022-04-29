@@ -27,7 +27,7 @@ const ItemOverview = () => {
             "dataSet": setid
         }
         let request = new ServerRequest()
-        request.sendGet("getRecordById",getData).then(requestData => {setItemData(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+        request.sendGet("getRecordById",getData).then(requestData => {setItemData(requestData); setLoading(false)}).catch(setLoading(false)); //toast.error(error.message);  TODO
     }
 
 

@@ -4,7 +4,9 @@ from datetime import datetime
 import pandas as pd
 from quote_data_access import DBConnection
 from config import config_data
+import psycopg2
 from psycopg2 import sql
+from psycopg2 import extras
 import numpy
 from psycopg2.extensions import register_adapter, AsIs
 
@@ -121,7 +123,16 @@ class Dataset():
         purchaseData = pd.read_csv(purchasesCSV)
         purchaseDf = pd.DataFrame(purchaseData)
         purchaseConnections = json.loads(purchaseConnections)
-        createCustomersTable = 'CREATE TABLE ' + purchaseTableName + '(timestamp timestamp, user_id int, item_id int, parameter int, FOREIGN KEY (user_id) REFERENCES ' + customerTableName + '(id) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (item_id) REFERENCES ' + articleTableName + '(id) ON UPDATE CASCADE ON DELETE CASCADE);'
+
+
+        tableDict = {'timestamp': "timestamp timestamp", 'user_id': " user_id int",'item_id': "item_id int",'parameter': " parameter int",'timestamp': "timestamp timestamp"}
+        volgordeTables = ""
+        for  param in purchaseConnections['csv']:
+            volgordeTables += tableDict[purchaseConnections['connections'][param]] + ', '
+
+        print('pur', volgordeTables)
+
+        createCustomersTable = 'CREATE TABLE ' + purchaseTableName + '(' + volgordeTables + 'FOREIGN KEY (user_id) REFERENCES ' + customerTableName + '(id) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (item_id) REFERENCES ' + articleTableName + '(id) ON UPDATE CASCADE ON DELETE CASCADE);'
         self.cursor.execute(sql.SQL(createCustomersTable))
 
         purchaseDataOrder = {}
@@ -135,16 +146,18 @@ class Dataset():
             if purchaseConnections['connections'][param] == 'parameter':
                 purchaseDataOrder[param] = 3
 
-        for row in purchaseDf.values:
-            sortedData = []
-            for i in range(len(row)):
-                if purchaseConnections['csv'][i] in purchaseDataOrder:
-                    sortedData.insert(purchaseDataOrder[purchaseConnections['csv'][i]], row[i])
+        # finalData = []
+        # for row in purchaseDf.values:
+        #     sortedData = []
+        #     for i in range(len(row)):
+        #         if purchaseConnections['csv'][i] in purchaseDataOrder:
+        #             sortedData.insert(purchaseDataOrder[purchaseConnections['csv'][i]], row[i])
 
-            procentString = ("%s," * len(sortedData))
-            procentString = procentString[:-1]
-            createPurchaseInsert = 'insert into ' + purchaseTableName + ' values (' + procentString + ' )'
-            self.cursor.execute(createPurchaseInsert, tuple(sortedData))
+        procentString = ("%s," * 4)
+        procentString = procentString[:-1]
+        createPurchaseInsert = 'insert into ' + purchaseTableName + ' values (' + procentString + ' )'
+        # finalData.append(tuple(sortedData))
+        psycopg2.extras.execute_batch(self.cursor,createPurchaseInsert, purchaseDf.values)
         self.cursor.execute(sql.SQL('insert into "datasets" ("name","createdBy") values (%s,%s)'),[datasetName.lower(), userName])
         print("purchases toegevoegd")
 

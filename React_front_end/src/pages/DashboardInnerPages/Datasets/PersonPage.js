@@ -68,12 +68,12 @@ const PersonOverview = () => {
             "dataSet": setid
         }
         let request = new ServerRequest();
-        request.sendGet("getRecordById",getData).then(requestData => {setPersonData(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+        request.sendGet("getRecordById",getData).then(requestData => {setPersonData(requestData); setLoading(false)}).catch(error => {setLoading(false)}); //toast.error(error.message);  TODO
         getData = {
             "id": personid,
             "dataSet": setid
         }
-        request.sendGet("getPurchases",getData).then(requestData => {setPurchaseData(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+        request.sendGet("getPurchases",getData).then(requestData => {setPurchaseData(requestData); setLoading(false)}).catch(error => {setLoading(false)}); //toast.error(error.message);  TODO
     }
 
     useEffect(()=>{
