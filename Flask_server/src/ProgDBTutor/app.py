@@ -90,13 +90,13 @@ def signup_def():
 
     data = request.form
 
-    username = data['userName']
-    email = data['email']
-    password = data['password']
-    date = data['dateOfBrith']
-    firstName = data['firstName']
-    lastName = data['lastName']
-    profileImage = request.files["profileImage"]
+    username = data.get('userName')
+    email = data.get('email')
+    password = data.get('password')
+    date = data.get('dateOfBrith')
+    firstName = data.get('firstName')
+    lastName = data.get('lastName')
+    profileImage = request.files.get("profileImage")
     admin = False
     if 'adminPermision' in data and data['adminPermision'] == "on":
         admin = True
