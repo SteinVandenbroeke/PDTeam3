@@ -76,3 +76,15 @@ port = 5433 or default
 ### import datascheme ###
 right click public > Run SQL script... > Select schemaInitialization.sql
 
+## Upload to google cloud ##
+ga naar de app user:
+```sudo su app```
+
+git pull:
+```git pull```
+
+ga naar eigen user:
+```exit```
+
+Restart webapp:
+```sudo systemctl restart webapp```
