@@ -106,7 +106,7 @@ class User():
             isAdmin = data[4]
 
             if not userCount:
-                return ('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm ="User does not exist !!"'})
+                return ('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm ="User does not exist 1!!"'})
 
             if check_password_hash(dbPassword, password):
                 # generates the JWT Token
@@ -119,7 +119,7 @@ class User():
             # returns 403 if password is wrong
             return ('Could not verify', 403, {'WWW-Authenticate' : 'Basic realm ="Wrong Password !!"'})
         else:
-            return ('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm ="User does not exist !!"'})
+            return ('Could not verify', 401, {'WWW-Authenticate' : 'Basic realm ="User does not exist 2!!"'})
 
     def uploadProfileImage(self, file, name):
         try:
