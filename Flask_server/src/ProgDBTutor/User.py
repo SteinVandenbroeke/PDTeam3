@@ -98,7 +98,7 @@ class User():
         select = 'SELECT users.email, users.password, users.public_id, users."profilePicture", users."admin"  FROM users WHERE email=%s;'
         self.cursor.execute(sql.SQL(select), [email])
         data = self.cursor.fetchone()
-        if data == None:
+        if data != None:
             userCount = data[0]
             dbPassword = data[1]
             public_id = data[2]
