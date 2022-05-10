@@ -1,5 +1,9 @@
 import datetime
 
+import psycopg2
+from psycopg2 import sql
+from psycopg2 import extras
+
 from config import config_data
 from quote_data_access import Quote, DBConnection, QuoteDataAccess
 from psycopg2 import sql
@@ -51,18 +55,44 @@ class ABTest():
             while (time < self.endTs):
                 results = self.execute(self.topK, time, time + datetime.timedelta(days=algo[1]), algo[0])
                 if (algo[0] == 0 or algo[0] == 1) and len(results) != 0:
+                    #niet knn
                     self.cursor.execute(
                         sql.SQL('insert into "abrec" ("algorithm","timestamp") values (%s,%s) RETURNING "idAbRec"'),
                         [algo[0], time + datetime.timedelta(days=algo[1])])
                     idAbRec = self.cursor.fetchone()[0]
-                    self.cursor.execute(sql.SQL(
-                        'insert into abrecid_personrecid("idAbRec", personid, test_name) SELECT abrec."idAbRec" ,id AS userId, test_name FROM {table}_customers,abrec,abtest WHERE abrec."idAbRec"=%s AND abtest.test_name=%s'.format(table=self.dataset)),
-                                        [idAbRec, self.abTestId])
 
+
+                    '''self.cursor.execute(sql.SQL(
+                        'insert into abrecid_personrecid("idAbRec", personid, test_name) SELECT abrec."idAbRec" ,id AS userId, test_name FROM {table}_customers,abrec,abtest WHERE abrec."idAbRec"=%s AND abtest.test_name=%s'.format(table=self.dataset)),
+                                        [idAbRec, self.abTestId])'''
+
+                    #niet nodig voor popularity en recency aangzien elke user hetzelfde is
+                    #query = 'insert into abrecid_personrecid("idAbRec", personid, test_name) SELECT %s ,id AS userId, %s FROM {table}_customers'.format(table=self.dataset)
+                    #items = [idAbRec, self.abTestId]
+                    #psycopg2.extras.execute_batch(self.cursor,query, [items])
+
+                    #zet person id op 0 aangezien dit voor elke user toch hetzelfde is
+                    query = 'insert into abrecid_personrecid("idAbRec", personid, test_name) VALUES(%s,0, %s)'.format(
+                        table=self.dataset)
+                    items = [idAbRec, self.abTestId]
+                    psycopg2.extras.execute_batch(self.cursor, query, [items])
+
+                    sqlInstert = []
                     for item in results:
-                        self.cursor.execute(sql.SQL('insert into "abreclist" ("idAbRec","itemId") values (%s,%s)'),
-                                            [idAbRec, item])
+                        sqlInstert.append([idAbRec, item])
+                    psycopg2.extras.execute_batch(self.cursor, 'insert into "abreclist" ("idAbRec","itemId") values (%s,%s)', sqlInstert)
+
+                elif algo[0] == 2:
+                    exit("knn moet nog geimplement worden")
+                    #knn
+
                 time += datetime.timedelta(days=self.stepSize)
+
+        query = 'insert into abrecmetric("idAbRec", ctr, atr7, atr30, avargeuserrevenuectr, avargeuserrevenue7, avargeuserrevenue30)SELECT CTRTable."idAbRec",(CTRTable.CTR::float/totalRecomendationsTable.totalRecomendations) * 100 AS CTR, (AR7Table.AR7::float)/(totalRecomendationsTable.totalRecomendations*7) * 100                                                                                                                                   AS AR7, (AR30Table.AR30::float)/(totalRecomendationsTable.totalRecomendations*30) * 100                                                                                                                                AS AR30, (AR0UTable.avaragePriceAR0/totalRecomendationsTable.totalRecomendations)                    AS avaragePriceAR0, (AR7UTable.avaragePriceAR7/(totalRecomendationsTable.totalRecomendations*7))                AS avaragePriceAR7, (AR30UTable.avaragePriceAR30/(totalRecomendationsTable.totalRecomendations*30))             AS avaragePriceAR30 FROM ( SELECT abrec."idAbRec", abrec.timestamp, COUNT("itemId") as CTR, algorithm FROM abrec, abreclist, abrecid_personrecid, {table}_purchases WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and (algorithm = 0 or algorithm = 1) and abrec.timestamp={table}_purchases.timestamp GROUP BY abrec.timestamp, personid, algorithm, abrec."idAbRec") AS CTRTable, (SELECT abrec."idAbRec", abrec.timestamp, COUNT("itemId") as AR7, algorithm FROM abrec, abreclist, abrecid_personrecid, {table}_purchases WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and (algorithm = 0 or algorithm = 1) and {table}_purchases.timestamp>=abrec.timestamp and {table}_purchases.timestamp<abrec.timestamp + INTERVAL \'7 days\' GROUP BY abrec.timestamp, personid, algorithm, abrec."idAbRec") AS AR7Table, (SELECT abrec."idAbRec", abrec.timestamp, COUNT("itemId") as AR30, algorithm FROM abrec, abreclist, abrecid_personrecid, {table}_purchases WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and (algorithm = 0 or algorithm = 1) and {table}_purchases.timestamp>=abrec.timestamp and {table}_purchases.timestamp<abrec.timestamp + INTERVAL \'30 days\' GROUP BY abrec.timestamp, personid, algorithm, abrec."idAbRec") AS AR30Table, (SELECT abrec."idAbRec", abrec.timestamp, SUM({table}_purchases."parameter") as avaragePriceAR0, algorithm FROM abrec, abreclist, abrecid_personrecid, {table}_purchases WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and (algorithm = 0 or algorithm = 1) and {table}_purchases.timestamp=abrec.timestamp GROUP BY abrec.timestamp, personid, algorithm, abrec."idAbRec") AS AR0UTable, (SELECT abrec."idAbRec", abrec.timestamp, SUM({table}_purchases."parameter") as avaragePriceAR7, algorithm FROM abrec, abreclist, abrecid_personrecid, {table}_purchases WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and (algorithm = 0 or algorithm = 1) and {table}_purchases.timestamp>=abrec.timestamp and {table}_purchases.timestamp<abrec.timestamp + INTERVAL \'7 days\' GROUP BY abrec.timestamp, personid, algorithm, abrec."idAbRec") AS AR7UTable, (SELECT abrec."idAbRec", abrec.timestamp, SUM({table}_purchases."parameter") as avaragePriceAR30, algorithm FROM abrec, abreclist, abrecid_personrecid, {table}_purchases WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and (algorithm = 0 or algorithm = 1) and {table}_purchases.timestamp>=abrec.timestamp and {table}_purchases.timestamp<abrec.timestamp + INTERVAL \'30 days\' GROUP BY abrec.timestamp, personid, algorithm, abrec."idAbRec") AS AR30UTable, (SELECT test."topK" * test1.totalUserCount AS totalRecomendations FROM (SELECT "topK" FROM abtest WHERE test_name=%s) as test, (SELECT COUNT("id") AS totalUserCount FROM {table}_customers) AS test1) AS totalRecomendationsTable WHERE CTRTable."idAbRec" = AR7Table."idAbRec" and AR7Table."idAbRec" = AR30Table."idAbRec" and AR30Table."idAbRec" = AR0UTable."idAbRec" and AR0UTable."idAbRec" = AR7UTable."idAbRec" and AR7UTable."idAbRec" = AR30UTable."idAbRec";'.format(
+            table=self.dataset)
+        print([self.abTestId * 7])
+        self.cursor.execute(sql.SQL(query), [self.abTestId] * 7)
+
         self.connection.commit()
         print("nice")
 
@@ -76,17 +106,14 @@ class ABTest():
         @param datasets: list of all used dataset id's
         """
         if (algorithm == 0):
-            print("popularty start")
             query = 'SELECT item_id, COUNT(item_id) AS itemIdCount FROM {table}_purchases WHERE "timestamp" >= %s AND "timestamp" <= %s GROUP BY item_id ORDER BY  itemIdCount DESC LIMIT %s;'.format(table=self.dataset)
             self.cursor.execute(sql.SQL(query), [startDate, endDate, topKItemsCount])
             sqlList = self.cursor.fetchall()
             topKItems = []
             for item in sqlList:
                 topKItems.append(item[0])
-            print("popularty end")
             return topKItems
         elif (algorithm == 1):
-            print("popularity")
             query = 'SELECT timestamp, item_id FROM {table}_purchases WHERE "timestamp" >= %s AND "timestamp" <= %s'.format(
                 table=self.dataset)
             self.cursor.execute(sql.SQL(query), [startDate, endDate])
@@ -206,7 +233,7 @@ class ABTest():
 
         if self.abTestId == None and abTestId != None:
             self.abTestId = abTestId
-            select = 'INSERT INTO abtest VALUES (%s,%s,%s,%s,%s,%s);'
+            select = 'INSERT INTO abtest VALUES (%s,%s,to_date(%s, \'DD/MM/YYYY\'),to_date(%s, \'DD/MM/YYYY\'),%s,%s);'
             self.cursor.execute(sql.SQL(select), [abTestId, dataset, beginTs, endTs, stepSize, topK])
 
             for algorithm in algorithms:

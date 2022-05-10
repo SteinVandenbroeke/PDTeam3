@@ -125,7 +125,7 @@ class Dataset():
         purchaseConnections = json.loads(purchaseConnections)
 
 
-        tableDict = {'timestamp': "timestamp timestamp", 'user_id': " user_id int",'item_id': "item_id int",'parameter': " parameter int",'timestamp': "timestamp timestamp"}
+        tableDict = {'timestamp': "timestamp timestamp", 'user_id': " user_id int",'item_id': "item_id int",'parameter': " parameter float",'timestamp': "timestamp timestamp"}
         volgordeTables = ""
         for  param in purchaseConnections['csv']:
             volgordeTables += tableDict[purchaseConnections['connections'][param]] + ', '

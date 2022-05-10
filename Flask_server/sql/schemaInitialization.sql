@@ -38,21 +38,32 @@ CREATE TABLE abtest_algorithms(
     PRIMARY KEY("test_name", "algorithmid", "interval")
 );
 
-CREATE TABLE "abtestsitems" (
-  "item_id" int,
-  "test" varchar,
-  "algorithm" int,
-  "timestamp" timestamp ,
-  "num_of_rec" int,
-  "num_of_suc_rec" int,
-   PRIMARY KEY("item_id", "test", "algorithm", "timestamp")
-);
+-- CREATE TABLE "abtestsitems" (
+--   "item_id" int,
+--   "test" varchar,
+--   "algorithm" int,
+--   "timestamp" timestamp ,
+--   "num_of_rec" int,
+--   "num_of_suc_rec" int,
+--    PRIMARY KEY("item_id", "test", "algorithm", "timestamp")
+-- );
 
 CREATE TABLE "abrec" (
   "idAbRec" int PRIMARY KEY,
   "algorithm" int,
   "timestamp" timestamp
 );
+
+CREATE TABLE "abrecmetric" (
+    "idAbRec" int REFERENCES "abrec" ("idAbRec"),
+    ctr float,
+    atr7 float,
+    atr30 float,
+    avargeUserRevenueCTR float,
+    avargeUserRevenue7 float,
+    avargeUserRevenue30 float,
+    PRIMARY KEY ("idAbRec")
+)
 
 CREATE TABLE "abreclist" (
   "idAbRec" int,
