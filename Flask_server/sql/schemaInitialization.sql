@@ -55,14 +55,16 @@ CREATE TABLE "abrec" (
 );
 
 CREATE TABLE "abrecmetric" (
-    "idAbRec" int REFERENCES "abrec" ("idAbRec"),
+    "testName" varchar REFERENCES abtest("test_name"),
+    "algorithmid" int REFERENCES algorithms(id),
+    "timestamp" timestamp,
     ctr float,
     atr7 float,
     atr30 float,
     avargeUserRevenueCTR float,
     avargeUserRevenue7 float,
     avargeUserRevenue30 float,
-    PRIMARY KEY ("idAbRec")
+    PRIMARY KEY ("timestamp","testName", "algorithmid")
 )
 
 CREATE TABLE "abreclist" (
