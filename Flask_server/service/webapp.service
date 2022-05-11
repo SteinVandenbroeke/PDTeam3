@@ -18,7 +18,7 @@ WorkingDirectory=/home/app/PDTeam3/Flask_server/src/ProgDBTutor
 Environment="PATH=/home/app/PDTeam3/Flask_server/env/bin"
 
 # We'll then specify the commanded to start the service
-ExecStart=/home/app/PDTeam3/Flask_server/env/bin/gunicorn --workers 3 --bind unix:webapp.sock -m 007 wsgi:app --timeout 1200 --log-file /home/app/PDTeam3/error.er --capture-output True
+ExecStart=/home/app/PDTeam3/Flask_server/env/bin/gunicorn --workers 3 --bind unix:webapp.sock -m 007 wsgi:app --timeout 1200 --log-file /home/app/PDTeam3/error.er --capture-output
 
 # This will tell systemd what to link this service to if we enable it to start at boot. We want this service to start when the regular multi-user system is up and running:
 [Install]
