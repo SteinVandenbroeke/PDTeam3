@@ -189,10 +189,7 @@ const ABTestOverview = () => {
     useEffect(() => {
     }, [abTestData]);
 
-    return (
-        <div>
-            <div style={{paddingTop: 20}}>
-                <Row>
+    let slider = <Row style={{paddingTop: 20}}>
                     <Col sm={1}>
                         <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={abTestData.points[values[0]]} onChange={(e)=>{setValues([abTestData.points.indexOf(e.target.value), values[1]])}} />
                     </Col>
@@ -202,31 +199,36 @@ const ABTestOverview = () => {
                     <Col sm={1}>
                         <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={abTestData.points[values[1]]} onChange={(e)=>{setValues([values[0], abTestData.points.indexOf(e.target.value)])}} />
                     </Col>
-                </Row>
+                </Row>;
+
+    return (
+        <div>
+            <div style={{paddingTop: 20}}>
+                {slider}
                 <Row>
                     <Col sm={4}>
                         <ABTestInformation algorithms={abTestData.algorithms} parameters={abTestData.parameters}/>
                     </Col>
                     <Col xs={12} md={4}>
-                        <Purchases purchases={abTestData.NotAlgDependent.Purchases}  abTestData={abTestData} startDate={values[0]} endDate={values[1]}></Purchases>
+                        <Purchases slider={slider} purchases={abTestData.NotAlgDependent.Purchases}  abTestData={abTestData} startDate={values[0]} endDate={values[1]}></Purchases>
                     </Col>
                     <Col xs={12} md={4}>
-                        <ActiveUserCard abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
+                        <ActiveUserCard slider={slider} abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
                     </Col>
                     <Col xs={12} md={4}>
-                        <RevenueCard abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
+                        <RevenueCard slider={slider} abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
                     </Col>
                     <Col xs={12} md={4}>
-                        <AverageRevenueUser abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
+                        <AverageRevenueUser slider={slider} abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
                     </Col>
                     <Col xs={12} md={4}>
-                        <ClickTroughRate abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
+                        <ClickTroughRate slider={slider} abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
                     </Col>
                     <Col xs={12} md={4}>
-                        <AttributionRate abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
+                        <AttributionRate slider={slider} abTestData={abTestData} startDate={values[0]} endDate={values[1]} />
                     </Col>
                     <Col xs={12} md={4}>
-                        <MostRecomendedItems abTestData={abTestData} startDate={values[0]} endDate={values[1]}/>
+                        <MostRecomendedItems slider={slider} abTestData={abTestData} startDate={values[0]} endDate={values[1]}/>
                     </Col>
                     <Col xs={2}>
                         <SmallInformationCard title={"Most buyed items"} value={

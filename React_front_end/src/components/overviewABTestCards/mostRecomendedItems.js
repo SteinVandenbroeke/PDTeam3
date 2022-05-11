@@ -68,7 +68,7 @@ const ABTestInformation = (props) => {
     }, [props.abTestData, props.startDate, props.endDate]);
 
     return (
-        <LargeInformationCard loading={loading} title={"Most recommended items"} tooltip={"The products that are the most recommended over the x days"}>
+        <LargeInformationCard settings={props.slider} loading={loading} title={"Most recommended items"} tooltip={"The products that are the most recommended over the x days"}>
               <Row>
                   <Col sm={12}>
                     <LogicTable data={logicTableData}/>

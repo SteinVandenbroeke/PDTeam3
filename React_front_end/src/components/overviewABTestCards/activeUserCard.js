@@ -50,10 +50,10 @@ const RevenueCard = (props) => {
     }, [props.abTestData, props.startDate, props.endDate]);
 
     return (
-        <LargeInformationCard loading={loading} title={"Users"} value={20} tooltip={"Purchases from day x to day y"}>
+        <LargeInformationCard settings={props.slider} loading={loading} title={"Users"} value={20} tooltip={"Purchases from day x to day y"}>
             <h5>Total from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: {totalUsers}</h5>
             {labels.length < 500 &&
-            <Line options={{
+            <Line height={"100%"} options={{
                   responsive: true,
                   backgroundColor: 'rgba(13,110,253,1)',
                   borderColor: 'rgba(13,110,253,0.5)',

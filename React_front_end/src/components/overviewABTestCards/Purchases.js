@@ -40,10 +40,10 @@ const Purchases = (props) => {
     }, [props.abTestData, props.startDate, props.endDate]);
 
     return (
-        <LargeInformationCard  loading={loading} title={"Purchases"} tooltip={"Purchases from day x to day y"}>
+        <LargeInformationCard settings={props.slider} loading={loading} title={"Purchases"} tooltip={"Purchases from day x to day y"}>
             <h5>Total from {props.startDate} to {props.endDate}: {totalPurchases}</h5>
             {labels.length < 500 &&
-            <Line options={{
+            <Line height={"100%"} options={{
                 backgroundColor: 'rgba(13,110,253,1)',
                 borderColor: 'rgba(13,110,253,0.5)',
                   responsive: true,

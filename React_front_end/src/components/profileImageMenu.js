@@ -25,7 +25,7 @@ const ProfileImageMenu = () => {
     let [image, setImage] = useState("https://d1nhio0ox7pgb.cloudfront.net/_img/g_collection_png/standard/256x256/menu.png");
 
     useEffect(() => {
-        loadProfileImage()
+       // loadProfileImage()
     }, []);
 
 

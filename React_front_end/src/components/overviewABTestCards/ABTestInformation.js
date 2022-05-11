@@ -1,4 +1,4 @@
-import {Button, Card, Col, Row} from "react-bootstrap";
+import {Button, Card, Col, Modal, Row} from "react-bootstrap";
 import Icon from 'react-eva-icons';
 import {useNavigate } from "react-router-dom";
 import React, {useEffect} from "react";
@@ -19,7 +19,7 @@ const ABTestInformation = (props) => {
     }
 
     return (
-        <LargeInformationCard title={"ABTest Information"} tooltip={"Information about this ABTest"}>
+            <LargeInformationCard title={"ABTest Information"} tooltip={"Information about this ABTest"}>
               <Row>
                   <Col sm={4}>
                       <h6>Dataset ID: {props.parameters.datasetId}</h6>
@@ -30,7 +30,7 @@ const ABTestInformation = (props) => {
                       <LogicTable data={data}/>
                   </Col>
               </Row>
-        </LargeInformationCard>
+            </LargeInformationCard>
         )
 };
 

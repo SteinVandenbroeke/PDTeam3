@@ -58,14 +58,14 @@ const Purchases = (props) => {
     }, [props.abTestData, props.startDate, props.endDate]);
 
     return (
-        <LargeInformationCard loading={loading} title={"Click Through Rate"} tooltip={"Purchases from day x to day y"}>
+        <LargeInformationCard settings={props.slider} loading={loading} title={"Click Through Rate"} tooltip={"Purchases from day x to day y"}>
             {
                 avargeCTR.map((value, index) => {
                     {return <h5>Avarage CTR for {value[0]} from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: {value[1]}</h5>}
                 })
             }
             {labels.length < 50 &&
-            <Line options={{
+            <Line height={"100%"} options={{
                   responsive: true,
                   plugins: {
                     legend: {
