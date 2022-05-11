@@ -82,9 +82,9 @@ CREATE TABLE "abrecid_personrecid" (
 
 --TODO add to python ALTER TABLE "abtestsitems" ADD FOREIGN KEY ("item_id") REFERENCES "setname_items" ("item_id");
 
-ALTER TABLE "abtestsitems" ADD FOREIGN KEY ("test") REFERENCES "abtest" ("test_name");
+--ALTER TABLE "abtestsitems" ADD FOREIGN KEY ("test") REFERENCES "abtest" ("test_name");
 
-ALTER TABLE "abtestsitems" ADD FOREIGN KEY ("algorithm") REFERENCES "algorithms" ("id");
+--ALTER TABLE "abtestsitems" ADD FOREIGN KEY ("algorithm") REFERENCES "algorithms" ("id");
 
 ALTER TABLE "abrec" ADD FOREIGN KEY ("algorithm") REFERENCES "algorithms" ("id");
 
