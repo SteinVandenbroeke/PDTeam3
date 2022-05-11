@@ -65,7 +65,7 @@ CREATE TABLE "abrecmetric" (
     avargeUserRevenue7 float,
     avargeUserRevenue30 float,
     PRIMARY KEY ("timestamp","testName", "algorithmid")
-)
+);
 
 CREATE TABLE "abreclist" (
   "idAbRec" int,
