@@ -6,7 +6,7 @@ import LogicTable from "../../../components/logicTable";
 import Slider from "../../../components/slider";
 import {ServerRequest} from "../../../logic/ServerCommunication";
 import {toast} from "react-toastify";
-import {Button} from "react-bootstrap";
+import {Button, Form} from "react-bootstrap";
 
 const ABTestPersons = (props) => {
     const [loading, setLoading] = useState(false);
@@ -17,6 +17,7 @@ const ABTestPersons = (props) => {
     const data1 = [["User Id","Purchase Amount", "CTR"]]
     const {abTestId, startDate, endDate} = useParams()
     const navigation = useNavigate();
+    const [paramSelect, setParamSelect] = React.useState(-1);
 
     //static
     const [abTestData, setAbTestData] = React.useState({
@@ -45,28 +46,32 @@ const ABTestPersons = (props) => {
         request.sendGet("getDatasetIdFromABTest",getData).then(requestData => {setDatasetId(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
     }
 
-    function loadUsers(){
-        setPersonData([])
+    function loadUsers(id){
         setLoading(true);
         let getData = {
             "abTestId": abTestId,
             "offset": personOffset,
             "startDate": startDate,
-            "endDate": endDate
+            "endDate": endDate,
+            "parameter":paramSelect
         }
         let request = new ServerRequest();
         request.sendGet("getUsersFromABTest",getData).then(requestData => {setPersonData(personData.concat(requestData)); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
         setPersonOffset(personOffset+40)
     }
 
-
+    function setparam(id){
+        setPersonOffset(0)
+        setParamSelect(id)
+        setPersonData([])
+        loadUsers()
+    }
 
     for(var i = 0; i < personData.length; i++){
         const temp = []
         for (const [key, value] of Object.entries(personData[i])) {
-  		    temp.push(value)
+  		    data1.push([value["personid"],value["purchaseAmount"]])
 	    }
-        data1.push(temp)
     }
 
     useEffect(() => {
@@ -78,6 +83,10 @@ const ABTestPersons = (props) => {
         <div className="App">
             <BackButton/>
             {/*<Slider labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />*/}
+            <Form.Select onChange={(e)=>setparam(e.target.value)} value={paramSelect}>
+              <option value="Purchase Amount">Purchase Amount</option>
+              <option value="CTR">CTR</option>
+            </Form.Select>
             <LogicTable action={openUser} data={data1}/>
             <Button variant="primary" onClick={()=>loadUsers()}>Load More</Button>
         </div>

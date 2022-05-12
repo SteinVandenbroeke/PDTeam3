@@ -135,24 +135,6 @@ class Dataset():
         createCustomersTable = 'CREATE TABLE ' + purchaseTableName + '(' + volgordeTables + 'FOREIGN KEY (user_id) REFERENCES ' + customerTableName + '(id) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (item_id) REFERENCES ' + articleTableName + '(id) ON UPDATE CASCADE ON DELETE CASCADE);'
         self.cursor.execute(sql.SQL(createCustomersTable))
 
-        purchaseDataOrder = {}
-        for param in purchaseConnections['connections']:
-            if purchaseConnections['connections'][param] == 'timestamp':
-                purchaseDataOrder[param] = 0
-            if purchaseConnections['connections'][param] == 'user_id':
-                purchaseDataOrder[param] = 1
-            if purchaseConnections['connections'][param] == 'item_id':
-                purchaseDataOrder[param] = 2
-            if purchaseConnections['connections'][param] == 'parameter':
-                purchaseDataOrder[param] = 3
-
-        # finalData = []
-        # for row in purchaseDf.values:
-        #     sortedData = []
-        #     for i in range(len(row)):
-        #         if purchaseConnections['csv'][i] in purchaseDataOrder:
-        #             sortedData.insert(purchaseDataOrder[purchaseConnections['csv'][i]], row[i])
-
         procentString = ("%s," * 4)
         procentString = procentString[:-1]
         createPurchaseInsert = 'insert into ' + purchaseTableName + ' values (' + procentString + ' )'
