@@ -1,6 +1,6 @@
 import {Outlet, Link} from "react-router-dom";
-import {Navbar, Container, Nav, Card, Image, ListGroup, Table, Button} from "react-bootstrap";
-import {useContext, React, useState, useEffect} from "react";
+import {Navbar, Container, Nav, Card, Image, ListGroup, Table, Button, Modal, Spinner} from "react-bootstrap";
+import {useContext, useState, useEffect} from "react";
 import {userSession} from "../App";
 import User from "../logic/User";
 
@@ -72,8 +72,6 @@ const LogicTable = (props) => {
             </Table>
             {dataLimit < tableData.length  && <Button variant="primary" onClick={()=>setDataLimit(dataLimit+40)}>Load More</Button>}
         </>
-
-
     )
 };
 

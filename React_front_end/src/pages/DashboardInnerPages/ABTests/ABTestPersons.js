@@ -6,7 +6,7 @@ import LogicTable from "../../../components/logicTable";
 import Slider from "../../../components/slider";
 import {ServerRequest} from "../../../logic/ServerCommunication";
 import {toast} from "react-toastify";
-import {Button, Form} from "react-bootstrap";
+import {Button, Card, Form, Modal, Spinner} from "react-bootstrap";
 
 const ABTestPersons = (props) => {
     const [loading, setLoading] = useState(false);
@@ -17,10 +17,12 @@ const ABTestPersons = (props) => {
     const [data1,setData1] = useState([["User Id","Purchase Amount", "CTR"]])
     const {abTestId, startDate, endDate} = useParams()
     const navigation = useNavigate();
-    const [paramSelect, setParamSelect] = React.useState(-1);
+    const [paramSelect, setParamSelect] = useState(-1);
+    const [modal, setModal] = useState(false);
+    const [userId, setUserId] = useState(-1);
 
     //static
-    const [abTestData, setAbTestData] = React.useState({
+    const [abTestData, setAbTestData] = useState({
         "algorithms": [],
         "points": [0,10],
         "parameters": {
@@ -34,6 +36,11 @@ const ABTestPersons = (props) => {
 
     function openUser(id){
         navigation("/dashboard/dataSets/overview/"+ datasetId + "/person/"+ id);
+    }
+
+    function openModal(id){
+        setModal(true);
+        setUserId(id);
     }
 
     function getDataSetId(){
@@ -80,8 +87,24 @@ const ABTestPersons = (props) => {
     return (
         <div className="App">
             <BackButton/>
+            <Modal show={modal} fullscreen={true}>
+                <Modal.Header closeButton onClick={()=>setModal(false)}>
+                  <Modal.Title>{props.title}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div style={{paddingTop: 20}}>
+                        <Card className={"shadow"} style={{textAlign: "left", maxHeight: "80vh", borderWidth: 0, borderLeftWidth: 8, borderLeftColor: "#0d6efd"}}>
+                            <Card.Body style={{height: "100%"}}>
+                                {props.loading === true && <Spinner style={{position: "absolute", right: 0, margin: 10, top: 0}} animation="grow" size="sm" />}
+                                TEST
+                                <Button variant="primary" onClick={()=>openUser(userId)}>Person Page</Button>
+                            </Card.Body>
+                        </Card>
+                    </div>
+                </Modal.Body>
+            </Modal>
             {/*<Slider labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />*/}
-            <LogicTable action={openUser} data={data1}/>
+            <LogicTable action={openModal} data={data1}/>
         </div>
     );
 };
