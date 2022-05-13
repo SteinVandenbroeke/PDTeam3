@@ -209,7 +209,6 @@ class ABTest():
         query = 'SELECT id FROM '+ setId +'_articles LIMIT 40 OFFSET '+offset
         self.cursor.execute(sql.SQL(query))
         items = self.cursor.fetchall()
-
         returnList = []
         for row in items:
             item = {"itemid": row[0]}

@@ -11,10 +11,8 @@ import {Button, Card, Form, Modal, Spinner} from "react-bootstrap";
 const ABTestPersons = (props) => {
     const [loading, setLoading] = useState(false);
     const [personData, setPersonData] = useState([]);
-    const [personOffset, setPersonOffset] = useState(0);
-    const [values, setValues] = useState([0, 1]);
     const [datasetId, setDatasetId] = useState(null)
-    const [data1,setData1] = useState([["User Id","Purchase Amount", "CTR"]])
+    const [data1,setData1] = useState([["User Id","Purchase Amount"]])
     const {abTestId, startDate, endDate} = useParams()
     const navigation = useNavigate();
     const [paramSelect, setParamSelect] = useState(-1);
@@ -64,18 +62,15 @@ const ABTestPersons = (props) => {
         request.sendGet("getUsersFromABTest",getData).then(requestData => {setPersonData(requestData[0]); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
     }
 
-    function setparam(id){
-        setPersonOffset(0)
-        setParamSelect(id)
-        setData1([["User Id","Purchase Amount", "CTR"]])
-    }
 
     useEffect(()=>{
-        for(var i = personOffset; i < Math.min(personData.length,personOffset+100); i++){
+        let temp = []
+        for(var i = 0; i < personData.length; i++){
             let data = [personData[i]["personid"],personData[i]["purchaseAmount"]]
-            setData1(oldData=>[...oldData,data])
+            temp.push(data)
         }
-    },[personOffset,personData]);
+        setData1(oldData=>[...oldData,...temp])
+    },[personData]);
 
 
 
