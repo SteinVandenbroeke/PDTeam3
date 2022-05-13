@@ -19,7 +19,7 @@ const ABTestPersons = (props) => {
     const navigation = useNavigate();
     const [paramSelect, setParamSelect] = useState(-1);
     const [modal, setModal] = useState(false);
-    const [userId, setUserId] = useState(-1);
+    const [personID, setPersonID] = useState(-1);
 
     //static
     const [abTestData, setAbTestData] = useState({
@@ -40,7 +40,7 @@ const ABTestPersons = (props) => {
 
     function openModal(id){
         setModal(true);
-        setUserId(id);
+        setPersonID(id);
     }
 
     function getDataSetId(){
@@ -89,7 +89,7 @@ const ABTestPersons = (props) => {
             <BackButton/>
             <Modal show={modal} fullscreen={true}>
                 <Modal.Header closeButton onClick={()=>setModal(false)}>
-                  <Modal.Title>User Metrics for User {userId}</Modal.Title>
+                  <Modal.Title>Person Metrics for Person {personID}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div style={{paddingTop: 20}}>
@@ -98,7 +98,7 @@ const ABTestPersons = (props) => {
                                 {props.loading === true && <Spinner style={{position: "absolute", right: 0, margin: 10, top: 0}} animation="grow" size="sm" />}
                                 TEST
                             </Card.Body>
-                            <Button variant="primary" onClick={()=>openUser(userId)} style={{borderWidth: 0}}>Person Page</Button>
+                            <Button variant="primary" onClick={()=>openUser(personID)} style={{borderWidth: 0}}>Person Page</Button>
                         </Card>
                     </div>
                 </Modal.Body>
