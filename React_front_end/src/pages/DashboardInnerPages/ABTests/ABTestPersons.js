@@ -14,7 +14,7 @@ const ABTestPersons = (props) => {
     const [personOffset, setPersonOffset] = useState(0);
     const [values, setValues] = useState([0, 1]);
     const [datasetId, setDatasetId] = useState(null)
-    const data1 = [["User Id","Purchase Amount", "CTR"]]
+    const [data1,setData1] = useState([["User Id","Purchase Amount", "CTR"]])
     const {abTestId, startDate, endDate} = useParams()
     const navigation = useNavigate();
     const [paramSelect, setParamSelect] = React.useState(-1);
@@ -50,29 +50,27 @@ const ABTestPersons = (props) => {
         setLoading(true);
         let getData = {
             "abTestId": abTestId,
-            "offset": personOffset,
             "startDate": startDate,
             "endDate": endDate,
-            "parameter":paramSelect
         }
         let request = new ServerRequest();
-        request.sendGet("getUsersFromABTest",getData).then(requestData => {setPersonData(personData.concat(requestData)); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
-        setPersonOffset(personOffset+40)
+        request.sendGet("getUsersFromABTest",getData).then(requestData => {setPersonData(requestData[0]); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
     }
 
     function setparam(id){
         setPersonOffset(0)
         setParamSelect(id)
-        setPersonData([])
-        loadUsers()
+        setData1([["User Id","Purchase Amount", "CTR"]])
     }
 
-    for(var i = 0; i < personData.length; i++){
-        const temp = []
-        for (const [key, value] of Object.entries(personData[i])) {
-  		    data1.push([value["personid"],value["purchaseAmount"]])
-	    }
-    }
+    useEffect(()=>{
+        for(var i = personOffset; i < Math.min(personData.length,personOffset+100); i++){
+            let data = [personData[i]["personid"],personData[i]["purchaseAmount"]]
+            setData1(oldData=>[...oldData,data])
+        }
+    },[personOffset,personData]);
+
+
 
     useEffect(() => {
         getDataSetId()
@@ -83,12 +81,7 @@ const ABTestPersons = (props) => {
         <div className="App">
             <BackButton/>
             {/*<Slider labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />*/}
-            <Form.Select onChange={(e)=>setparam(e.target.value)} value={paramSelect}>
-              <option value="Purchase Amount">Purchase Amount</option>
-              <option value="CTR">CTR</option>
-            </Form.Select>
             <LogicTable action={openUser} data={data1}/>
-            <Button variant="primary" onClick={()=>loadUsers()}>Load More</Button>
         </div>
     );
 };
