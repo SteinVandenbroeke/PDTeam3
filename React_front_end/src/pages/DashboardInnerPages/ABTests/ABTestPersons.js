@@ -89,16 +89,16 @@ const ABTestPersons = (props) => {
             <BackButton/>
             <Modal show={modal} fullscreen={true}>
                 <Modal.Header closeButton onClick={()=>setModal(false)}>
-                  <Modal.Title>{props.title}</Modal.Title>
+                  <Modal.Title>User Metrics for User {userId}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div style={{paddingTop: 20}}>
-                        <Card className={"shadow"} style={{textAlign: "left", maxHeight: "80vh", borderWidth: 0, borderLeftWidth: 8, borderLeftColor: "#0d6efd"}}>
+                        <Card className={"shadow"} style={{textAlign: "left", maxHeight: "80vh", borderWidth: 0}}>
                             <Card.Body style={{height: "100%"}}>
                                 {props.loading === true && <Spinner style={{position: "absolute", right: 0, margin: 10, top: 0}} animation="grow" size="sm" />}
                                 TEST
-                                <Button variant="primary" onClick={()=>openUser(userId)}>Person Page</Button>
                             </Card.Body>
+                            <Button variant="primary" onClick={()=>openUser(userId)} style={{borderWidth: 0}}>Person Page</Button>
                         </Card>
                     </div>
                 </Modal.Body>
