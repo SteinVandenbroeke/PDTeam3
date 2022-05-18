@@ -170,6 +170,34 @@ def createAbTest():
 
     return make_response('{"message": "Created."}', 201)
 
+
+@app.route('/api/ABTestOverview', methods=['GET', 'POST'])
+def overviewPageABTest():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    elif not user.admin:
+        return make_response('you must be admin to perform this action', 500)
+
+    abtest = ABTest(request.args.get("abTestName"))
+    overviewPageData = abtest.overviewPageData()
+
+    return make_response(overviewPageData[0], overviewPageData[1])
+
+@app.route('/api/totalActiveUserAmount', methods=['GET', 'POST'])
+def totalActiveUserAmount():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('User token wrong or missing', 401)
+    elif not user.admin:
+        return make_response('you must be admin to perform this action', 500)
+
+    abtest = ABTest(request.args.get("abTestName"))
+    overviewPageData = abtest.getTotalActiveUsers(request.args.get("startDate"), request.args.get("endDate"))
+    return make_response(overviewPageData[0], overviewPageData[1])
+
 @app.route('/api/changeDataset', methods=['POST'])
 def changeDataset():
     user = User(app)

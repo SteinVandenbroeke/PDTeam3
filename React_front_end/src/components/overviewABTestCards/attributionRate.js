@@ -30,8 +30,8 @@ const Purchases = (props) => {
             let data = [];
             let avargeARDTemp = 0;
             allData.algorithms[algorithm].points.slice(begin, end + 1).map((value1, index) =>{
-                data.push(value1.ard);
-                avargeARDTemp += value1.ard;
+                data.push(value1.ard7);
+                avargeARDTemp += value1.ard7;
             });
 
             let colorGraph = graphColors[colorCounter];

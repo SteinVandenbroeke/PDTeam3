@@ -1,4 +1,4 @@
-import {Button} from "react-bootstrap";
+import {Button, Spinner} from "react-bootstrap";
 import Icon from 'react-eva-icons';
 import {useNavigate } from "react-router-dom";
 import React, {useEffect} from "react";
@@ -15,6 +15,8 @@ Tooltip,
 Legend,
 } from 'chart.js';
 import SmallInformationCard from "../smallInformationCard";
+import {ServerRequest} from "../../logic/ServerCommunication";
+import {toast} from "react-toastify";
 
 const RevenueCard = (props) => {
     const navigation = useNavigate();
@@ -24,6 +26,7 @@ const RevenueCard = (props) => {
     const [loading, setLoading] = React.useState(true);
 
     async function processData(begin, end){
+        setTotalUsers(<Spinner animation="grow" size="sm" />)
         setLoading(true);
         setDatasets([]);
         let allData = props.abTestData;
@@ -31,18 +34,21 @@ const RevenueCard = (props) => {
         Letlabels(allData.points.slice(begin, end + 1));
 
         let data = [];
-        let totalUsersTemp = 0;
+
         allData.NotAlgDependent.slice(begin, end + 1).map((value, index) =>{
                     data.push(value.activeUsersAmount);
-                    totalUsersTemp += value.activeUsersAmount;
                 });
 
-        setTotalUsers(totalUsersTemp);
         setDatasets(datasets => [...datasets, {
                   label: "Revenue",
                   data: data,
                 }]);
-        setLoading(false);
+
+        if(props.abTestData.points[props.startDate] != 0 && props.abTestData.points[props.endDate] != 0) {
+            let getData = {abTestName: "hmABTest", startDate: props.abTestData.points[props.startDate],endDate: props.abTestData.points[props.endDate]}
+            let request = new ServerRequest();
+            request.sendGet("totalActiveUserAmount", getData).then(requestData => {setTotalUsers(requestData); setLoading(false);}).catch(error => {toast.error(error.message); setLoading(false);});
+        }
     }
 
     useEffect(() => {

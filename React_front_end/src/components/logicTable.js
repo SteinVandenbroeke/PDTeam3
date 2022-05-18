@@ -22,7 +22,6 @@ const LogicTable = (props) => {
     let action = props.action;
 
     function sortOnParameter(parameter) {
-
         let currentPar = currentSortparam
         let currectHighest = currentSortHighest
         if (currentPar === parameter) {
@@ -46,7 +45,6 @@ const LogicTable = (props) => {
         setCurrentSortParam(currentPar)
         setTableData([])
         setTableData(oldData => [...oldData, ...temp])
-        setHeader(oldData => [...oldData, 0])
     }
 
     useEffect(() => {
@@ -72,7 +70,8 @@ const LogicTable = (props) => {
                 <tr>
                     {header.map((value, index) => {
                         return <th style={{cursor: "pointer"}} onClick={() => sortOnParameter(index)}
-                                   key={index}>{value} <Icon fill={(index===currentSortparam)?"Black":"White"} name={"arrow-ios-downward-outline"}/></th>
+                                   key={index}>{value} {(index===currentSortparam) && currentSortHighest && <div style={{display:"inline-block"} }><Icon fill={"black"} name={"arrow-ios-upward-outline"}/></div>}
+                        {(index===currentSortparam) && !currentSortHighest && <div style={{display:"inline-block"} }><Icon fill={"black"} name={"arrow-ios-downward-outline"}/></div>}</th>
                     })}
                 </tr>
                 </thead>

@@ -31,11 +31,12 @@ CREATE TABLE abtest(
 );
 
 CREATE TABLE abtest_algorithms(
+    "id" serial PRIMARY KEY,
     "test_name" varchar REFERENCES abtest(test_name) ON UPDATE CASCADE ON DELETE CASCADE,
     "algorithmid" int REFERENCES algorithms(id),
     "interval" int,
     "K" int,
-    PRIMARY KEY("test_name", "algorithmid", "interval")
+    UNIQUE ("test_name", "algorithmid", "interval", "K")
 );
 
 -- CREATE TABLE "abtestsitems" (
@@ -50,13 +51,12 @@ CREATE TABLE abtest_algorithms(
 
 CREATE TABLE "abrec" (
   "idAbRec" int PRIMARY KEY,
-  "algorithm" int,
+  "abtest_algorithms_id" int REFERENCES abtest_algorithms("id"),
   "timestamp" timestamp
 );
 
 CREATE TABLE "abrecmetric" (
-    "testName" varchar REFERENCES abtest("test_name"),
-    "algorithmid" int REFERENCES algorithms(id),
+    "abtest_algorithms_id" int REFERENCES abtest_algorithms("id"),
     "timestamp" timestamp,
     ctr float,
     atr7 float,
@@ -64,7 +64,7 @@ CREATE TABLE "abrecmetric" (
     avargeUserRevenueCTR float,
     avargeUserRevenue7 float,
     avargeUserRevenue30 float,
-    PRIMARY KEY ("timestamp","testName", "algorithmid")
+    PRIMARY KEY ("timestamp","abtest_algorithms_id")
 );
 
 CREATE TABLE "abreclist" (
@@ -80,13 +80,23 @@ CREATE TABLE "abrecid_personrecid" (
   PRIMARY KEY ("idAbRec", "personid", "test_name")
 );
 
+CREATE TABLE "dataSetStat" (
+    "dataSetName" varchar,
+    "timestamp" timestamp,
+    "Purchases" int,
+    "Revenue" float,
+    "activeUsersAmount" int,
+    PRIMARY KEY ("dataSetName", "timestamp")
+);
+
+
 --TODO add to python ALTER TABLE "abtestsitems" ADD FOREIGN KEY ("item_id") REFERENCES "setname_items" ("item_id");
 
 --ALTER TABLE "abtestsitems" ADD FOREIGN KEY ("test") REFERENCES "abtest" ("test_name");
 
 --ALTER TABLE "abtestsitems" ADD FOREIGN KEY ("algorithm") REFERENCES "algorithms" ("id");
 
-ALTER TABLE "abrec" ADD FOREIGN KEY ("algorithm") REFERENCES "algorithms" ("id");
+--ALTER TABLE "abrec" ADD FOREIGN KEY ("algorithm") REFERENCES "algorithms" ("id");
 
 ALTER TABLE "abrecid_personrecid" ADD FOREIGN KEY ("idAbRec") REFERENCES "abrec" ("idAbRec");
 

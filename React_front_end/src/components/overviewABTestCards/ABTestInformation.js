@@ -8,14 +8,14 @@ import LogicTable from "../logicTable";
 const ABTestInformation = (props) => {
     const navigation = useNavigate();
 
-    let data = [["Algorithms","Training interval"]].concat(getAlgorithms())
+    let data = [["Algorithms","Training interval", "Algoritme"]].concat(getAlgorithms());
 
     function getAlgorithms(){
         let a = []
         for(let key in props.algorithms){
-            a.push([key,props.algorithms[key].trainingInterval])
+            a.push([key,props.algorithms[key].trainingInterval, props.parameters.idAlgorithm[key]]);
         }
-        return a
+        return a;
     }
 
     return (
