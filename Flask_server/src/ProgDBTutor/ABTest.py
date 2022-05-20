@@ -95,10 +95,27 @@ class ABTest():
         print("start")
         self.connection.commit()
 
-        #self.cursor.execute(sql.SQL(query), [self.abTestId] * 8)
+        self.cursor.execute(sql.SQL(query), [self.abTestId] * 7)
         print("klaar")
-        #self.connection.commit()
+        self.connection.commit()
         print("nice")
+
+    def delete(self):
+        message = '{"message": "ABTest succesfully Deleted"}'
+        errorCode = 201
+        try:
+            query = 'DELETE FROM abtest WHERE test_name=name;'.format(name=self.abTestId)
+            self.cursor.execute(sql.SQL(query))
+            self.connection.commit()
+        except:
+            message = '{"message": "AB Test: '+self.abTestId+' could not be deleted."}'
+            errorCode = 500
+
+        self.connection.commit()
+        self.connection.close()
+        self.cursor.close()
+        return (message, errorCode)
+
 
     def execute(self, topKItemsCount, startDate, endDate, algorithm, users=1, k=1):
         """
@@ -152,6 +169,7 @@ class ABTest():
 
         algoritms = {}
         for itemsql in itemssql:
+
             timeItem = {}
             timeItem["ctr"] = itemsql[2]
             timeItem["ard7"] = itemsql[3]
@@ -172,6 +190,7 @@ class ABTest():
         self.cursor.execute(sql.SQL(query), [self.abTestId])
         itemssql = self.cursor.fetchall()
         counter = 0
+        print(algoritms)
         for itemsql in itemssql:
             if itemsql[1].strftime("%d/%m/%Y %H:%M:%S") not in algoritms[itemsql[0]]["points"]:
                 algoritms[itemsql[0]]["points"][itemsql[1].strftime("%d/%m/%Y %H:%M:%S")] = {"ctr": 0, "ard7": 0, "ard30": 0, "arpu7": 0, "arpu30":0}
