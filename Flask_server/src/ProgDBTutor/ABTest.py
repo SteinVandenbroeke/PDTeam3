@@ -104,8 +104,7 @@ class ABTest():
         message = '{"message": "ABTest succesfully Deleted"}'
         errorCode = 201
         try:
-            query = 'DELETE FROM abtest WHERE test_name=name;'.format(name=self.abTestId)
-            self.cursor.execute(sql.SQL(query))
+            self.cursor.execute(sql.SQL('DELETE FROM abtest WHERE test_name=%s;'),[self.abTestId])
             self.connection.commit()
         except:
             message = '{"message": "AB Test: '+self.abTestId+' could not be deleted."}'
