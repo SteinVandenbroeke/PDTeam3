@@ -143,6 +143,9 @@ class Dataset():
         self.cursor.execute(sql.SQL('insert into "datasets" ("name","createdBy") values (%s,%s)'),[datasetName.lower(), userName])
         print("purchases toegevoegd")
 
+        dataSetStats = 'INSERT INTO "dataSetStat" ("dataSetName", timestamp, "Purchases", "Revenue", "activeUsersAmount") SELECT \'{table1}\' AS datasetname, {table1}_purchases.timestamp AS timestamp, COUNT({table1}_purchases.item_id) AS purchases, SUM({table1}_purchases.parameter) AS Revenue, COUNT(DISTINCT {table1}_purchases.user_id) AS activeusersamount FROM {table1}_purchases GROUP BY {table1}_purchases.timestamp;'.format(table1=datasetName.lower())
+        self.cursor.execute(sql.SQL(dataSetStats))
+
         self.connection.commit()
         self.connection.close()
         self.cursor.close()

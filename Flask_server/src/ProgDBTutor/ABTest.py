@@ -141,11 +141,13 @@ class ABTest():
         """
         overviewPageData: gives a json format for the overview page in the interface
         """
+        print(self.abTestId)
+        print(self.dataset)
         dataSet = Dataset()
-        allPoints = dataSet.getTimeStampList("hm4", list)
+        allPoints = dataSet.getTimeStampList(self.dataset, list)
 
         query = 'SELECT abrecmetric.abtest_algorithms_id,timestamp,ctr,atr7,atr30, avargeuserrevenuectr, avargeuserrevenue7, avargeuserrevenue30, "interval", "K",name FROM abrecmetric, abtest_algorithms, algorithms WHERE abtest_algorithms.id=abrecmetric.abtest_algorithms_id and algorithms.id=abtest_algorithms.algorithmid and test_name=%s'
-        self.cursor.execute(sql.SQL(query), ['hmABTest'])
+        self.cursor.execute(sql.SQL(query), [self.abTestId])
         itemssql = self.cursor.fetchall()
 
         algoritms = {}
@@ -166,8 +168,8 @@ class ABTest():
                 algoritms[itemsql[0]]["points"] = {}
             algoritms[itemsql[0]]["points"][itemsql[1].strftime("%d/%m/%Y %H:%M:%S")] = timeItem
 
-        query = 'SELECT abtest_algorithms.id, abrec.timestamp, hm4_articles.title FROM abrec, abreclist, hm4_articles, abtest_algorithms WHERE hm4_articles.id=abreclist."itemId" and  abreclist."idAbRec"=abrec."idAbRec" and abrec.abtest_algorithms_id=abtest_algorithms.id and abtest_algorithms.test_name=%s;'
-        self.cursor.execute(sql.SQL(query), ['hmABTest'])
+        query = 'SELECT abtest_algorithms.id, abrec.timestamp, {dataset}_articles.title FROM abrec, abreclist, {dataset}_articles, abtest_algorithms WHERE {dataset}_articles.id=abreclist."itemId" and  abreclist."idAbRec"=abrec."idAbRec" and abrec.abtest_algorithms_id=abtest_algorithms.id and abtest_algorithms.test_name=%s;'.format(dataset=self.dataset.lower())
+        self.cursor.execute(sql.SQL(query), [self.abTestId])
         itemssql = self.cursor.fetchall()
         counter = 0
         for itemsql in itemssql:
@@ -180,7 +182,7 @@ class ABTest():
 
 
         query = 'SELECT dataset, stepsize, "topK" FROM abtest WHERE test_name=%s'
-        self.cursor.execute(sql.SQL(query), ['hmABTest'])
+        self.cursor.execute(sql.SQL(query), [self.abTestId])
         itemsql = self.cursor.fetchone()
         parameters = {}
         parameters["datasetId"] = itemsql[0]
@@ -188,14 +190,14 @@ class ABTest():
         parameters["topK"] = itemsql[2]
 
         query = 'SELECT abtest_algorithms.id, algorithms.name FROM abtest_algorithms, algorithms WHERE abtest_algorithms.algorithmid=algorithms.id and abtest_algorithms.test_name=%s;'
-        self.cursor.execute(sql.SQL(query), ['hmABTest'])
+        self.cursor.execute(sql.SQL(query), [self.abTestId])
         itemssql = self.cursor.fetchall()
         parameters["idAlgorithm"] = {}
         for itemsql in itemssql:
             parameters["idAlgorithm"][itemsql[0]] = itemsql[1]
 
         query = 'SELECT timestamp, "Purchases", "Revenue", "activeUsersAmount" FROM "dataSetStat" WHERE "dataSetName"=%s;'
-        self.cursor.execute(sql.SQL(query), ['hm4'])
+        self.cursor.execute(sql.SQL(query), [self.dataset])
         itemssql = self.cursor.fetchall()
 
         NotAlgDependent = {}
@@ -223,7 +225,7 @@ class ABTest():
         return (returnDict, 200)
 
     def getTotalActiveUsers(self, fromDate, toDate):
-        query = 'SELECT count(user_id) AS activeUsersAmount FROM (SELECT DISTINCT user_id FROM hm4_purchases WHERE hm4_purchases.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') and hm4_purchases.timestamp <= to_date(%s, \'DD/MM/YYYY HH24:MI:SS\')) AS temp;'
+        query = 'SELECT count(user_id) AS activeUsersAmount FROM (SELECT DISTINCT user_id FROM {dataset}_purchases WHERE {dataset}_purchases.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') and {dataset}_purchases.timestamp <= to_date(%s, \'DD/MM/YYYY HH24:MI:SS\')) AS temp;'.format(dataset=self.dataset.lower())
         print(fromDate, toDate)
         self.cursor.execute(sql.SQL(query), [fromDate, toDate])
         itemsql = self.cursor.fetchone()
