@@ -26,12 +26,20 @@ const Purchases = (props) => {
 
         let data = [];
         let colorCounter = 0;
+        let value = 0;
+        let thirthyDays = false;
         for(let algorithm in allData.algorithms){
             let data = [];
             let avargeARDTemp = 0;
             allData.algorithms[algorithm].points.slice(begin, end + 1).map((value1, index) =>{
-                data.push(value1.ard7);
-                avargeARDTemp += value1.ard7;
+                if(!thirthyDays){
+                    value = value1.ard7
+                }
+                else{
+                    value = value1.ard30
+                }
+                data.push(value);
+                avargeARDTemp += value;
             });
 
             let colorGraph = graphColors[colorCounter];
