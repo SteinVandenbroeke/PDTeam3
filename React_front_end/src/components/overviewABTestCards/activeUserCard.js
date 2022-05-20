@@ -44,8 +44,8 @@ const RevenueCard = (props) => {
                   data: data,
                 }]);
 
-        if(props.abTestData.points[props.startDate] != 0 && props.abTestData.points[props.endDate] != 0) {
-            let getData = {abTestName: "hmABTest", startDate: props.abTestData.points[props.startDate],endDate: props.abTestData.points[props.endDate]}
+        if(props.abTestData.points[props.startDate] != 0 && props.abTestData.points[props.endDate] != 0 && props.abTestData.points[props.startDate] != undefined && props.abTestData.points[props.endDate] != undefined) {
+            let getData = {abTestName: props.AbTest, startDate: props.abTestData.points[props.startDate],endDate: props.abTestData.points[props.endDate]}
             let request = new ServerRequest();
             request.sendGet("totalActiveUserAmount", getData).then(requestData => {setTotalUsers(requestData); setLoading(false);}).catch(error => {toast.error(error.message); setLoading(false);});
         }

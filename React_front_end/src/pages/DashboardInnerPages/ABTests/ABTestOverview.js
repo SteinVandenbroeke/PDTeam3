@@ -58,7 +58,7 @@ const ABTestOverview = () => {
     const [loading, setLoading] = React.useState(true);
 
     function loadData(){
-        let getData = {abTestName: "hmABTest"}
+        let getData = {abTestName: abTestId}
         let request = new ServerRequest();
         request.sendGet("ABTestOverview", getData).then(requestData => {setAbTestData(requestData); setLoading(false);}).catch(error => {toast.error(error.message); /*setLoading(false)*/});
     }
@@ -92,7 +92,7 @@ const ABTestOverview = () => {
                                                                     abTestData={abTestData} startDate={values[0]} endDate={values[1]}/></CharSkeleton>
                     </Col>
                     <Col xs={12} md={4}>
-                        <CharSkeleton loading={loading}><ActiveUserCard slider={slider} abTestData={abTestData} startDate={values[0]}
+                        <CharSkeleton loading={loading}><ActiveUserCard AbTest={abTestId} slider={slider} abTestData={abTestData} startDate={values[0]}
                                                                      endDate={values[1]}/></CharSkeleton>
                     </Col>
                     <Col xs={12} md={4}>

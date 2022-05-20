@@ -275,10 +275,8 @@ class ABTest():
         returnList.append(max_alg_count)
         return (json.dumps(returnList), 200)
 
-    def getUsersFromABTest(self, abTestId, startDate, endDate):
-        self.cursor.execute(sql.SQL('SELECT dataset FROM "abtest" WHERE test_name=%s'),[abTestId])
-        setId = self.cursor.fetchall()[0][0]
-        self.cursor.execute(sql.SQL('SELECT id, SUM(parameter) FROM {table}_customers,{table}_purchases  WHERE id = user_id GROUP BY id'.format(table=setId))) #ORDER BY totalAmount DESC LIMIT 40 OFFSET {offset}
+    def getUsersFromABTest(self, startDate, endDate):
+        self.cursor.execute(sql.SQL('SELECT id, SUM(parameter) FROM {table}_customers,{table}_purchases  WHERE id = user_id GROUP BY id'.format(table=self.dataset))) #ORDER BY totalAmount DESC LIMIT 40 OFFSET {offset}
         users = self.cursor.fetchall()
         returnList = []
         for row in users:

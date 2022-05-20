@@ -400,8 +400,8 @@ def getUsersFromABTest():
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
 
-    abtest = ABTest()
-    returnValue = abtest.getUsersFromABTest(request.args.get("abTestId"), request.args.get("startDate"), request.args.get("endDate"))
+    abtest = ABTest(request.args.get("abTestId"))
+    returnValue = abtest.getUsersFromABTest(request.args.get("startDate"), request.args.get("endDate"))
     return make_response(returnValue[0], returnValue[1])
 
 

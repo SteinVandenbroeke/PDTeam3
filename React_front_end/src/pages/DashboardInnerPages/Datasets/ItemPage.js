@@ -16,8 +16,6 @@ const ItemOverview = () => {
     const [itemDescription, setItemDescription] = useState("")
     const [metaDataList, setMetaDataList] = useState([["Property", "Value"]])
 
-
-
     function loadId(){
         setItemData([])
         setLoading(true)
