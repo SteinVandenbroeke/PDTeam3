@@ -9,6 +9,7 @@ from config import config_data
 from quote_data_access import Quote, DBConnection, QuoteDataAccess
 import os
 from psycopg2 import sql
+from Dataset import Dataset
 
 # imports for PyJWT authentication
 import jwt
@@ -80,6 +81,14 @@ class User():
         return (json.dumps(returnList), 200)
 
     def deleteUser(self, userName):
+        self.cursor.execute(sql.SQL('SELECT name from datasets Where "createdBy" =%s'),[userName])
+        datasets = self.cursor.fetchall()
+        for datasetName in datasets:
+            dataset = Dataset()
+            try:
+                dataset.deleteDataset(datasetName[0])
+            except:
+                return ('{"message":"User could not be deleted."}', 500)
         try:
             self.cursor.execute(sql.SQL('DELETE FROM users WHERE username=%s'), [userName])
             self.connection.commit()

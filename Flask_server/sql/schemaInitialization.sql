@@ -12,7 +12,7 @@ CREATE TABLE users(
 
 CREATE TABLE datasets(
   "name" varchar PRIMARY KEY,
-  "createdBy" varchar REFERENCES users("username"),
+  "createdBy" varchar REFERENCES users("username") ON DELETE CASCADE,
   "creationDate" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -33,7 +33,7 @@ CREATE TABLE abtest(
 CREATE TABLE abtest_algorithms(
     "id" serial PRIMARY KEY,
     "test_name" varchar REFERENCES abtest(test_name) ON UPDATE CASCADE ON DELETE CASCADE,
-    "algorithmid" int REFERENCES algorithms(id),
+    "algorithmid" int REFERENCES algorithms(id) ON DELETE CASCADE,
     "interval" int,
     "K" int,
     UNIQUE ("test_name", "algorithmid", "interval", "K")
@@ -51,12 +51,12 @@ CREATE TABLE abtest_algorithms(
 
 CREATE TABLE "abrec" (
   "idAbRec" int PRIMARY KEY,
-  "abtest_algorithms_id" int REFERENCES abtest_algorithms("id"),
+  "abtest_algorithms_id" int REFERENCES abtest_algorithms("id") ON DELETE CASCADE,
   "timestamp" timestamp
 );
 
 CREATE TABLE "abrecmetric" (
-    "abtest_algorithms_id" int REFERENCES abtest_algorithms("id"),
+    "abtest_algorithms_id" int REFERENCES abtest_algorithms("id") ON DELETE CASCADE,
     "timestamp" timestamp,
     ctr float,
     atr7 float,
@@ -81,7 +81,7 @@ CREATE TABLE "abrecid_personrecid" (
 );
 
 CREATE TABLE "dataSetStat" (
-    "dataSetName" varchar,
+    "dataSetName" varchar REFERENCES datasets(name) ON DELETE CASCADE,
     "timestamp" timestamp,
     "Purchases" int,
     "Revenue" float,
@@ -98,15 +98,15 @@ CREATE TABLE "dataSetStat" (
 
 --ALTER TABLE "abrec" ADD FOREIGN KEY ("algorithm") REFERENCES "algorithms" ("id");
 
-ALTER TABLE "abrecid_personrecid" ADD FOREIGN KEY ("idAbRec") REFERENCES "abrec" ("idAbRec");
+ALTER TABLE "abrecid_personrecid" ADD FOREIGN KEY ("idAbRec") REFERENCES "abrec" ("idAbRec") ON DELETE CASCADE;
 
-ALTER TABLE "abreclist" ADD FOREIGN KEY ("idAbRec") REFERENCES "abrec" ("idAbRec");
+ALTER TABLE "abreclist" ADD FOREIGN KEY ("idAbRec") REFERENCES "abrec" ("idAbRec") ON DELETE CASCADE;
 
-ALTER TABLE "abreclist" ADD FOREIGN KEY ("itemId") REFERENCES "setname_items" ("item_id");
+ALTER TABLE "abreclist" ADD FOREIGN KEY ("itemId") REFERENCES "setname_items" ("item_id") ON DELETE CASCADE;
 
-ALTER TABLE "abrecid_personrecid" ADD FOREIGN KEY ("test_name") REFERENCES "abtest" ("test_name");
+ALTER TABLE "abrecid_personrecid" ADD FOREIGN KEY ("test_name") REFERENCES "abtest" ("test_name") ON DELETE CASCADE;
 
-ALTER TABLE "abrecid_personrecid" ADD FOREIGN KEY ("personid") REFERENCES "setname_people" ("person_id");
+ALTER TABLE "abrecid_personrecid" ADD FOREIGN KEY ("personid") REFERENCES "setname_people" ("person_id") ON DELETE CASCADE;
 
 create sequence "abrec_idAbRec_seq"
 	as integer;

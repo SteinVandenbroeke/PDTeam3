@@ -233,6 +233,20 @@ def getDatasets():
     returnValue = dataset.getDatasets()
     return make_response(returnValue[0],returnValue[1])
 
+@app.route('/api/deleteABTest', methods=['GET'])
+def deleteABTest():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    elif not user.admin:
+        return make_response('you must be admin to perform this action', 500)
+
+    abtest = ABTest(request.args.get("abTestName"))
+    returnValue = abtest.delete()
+    return make_response(returnValue[0],returnValue[1])
+
+
 @app.route('/api/deleteDataset', methods=['GET'])
 def deleteDataset():
     user = User(app)

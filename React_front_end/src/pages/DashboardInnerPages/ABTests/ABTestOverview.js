@@ -31,6 +31,7 @@ import {ServerRequest} from "../../../logic/ServerCommunication";
 import TabelSkeleton from "../../../components/loadingSkeletons/tabelSkeleton";
 import CharSkeleton from "../../../components/loadingSkeletons/charSkeleton";
 import SliderSkeleton from "../../../components/loadingSkeletons/sliderSkeleton";
+import {useNavigate } from "react-router-dom";
 
 ChartJS.register(
 CategoryScale,
@@ -43,6 +44,7 @@ Legend
 );
 
 const ABTestOverview = () => {
+    const navigation = useNavigate();
     const {abTestId} = useParams()
     const [values, setValues] = React.useState([0, 1]);
     const [totalUsers, setTotalUsers] = React.useState([0, 1]);
@@ -99,9 +101,20 @@ const ABTestOverview = () => {
                     </Col>
                 </Row>;
 
+    function deleteABTest(){
+        setLoading(true);
+        let request = new ServerRequest();
+        let getData = {
+            "abTestName": abTestId
+        }
+        request.sendGet("deleteABTest",getData).then(message => {toast.success(message.message); navigation('/dashboard/abTests', { replace: true }); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+
+    }
+
     return (
         <div>
             <div style={{paddingTop: 20}}>
+                <Button onClick={()=>deleteABTest()} variant="danger">Delete AB-Test</Button>
                 <SliderSkeleton loading={loading}>{slider}</SliderSkeleton>
                 <Row>
                     <Col sm={4}>
