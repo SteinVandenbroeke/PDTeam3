@@ -28,6 +28,7 @@ const Slider = (props) => {
         min={props.min}
         max={props.max}
         onChange={(values) => setValues(values)}
+        onFinalChange={(values) => {try{props.onFinalChange()}catch{}}}
         renderTrack={({ props, children }) => (
           <div
             onMouseDown={props.onMouseDown}

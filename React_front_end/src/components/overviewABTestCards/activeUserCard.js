@@ -18,15 +18,13 @@ import SmallInformationCard from "../smallInformationCard";
 import {ServerRequest} from "../../logic/ServerCommunication";
 import {toast} from "react-toastify";
 
-const RevenueCard = (props) => {
+const ActiveUserCard = (props) => {
     const navigation = useNavigate();
     const [labels, Letlabels] = React.useState([]);
     const [datasets, setDatasets]  = React.useState([]);
-    const [totalUsers, setTotalUsers]  = React.useState(0);
     const [loading, setLoading] = React.useState(true);
 
     async function processData(begin, end){
-        setTotalUsers(<Spinner animation="grow" size="sm" />)
         setLoading(true);
         setDatasets([]);
         let allData = props.abTestData;
@@ -43,12 +41,7 @@ const RevenueCard = (props) => {
                   label: "Revenue",
                   data: data,
                 }]);
-
-        if(props.abTestData.points[props.startDate] != 0 && props.abTestData.points[props.endDate] != 0 && props.abTestData.points[props.startDate] != undefined && props.abTestData.points[props.endDate] != undefined) {
-            let getData = {abTestName: props.AbTest, startDate: props.abTestData.points[props.startDate],endDate: props.abTestData.points[props.endDate]}
-            let request = new ServerRequest();
-            request.sendGet("totalActiveUserAmount", getData).then(requestData => {setTotalUsers(requestData); setLoading(false);}).catch(error => {toast.error(error.message); setLoading(false);});
-        }
+        setLoading(false)
     }
 
     useEffect(() => {
@@ -57,7 +50,7 @@ const RevenueCard = (props) => {
 
     return (
         <LargeInformationCard settings={props.slider} loading={loading} title={"Users"} value={20} tooltip={"Purchases from day x to day y"}>
-            <h5>Total from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: {totalUsers}</h5>
+            <h5>Total from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: {props.totalUsers}</h5>
             {labels.length < 500 &&
             <Line height={"100%"} options={{
                   responsive: true,
@@ -82,4 +75,4 @@ const RevenueCard = (props) => {
         )
 };
 
-export default RevenueCard;
+export default ActiveUserCard;

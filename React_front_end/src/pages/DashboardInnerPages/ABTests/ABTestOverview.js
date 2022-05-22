@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, {useEffect} from 'react';
-import {Col, Row, Table, Button, Text, Card, Form} from "react-bootstrap";
+import {Col, Row, Table, Button, Text, Card, Form, Spinner} from "react-bootstrap";
 import Icon from 'react-eva-icons';
 import LogicTable from "../../../components/logicTable"
 import SmallInformationCard from "../../../components/smallInformationCard"
@@ -45,6 +45,7 @@ Legend
 const ABTestOverview = () => {
     const {abTestId} = useParams()
     const [values, setValues] = React.useState([0, 1]);
+    const [totalUsers, setTotalUsers] = React.useState([0, 1]);
     const [abTestData, setAbTestData] = React.useState({
             "algorithms": [],
             "points": [0,0],
@@ -63,11 +64,30 @@ const ABTestOverview = () => {
         request.sendGet("ABTestOverview", getData).then(requestData => {setAbTestData(requestData); setLoading(false);}).catch(error => {toast.error(error.message); /*setLoading(false)*/});
     }
 
+    function loadTotalActiveUsers(){
+        setTotalUsers(<Spinner animation="grow" size="sm" />)
+        let getData = {abTestName: abTestId, startDate: abTestData.points[values[0]],endDate: abTestData.points[values[1]]}
+        let request = new ServerRequest();
+        request.sendGet("totalActiveUserAmount", getData).then(requestData => {setTotalUsers(requestData); setLoading(false);}).catch(error => {toast.error(error.message); setLoading(false);});
+    }
+
     useEffect(() => {
         loadData();
     }, []);
 
     let slider = <Row style={{paddingTop: 20}}>
+                    <Col sm={1}>
+                        <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={abTestData.points[values[0]]} onChange={(e)=>{setValues([abTestData.points.indexOf(e.target.value), values[1]])}} />
+                    </Col>
+                    <Col sm={10}>
+                        <Slider onFinalChange={loadTotalActiveUsers} labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />
+                    </Col>
+                    <Col sm={1}>
+                        <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={abTestData.points[values[1]]} onChange={(e)=>{setValues([values[0], abTestData.points.indexOf(e.target.value)])}} />
+                    </Col>
+                </Row>;
+
+    let windowSmooting = <Row style={{paddingTop: 20}}>
                     <Col sm={1}>
                         <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={abTestData.points[values[0]]} onChange={(e)=>{setValues([abTestData.points.indexOf(e.target.value), values[1]])}} />
                     </Col>
@@ -92,7 +112,7 @@ const ABTestOverview = () => {
                                                                     abTestData={abTestData} startDate={values[0]} endDate={values[1]}/></CharSkeleton>
                     </Col>
                     <Col xs={12} md={4}>
-                        <CharSkeleton loading={loading}><ActiveUserCard AbTest={abTestId} slider={slider} abTestData={abTestData} startDate={values[0]}
+                        <CharSkeleton loading={loading}><ActiveUserCard totalUsers={totalUsers} slider={slider} abTestData={abTestData} startDate={values[0]}
                                                                      endDate={values[1]}/></CharSkeleton>
                     </Col>
                     <Col xs={12} md={4}>
