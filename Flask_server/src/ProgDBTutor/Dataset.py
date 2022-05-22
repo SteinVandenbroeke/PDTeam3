@@ -130,17 +130,19 @@ class Dataset():
         for  param in purchaseConnections['csv']:
             volgordeTables += tableDict[purchaseConnections['connections'][param]] + ', '
 
-        print('pur', volgordeTables)
-
         createCustomersTable = 'CREATE TABLE ' + purchaseTableName + '(' + volgordeTables + 'FOREIGN KEY (user_id) REFERENCES ' + customerTableName + '(id) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (item_id) REFERENCES ' + articleTableName + '(id) ON UPDATE CASCADE ON DELETE CASCADE);'
         self.cursor.execute(sql.SQL(createCustomersTable))
 
         procentString = ("%s," * 4)
         procentString = procentString[:-1]
         createPurchaseInsert = 'insert into ' + purchaseTableName + ' values (' + procentString + ' )'
+
+        customerAmpunt = len(customerDf.values)
+        articleAmount = len(articleDf.values)
+        purchaseAmount = len(purchaseDf.values)
         # finalData.append(tuple(sortedData))
         psycopg2.extras.execute_batch(self.cursor,createPurchaseInsert, purchaseDf.values)
-        self.cursor.execute(sql.SQL('insert into "datasets" ("name","createdBy") values (%s,%s)'),[datasetName.lower(), userName])
+        self.cursor.execute(sql.SQL('insert into "datasets" ("name","customerAmount","itemAmount","purchaseAmount","createdBy") values (%s,%s,%s,%s,%s)'),[datasetName.lower(), customerAmpunt, articleAmount,purchaseAmount, userName])
         print("purchases toegevoegd")
 
         self.connection.commit()
@@ -219,7 +221,7 @@ class Dataset():
         data = self.cursor.fetchall()
         returnList = []
         for row in data:
-            item = [row[0], row[1], row[2].strftime("%m/%d/%Y %H:%M:%S")]
+            item = [row[0], row[4], row[5].strftime("%m/%d/%Y %H:%M:%S")]
             returnList.append(item)
         return (json.dumps(returnList), 200)
 
@@ -351,6 +353,12 @@ class Dataset():
         count = self.cursor.fetchall()[0][0]
         return (json.dumps(count), 200)
 
+    def getAmounts(self, datasetId):
+        print(datasetId)
+        self.cursor.execute(sql.SQL('SELECT "customerAmount", "itemAmount", "purchaseAmount" FROM datasets WHERE name=%s'),[datasetId])
+        amounts = self.cursor.fetchall()
+        print(amounts[0])
+        return (json.dumps(amounts[0]), 200)
 
     def addapt_numpy_float64(numpy_float64):
         return AsIs(numpy_float64)

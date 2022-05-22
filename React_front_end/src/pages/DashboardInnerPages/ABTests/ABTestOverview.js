@@ -116,7 +116,9 @@ const ABTestOverview = () => {
     return (
         <div>
             <div style={{paddingTop: 20}}>
-                <Button onClick={()=>deleteABTest()} variant="danger">Delete AB-Test</Button>
+                <div style={{width: "100%", textAlign: "right", paddingBottom: "10px"}}>
+                    <Button onClick={()=>deleteABTest()} variant="danger">Delete AB-Test</Button>
+                </div>
                 <SliderSkeleton loading={loading}>{slider}</SliderSkeleton>
                 <Row>
                     <Col sm={4}>

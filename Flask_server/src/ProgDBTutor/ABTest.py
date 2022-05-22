@@ -242,7 +242,6 @@ class ABTest():
 
     def getTotalActiveUsers(self, fromDate, toDate):
         query = 'SELECT count(user_id) AS activeUsersAmount FROM (SELECT DISTINCT user_id FROM {dataset}_purchases WHERE {dataset}_purchases.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') and {dataset}_purchases.timestamp <= to_date(%s, \'DD/MM/YYYY HH24:MI:SS\')) AS temp;'.format(dataset=self.dataset.lower())
-        print(fromDate, toDate)
         self.cursor.execute(sql.SQL(query), [fromDate, toDate])
         itemsql = self.cursor.fetchone()
         return (json.dumps(itemsql[0]), 200)
@@ -292,36 +291,19 @@ class ABTest():
         return (json.dumps(returnList), 200)
 
     def getUsersFromABTest(self, startDate, endDate):
-        self.cursor.execute(sql.SQL('SELECT id, SUM(parameter) FROM {table}_customers,{table}_purchases  WHERE id = user_id GROUP BY id'.format(table=self.dataset))) #ORDER BY totalAmount DESC LIMIT 40 OFFSET {offset}
+        self.cursor.execute(sql.SQL('SELECT id, SUM(p.parameter),COUNT(p.user_id),SUM(case when p.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND p.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) FROM {table}_customers,{table}_purchases AS p WHERE id = user_id GROUP BY id'.format(table=self.dataset)), [startDate,endDate])
         users = self.cursor.fetchall()
         returnList = []
-
-        query_NoP = 'SELECT COUNT(p.user_id) FROM {table}_purchases AS p WHERE p.user_id = %s'.format(table=self.dataset)
-        query_NoPinRange = 'SELECT COUNT(p.user_id) FROM {table}_purchases as p WHERE p.user_id = %s AND p.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND p.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\')'.format(table=self.dataset)
         for row in users:
-            id_string = str(row[0])
-            self.cursor.execute(sql.SQL(query_NoP), [id_string])
-            numofp = self.cursor.fetchone()[0]
-            self.cursor.execute(sql.SQL(query_NoPinRange), [id_string, startDate, endDate])
-            numofpInRange = self.cursor.fetchone()[0]
-
-            item = {"personid": row[0],
-                    "purchaseAmount": row[1],
-                    "total purchases": numofp,
-                    "purchases in range": numofpInRange}
-            returnList.append(item)
+            returnList.append(row)
         return (json.dumps([returnList]), 200)
 
-    def getItemsFromABTest(self, abTestId, offset, startDate, endDate):
-        self.cursor.execute(sql.SQL('SELECT dataset FROM "abtest" WHERE test_name=%s'),[abTestId])
-        setId = self.cursor.fetchall()[0][0]
-        query = 'SELECT id FROM '+ setId +'_articles LIMIT 40 OFFSET '+offset
-        self.cursor.execute(sql.SQL(query))
+    def getItemsFromABTest(self, startDate, endDate):
+        self.cursor.execute(sql.SQL('SELECT a.id,a.title, COUNT(p.item_id), SUM(case when p.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND p.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) FROM {table}_articles AS a, {table}_purchases AS p WHERE p.item_id = a.id GROUP BY a.id'.format(table=self.dataset)), [startDate,endDate])
         items = self.cursor.fetchall()
         returnList = []
         for row in items:
-            item = {"itemid": row[0]}
-            returnList.append(item)
+            returnList.append(row)
         return (json.dumps(returnList), 200)
 
     def getDatasetIdFromABTest(self, abTestId):
