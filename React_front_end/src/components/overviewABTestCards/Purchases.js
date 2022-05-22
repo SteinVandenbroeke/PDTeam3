@@ -8,7 +8,7 @@ import { Line } from 'react-chartjs-2';
 
 const Purchases = (props) => {
     const navigation = useNavigate();
-    const [labels, Letlabels] = React.useState([]);
+    const [labels, letlabels] = React.useState([]);
     const [datasets, setDatasets]  = React.useState([]);
     const [totalPurchases, setTotalPurchases]  = React.useState(0);
     const [loading, setLoading] = React.useState(true);
@@ -18,7 +18,7 @@ const Purchases = (props) => {
         setDatasets([]);
         let allData = props.abTestData;
 
-        Letlabels(allData.points.slice(begin, end + 1));
+        letlabels(allData.points.slice(begin, end + 1));
 
         let data = [];
         let totalPurch = 0;
@@ -36,12 +36,12 @@ const Purchases = (props) => {
     }
 
     useEffect(() => {
-        processData(props.startDate,props.endDate);
+        processData(props.startDate, props.endDate);
     }, [props.abTestData, props.startDate, props.endDate]);
 
     return (
         <LargeInformationCard settings={props.slider} loading={loading} title={"Purchases"} tooltip={"Purchases from day x to day y"}>
-            <h5>Total from {props.startDate} to {props.endDate}: {totalPurchases}</h5>
+            <h5>Total from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: {totalPurchases}</h5>
             {labels.length < 500 &&
             <Line height={"100%"} options={{
                 backgroundColor: 'rgba(13,110,253,1)',

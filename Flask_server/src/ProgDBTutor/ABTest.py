@@ -155,8 +155,8 @@ class ABTest():
         """
         overviewPageData: gives a json format for the overview page in the interface
         """
-        print(self.abTestId)
-        print(self.dataset)
+        # print(self.abTestId)
+        # print(self.dataset)
         dataSet = Dataset()
         allPoints = dataSet.getTimeStampList(self.dataset, list)
 
@@ -187,7 +187,7 @@ class ABTest():
         self.cursor.execute(sql.SQL(query), [self.abTestId])
         itemssql = self.cursor.fetchall()
         counter = 0
-        print(algoritms)
+        # print(algoritms)
         for itemsql in itemssql:
             if itemsql[1].strftime("%d/%m/%Y %H:%M:%S") not in algoritms[itemsql[0]]["points"]:
                 algoritms[itemsql[0]]["points"][itemsql[1].strftime("%d/%m/%Y %H:%M:%S")] = {"ctr": 0, "ard7": 0, "ard30": 0, "arpu7": 0, "arpu30":0}
@@ -295,9 +295,20 @@ class ABTest():
         self.cursor.execute(sql.SQL('SELECT id, SUM(parameter) FROM {table}_customers,{table}_purchases  WHERE id = user_id GROUP BY id'.format(table=self.dataset))) #ORDER BY totalAmount DESC LIMIT 40 OFFSET {offset}
         users = self.cursor.fetchall()
         returnList = []
+
+        query_NoP = 'SELECT COUNT(p.user_id) FROM {table}_purchases AS p WHERE p.user_id = %s'.format(table=self.dataset)
+        query_NoPinRange = 'SELECT COUNT(p.user_id) FROM {table}_purchases as p WHERE p.user_id = %s AND p.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND p.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\')'.format(table=self.dataset)
         for row in users:
-            item = {"personid":row[0],
-                    "purchaseAmount":row[1]}
+            id_string = str(row[0])
+            self.cursor.execute(sql.SQL(query_NoP), [id_string])
+            numofp = self.cursor.fetchone()[0]
+            self.cursor.execute(sql.SQL(query_NoPinRange), [id_string, startDate, endDate])
+            numofpInRange = self.cursor.fetchone()[0]
+
+            item = {"personid": row[0],
+                    "purchaseAmount": row[1],
+                    "total purchases": numofp,
+                    "purchases in range": numofpInRange}
             returnList.append(item)
         return (json.dumps([returnList]), 200)
 
