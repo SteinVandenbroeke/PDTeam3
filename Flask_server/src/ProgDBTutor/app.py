@@ -115,6 +115,7 @@ def helloWorld():
 def uploadDataset():
     user = User(app)
     back = user.checkTokenAndLoadData(request)
+    print(app)
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
     elif not user.admin:

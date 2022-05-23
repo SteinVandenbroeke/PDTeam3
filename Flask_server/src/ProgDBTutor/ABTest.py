@@ -124,6 +124,7 @@ class ABTest():
         @param datasets: list of all used dataset id's
         """
         if (algorithm == 0):
+            #popularity
             query = 'SELECT item_id, COUNT(item_id) AS itemIdCount FROM {table}_purchases WHERE "timestamp" >= %s AND "timestamp" <= %s GROUP BY item_id ORDER BY  itemIdCount DESC LIMIT %s;'.format(table=self.dataset)
             self.cursor.execute(sql.SQL(query), [startDate, endDate, topKItemsCount])
             sqlList = self.cursor.fetchall()
@@ -132,6 +133,7 @@ class ABTest():
                 topKItems.append(item[0])
             return topKItems
         elif (algorithm == 1):
+            # recency
             query = 'SELECT timestamp, item_id FROM {table}_purchases WHERE "timestamp" >= %s AND "timestamp" <= %s'.format(
                 table=self.dataset)
             self.cursor.execute(sql.SQL(query), [startDate, endDate])
@@ -187,7 +189,6 @@ class ABTest():
         self.cursor.execute(sql.SQL(query), [self.abTestId])
         itemssql = self.cursor.fetchall()
         counter = 0
-        print(algoritms)
         for itemsql in itemssql:
             if itemsql[1].strftime("%d/%m/%Y %H:%M:%S") not in algoritms[itemsql[0]]["points"]:
                 algoritms[itemsql[0]]["points"][itemsql[1].strftime("%d/%m/%Y %H:%M:%S")] = {"ctr": 0, "ard7": 0, "ard30": 0, "arpu7": 0, "arpu30":0}
@@ -237,7 +238,7 @@ class ABTest():
                 NotAlgDependentList.append({"Purchases": 0, "Revenue": 0, "activeUsersAmount": 0})
 
         returnDict = {"NotAlgDependent":NotAlgDependentList, "parameters":parameters, "algorithms": algoritmsList, "points": allPoints}
-
+        print(returnDict)
         return (returnDict, 200)
 
     def getTotalActiveUsers(self, fromDate, toDate):
@@ -334,8 +335,8 @@ class ABTest():
 
         if self.abTestId == None and abTestId != None:
             self.abTestId = abTestId
-            select = 'INSERT INTO abtest VALUES (%s,%s,to_date(%s, \'DD/MM/YYYY\'),to_date(%s, \'DD/MM/YYYY\'),%s,%s);'
-            self.cursor.execute(sql.SQL(select), [abTestId, dataset, beginTs, endTs, stepSize, topK])
+            select = 'INSERT INTO abtest ("test_name", "dataset", "begin_ts", "end_ts", "topK", "stepsize") VALUES (%s,%s,to_date(%s, \'DD/MM/YYYY\'),to_date(%s, \'DD/MM/YYYY\'),%s,%s);'
+            self.cursor.execute(sql.SQL(select), [abTestId, dataset, beginTs, endTs, topK, stepSize])
 
             for algorithm in algorithms:
                 select = 'INSERT INTO abtest_algorithms ("test_name", "algorithmid", "interval", "K") VALUES (%s,%s,%s,%s);'
@@ -344,7 +345,7 @@ class ABTest():
         elif self.abTestId == None and abTestId == None:
             exit("No data to initialize")
 
-        select = 'SELECT * FROM abtest WHERE test_name = %s;'
+        select = 'SELECT "test_name", "dataset", "begin_ts", "end_ts", "topK", "stepsize" FROM abtest WHERE test_name = %s;'
         self.cursor.execute(sql.SQL(select).format(), [self.abTestId])
         data = self.cursor.fetchone()
 

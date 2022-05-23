@@ -6,6 +6,7 @@ import {Link} from "react-router-dom";
 import Icon from "react-eva-icons";
 import {toast} from "react-toastify";
 import {ServerRequest} from "../../logic/ServerCommunication";
+import TabelSkeleton from "../../components/loadingSkeletons/tabelSkeleton";
 
 const UserList = () => {
     const [loading, setLoading] = useState(false);
@@ -62,7 +63,7 @@ const UserList = () => {
                     <Button variant="primary">Add new user <Icon name="plus-circle-outline"/></Button>
                 </Link>
             </div>
-            <LogicTable data={TableData}/>
+            <TabelSkeleton loading={loading}><LogicTable data={TableData}/></TabelSkeleton>
         </div>
     );
 };

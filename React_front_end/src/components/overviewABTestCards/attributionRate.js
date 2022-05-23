@@ -4,6 +4,7 @@ import {useNavigate } from "react-router-dom";
 import React, {useEffect} from "react";
 import LargeInformationCard from "../largeInformationCard";
 import { Line } from 'react-chartjs-2';
+import SmoothingLineCard from "../smoothingLineChar";
 
 
 const Purchases = (props) => {
@@ -12,9 +13,11 @@ const Purchases = (props) => {
     const [datasets, setDatasets]  = React.useState([]);
     const [avargeARD, setavargeARD]  = React.useState([]);
     const [loading, setLoading] = React.useState(true);
+    const [showAllDataPoints, setShowAllDataPoints] = React.useState(false);
     const graphColors = ['#0d6efd', '#84c98b', '#27292d', '#bc1ed7', '#2b2b2b', '#0c1f3d', '#84c98b']
 
     async function processData(begin, end){
+        setShowAllDataPoints(false)
         //TODO check if correct
         setLoading(true);
         setDatasets([]);
@@ -74,10 +77,8 @@ const Purchases = (props) => {
                     {return <h5>Avarage AR for {value[0]} from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: {value[1]}</h5>}
                 })
             }
-            {labels.length < 50 &&
-            <Line height={"100%"} options={{
-                backgroundColor: 'rgba(13,110,253,1)',
-                borderColor: 'rgba(13,110,253,0.5)',
+            {(labels.length < 50 || showAllDataPoints) &&
+            <SmoothingLineCard height={"100%"} smoothingWindow={props.smoothingWindow} options={{
                   responsive: true,
                   plugins: {
                     legend: {
@@ -88,12 +89,11 @@ const Purchases = (props) => {
                     },
                   },
                 }}
-
-            data={{
-              labels, datasets: datasets
-            }} />}
-            {labels.length >= 50 &&
-                <p style={{color: "red"}}>To many datapoints to show in a graph</p>}
+            labels={labels}
+            data={datasets}
+            />}
+            {(labels.length >= 50 && !showAllDataPoints) &&
+                <div><p style={{color: "red"}}>To many datapoints to show in a graph</p><Button variant="primary" onClick={()=>setShowAllDataPoints(true)}>Just show</Button></div>}
         </LargeInformationCard>
         )
 };

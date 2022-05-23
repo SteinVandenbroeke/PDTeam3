@@ -4,6 +4,7 @@ import {useNavigate } from "react-router-dom";
 import React, {useEffect} from "react";
 import LargeInformationCard from "../largeInformationCard";
 import { Line } from 'react-chartjs-2';
+import SmoothingLineCard from "../smoothingLineChar";
 
 
 const Purchases = (props) => {
@@ -43,7 +44,7 @@ const Purchases = (props) => {
         <LargeInformationCard settings={props.slider} loading={loading} title={"Purchases"} tooltip={"Purchases from day x to day y"}>
             <h5>Total from {props.startDate} to {props.endDate}: {totalPurchases}</h5>
             {labels.length < 500 &&
-            <Line height={"100%"} options={{
+            <SmoothingLineCard height={"100%"} smoothingWindow={props.smoothingWindow} options={{
                 backgroundColor: 'rgba(13,110,253,1)',
                 borderColor: 'rgba(13,110,253,0.5)',
                   responsive: true,
@@ -54,12 +55,20 @@ const Purchases = (props) => {
                     title: {
                       display: false,
                     },
+                    scales: {
+                        x: {
+                            ticks: {
+                                autoSkip: true,
+                                maxTicksLimit: 1
+                            }
+                        }
+                    }
                   },
                 }}
+            labels={labels}
+            data={datasets}
+            />}
 
-            data={{
-              labels, datasets: datasets
-            }} />}
             {labels.length >= 500 &&
                 <p style={{color: "red"}}>To many datapoints to show in a graph</p>}
         </LargeInformationCard>

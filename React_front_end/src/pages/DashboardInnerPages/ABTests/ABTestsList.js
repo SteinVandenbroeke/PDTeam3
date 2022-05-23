@@ -8,6 +8,7 @@ import LogicTable from "../../../components/logicTable"
 import {Link, useNavigate} from "react-router-dom";
 import {ServerRequest} from "../../../logic/ServerCommunication";
 import {toast} from "react-toastify";
+import TabelSkeleton from "../../../components/loadingSkeletons/tabelSkeleton";
 
 const ABTestsList = () => {
     const navigation = useNavigate();
@@ -48,7 +49,7 @@ const ABTestsList = () => {
                     <Button variant="primary">Add new <Icon name="plus-circle-outline"/></Button>
                 </Link>
             </div>
-            <LogicTable action={openAbTest} data={header}/>
+            <TabelSkeleton loading={loading}><LogicTable action={openAbTest} data={header}/></TabelSkeleton>
         </div>
     );
 };
