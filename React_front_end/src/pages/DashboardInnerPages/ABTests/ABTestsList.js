@@ -8,10 +8,13 @@ import LogicTable from "../../../components/logicTable"
 import {Link, useNavigate} from "react-router-dom";
 import {ServerRequest} from "../../../logic/ServerCommunication";
 import {toast} from "react-toastify";
+import TabelSkeleton from "../../../components/loadingSkeletons/tabelSkeleton";
+import ServerError from "../../../components/serverError";
 
 const ABTestsList = () => {
     const navigation = useNavigate();
     const [loading, setLoading] = useState(false);
+    const [serverError, setServerError] = useState(false);
     const [header, setHeader] = useState([[]]);
     function openAbTest(id){
         navigation("/dashboard/abTests/overview/" + id);
@@ -34,7 +37,7 @@ const ABTestsList = () => {
     function loadABtests(){
         setLoading(true);
         let request = new ServerRequest();
-        request.sendGet("getABtests").then(requestData => {handleRequestData(requestData); setLoading(false);}).catch(error => {toast.error(error.message); setLoading(false)});
+        request.sendGet("getABtests").then(requestData => {handleRequestData(requestData); setLoading(false);}).catch(error => {toast.error(error.message); setLoading(false); setServerError(true)});
     }
 
     useEffect(() => {
@@ -48,7 +51,8 @@ const ABTestsList = () => {
                     <Button variant="primary">Add new <Icon name="plus-circle-outline"/></Button>
                 </Link>
             </div>
-            <LogicTable action={openAbTest} data={header}/>
+            <TabelSkeleton loading={loading}><LogicTable action={openAbTest} data={header}/></TabelSkeleton>
+            <ServerError error={serverError}/>
         </div>
     );
 };

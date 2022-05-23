@@ -15,6 +15,7 @@ Tooltip,
 Legend,
 } from 'chart.js';
 import SmallInformationCard from "../smallInformationCard";
+import SmoothingLineCard from "../smoothingLineChar";
 
 const RevenueCard = (props) => {
     const navigation = useNavigate();
@@ -58,7 +59,7 @@ const RevenueCard = (props) => {
         <LargeInformationCard settings={props.slider} loading={loading} title={"Revenue"} tooltip={"Revenue from day x to day y"}>
             <h5>Total from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: € {totalRevenue.toFixed(2)}</h5>
             {labels.length < 500 &&
-            <Line height={"100%"} options={{
+            <SmoothingLineCard height={"100%"} smoothingWindow={props.smoothingWindow} options={{
                 backgroundColor: 'rgba(13,110,253,1)',
                 borderColor: 'rgba(13,110,253,0.5)',
                   responsive: true,
@@ -69,12 +70,19 @@ const RevenueCard = (props) => {
                     title: {
                       display: false,
                     },
+                    scales: {
+                        x: {
+                            ticks: {
+                                autoSkip: true,
+                                maxTicksLimit: 1
+                            }
+                        }
+                    }
                   },
                 }}
-
-            data={{
-              labels, datasets: datasets
-            }} />}
+            labels={labels}
+            data={datasets}
+            />}
             {labels.length >= 500 &&
                 <p style={{color: "red"}}>To many datapoints to show in a graph</p>}
         </LargeInformationCard>

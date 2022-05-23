@@ -17,6 +17,7 @@ Legend,
 import SmallInformationCard from "../smallInformationCard";
 import {ServerRequest} from "../../logic/ServerCommunication";
 import {toast} from "react-toastify";
+import SmoothingLineCard from "../smoothingLineChar";
 
 const ActiveUserCard = (props) => {
     const navigation = useNavigate();
@@ -52,10 +53,10 @@ const ActiveUserCard = (props) => {
         <LargeInformationCard settings={props.slider} loading={loading} title={"Users"} value={20} tooltip={"Purchases from day x to day y"}>
             <h5>Total from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: {props.totalUsers}</h5>
             {labels.length < 500 &&
-            <Line height={"100%"} options={{
+            <SmoothingLineCard height={"100%"} smoothingWindow={props.smoothingWindow} options={{
+                backgroundColor: 'rgba(13,110,253,1)',
+                borderColor: 'rgba(13,110,253,0.5)',
                   responsive: true,
-                  backgroundColor: 'rgba(13,110,253,1)',
-                  borderColor: 'rgba(13,110,253,0.5)',
                   plugins: {
                     legend: {
                       position: 'top',
@@ -63,12 +64,19 @@ const ActiveUserCard = (props) => {
                     title: {
                       display: false,
                     },
+                    scales: {
+                        x: {
+                            ticks: {
+                                autoSkip: true,
+                                maxTicksLimit: 1
+                            }
+                        }
+                    }
                   },
                 }}
-
-            data={{
-              labels, datasets: datasets
-            }} />}
+            labels={labels}
+            data={datasets}
+            />}
             {labels.length >= 500 &&
                 <p style={{color: "red"}}>To many datapoints to show in a graph</p>}
         </LargeInformationCard>

@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Col, Row, Table, Button, Text, Card, Form, Spinner} from "react-bootstrap";
 import Icon from 'react-eva-icons';
 import LogicTable from "../../../components/logicTable"
@@ -32,6 +32,7 @@ import TabelSkeleton from "../../../components/loadingSkeletons/tabelSkeleton";
 import CharSkeleton from "../../../components/loadingSkeletons/charSkeleton";
 import SliderSkeleton from "../../../components/loadingSkeletons/sliderSkeleton";
 import {useNavigate } from "react-router-dom";
+import ServerError from "../../../components/serverError";
 
 ChartJS.register(
 CategoryScale,
@@ -46,8 +47,10 @@ Legend
 const ABTestOverview = () => {
     const navigation = useNavigate();
     const {abTestId} = useParams()
+    const [windowSizeSmoothing, setWindowSizeSmoothing] = React.useState([0]);
     const [values, setValues] = React.useState([0, 1]);
     const [totalUsers, setTotalUsers] = React.useState([0, 1]);
+    const [serverError, setServerError] = useState(false);
     const [abTestData, setAbTestData] = React.useState({
             "algorithms": [],
             "points": [0,0],
@@ -61,11 +64,9 @@ const ABTestOverview = () => {
     const [loading, setLoading] = React.useState(true);
 
     function loadData(){
-        let getData = {
-            "abTestName": abTestId
-        };
+        let getData = {abTestName: abTestId}
         let request = new ServerRequest();
-        request.sendGet("ABTestOverview", getData).then(requestData => {setAbTestData(requestData); setLoading(false);}).catch(error => {toast.error(error.message); /*setLoading(false)*/});
+        request.sendGet("ABTestOverview", getData).then(requestData => {setAbTestData(requestData); setLoading(false);}).catch(error => {toast.error(error.message); setServerError(true) /*setLoading(false)*/});
     }
 
     function loadTotalActiveUsers(){
@@ -79,27 +80,16 @@ const ABTestOverview = () => {
         loadData();
     }, []);
 
-    let slider = <Row style={{paddingTop: 20}}>
-                    <Col sm={1}>
-                        <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={abTestData.points[values[0]]} onChange={(e)=>{setValues([abTestData.points.indexOf(e.target.value), values[1]])}} />
+    let sliders = <Row style={{paddingTop: 20}}>
+                    <Col sm={12}>
+                        <SliderSkeleton loading={loading}>
+                            <Slider onFinalChange={loadTotalActiveUsers} labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />
+                        </SliderSkeleton>
                     </Col>
-                    <Col sm={10}>
-                        <Slider onFinalChange={loadTotalActiveUsers} labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />
-                    </Col>
-                    <Col sm={1}>
-                        <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={abTestData.points[values[1]]} onChange={(e)=>{setValues([values[0], abTestData.points.indexOf(e.target.value)])}} />
-                    </Col>
-                </Row>;
-
-    let windowSmooting = <Row style={{paddingTop: 20}}>
-                    <Col sm={1}>
-                        <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={abTestData.points[values[0]]} onChange={(e)=>{setValues([abTestData.points.indexOf(e.target.value), values[1]])}} />
-                    </Col>
-                    <Col sm={10}>
-                        <Slider labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />
-                    </Col>
-                    <Col sm={1}>
-                        <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={abTestData.points[values[1]]} onChange={(e)=>{setValues([values[0], abTestData.points.indexOf(e.target.value)])}} />
+                    <Col sm={12}>
+                        <SliderSkeleton loading={loading}>
+                            <Slider max={abTestData.points.length - 1} min={0} step={1} values={windowSizeSmoothing} setValues={setWindowSizeSmoothing} />
+                        </SliderSkeleton>
                     </Col>
                 </Row>;
 
@@ -110,46 +100,46 @@ const ABTestOverview = () => {
             "abTestName": abTestId
         }
         request.sendGet("deleteABTest",getData).then(message => {toast.success(message.message); navigation('/dashboard/abTests', { replace: true }); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
-
     }
 
     return (
         <div>
+            <div style={{width: "100%", textAlign: "right", paddingBottom: "10px"}}>
+                <Button onClick={()=>deleteABTest()} variant="danger">Delete AB-Test</Button>
+            </div>
+            { !serverError &&
             <div style={{paddingTop: 20}}>
-                <div style={{width: "100%", textAlign: "right", paddingBottom: "10px"}}>
-                    <Button onClick={()=>deleteABTest()} variant="danger">Delete AB-Test</Button>
-                </div>
-                <SliderSkeleton loading={loading}>{slider}</SliderSkeleton>
+                {sliders}
                 <Row>
                     <Col sm={4}>
                         <TabelSkeleton loading={loading}><ABTestInformation algorithms={abTestData.algorithms} parameters={abTestData.parameters}/></TabelSkeleton>
                     </Col>
                     <Col xs={12} md={4}>
-                        <CharSkeleton loading={loading}><Purchases slider={slider} purchases={abTestData.NotAlgDependent.Purchases}
+                        <CharSkeleton loading={loading}><Purchases smoothingWindow={windowSizeSmoothing} slider={sliders} purchases={abTestData.NotAlgDependent.Purchases}
                                                                     abTestData={abTestData} startDate={values[0]} endDate={values[1]}/></CharSkeleton>
                     </Col>
                     <Col xs={12} md={4}>
-                        <CharSkeleton loading={loading}><ActiveUserCard totalUsers={totalUsers} slider={slider} abTestData={abTestData} startDate={values[0]}
+                        <CharSkeleton loading={loading}><ActiveUserCard smoothingWindow={windowSizeSmoothing} totalUsers={totalUsers} slider={sliders} abTestData={abTestData} startDate={values[0]}
                                                                      endDate={values[1]}/></CharSkeleton>
                     </Col>
                     <Col xs={12} md={4}>
-                        <CharSkeleton loading={loading}><RevenueCard slider={slider} abTestData={abTestData} startDate={values[0]}
+                        <CharSkeleton loading={loading}><RevenueCard smoothingWindow={windowSizeSmoothing} slider={sliders} abTestData={abTestData} startDate={values[0]}
                                                                      endDate={values[1]}/></CharSkeleton>
                     </Col>
                     <Col xs={12} md={4}>
-                        <CharSkeleton loading={loading}><AverageRevenueUser slider={slider} abTestData={abTestData} startDate={values[0]}
+                        <CharSkeleton loading={loading}><AverageRevenueUser smoothingWindow={windowSizeSmoothing} slider={sliders} abTestData={abTestData} startDate={values[0]}
                                                                             endDate={values[1]}/></CharSkeleton>
                     </Col>
                     <Col xs={12} md={4}>
-                        <CharSkeleton loading={loading}><ClickTroughRate slider={slider} abTestData={abTestData} startDate={values[0]}
+                        <CharSkeleton loading={loading}><ClickTroughRate smoothingWindow={windowSizeSmoothing} slider={sliders} abTestData={abTestData} startDate={values[0]}
                                                                          endDate={values[1]}/></CharSkeleton>
                     </Col>
                     <Col xs={12} md={4}>
-                        <CharSkeleton loading={loading}><AttributionRate slider={slider} abTestData={abTestData} startDate={values[0]}
+                        <CharSkeleton loading={loading}><AttributionRate smoothingWindow={windowSizeSmoothing} slider={sliders} abTestData={abTestData} startDate={values[0]}
                                                                          endDate={values[1]}/></CharSkeleton>
                     </Col>
                     <Col xs={12} md={4}>
-                        <TabelSkeleton loading={loading}><MostRecomendedItems slider={slider} abTestData={abTestData} startDate={values[0]}
+                        <TabelSkeleton loading={loading}><MostRecomendedItems slider={sliders} abTestData={abTestData} startDate={values[0]}
                                                                               endDate={values[1]}/></TabelSkeleton>
                     </Col>
                     <Col xs={2}>
@@ -172,23 +162,8 @@ const ABTestOverview = () => {
                         } tooltip={"Purchases from day x to day y"}/>
                     </Col>
                 </Row>
-
-                Meterieken overzicht
-                <br/>
-                vergelijking
-                <br/>
-                item lijst voor specifiek algoritme
-                {/*
-            <h3 style={{textAlign: "left"}}>Quick information</h3>
-            <Row>
-                <Col><SmallInformationCard xs={12} title={"Purchases"} value={100} tooltip={"Amount of purchases over given periode"}></SmallInformationCard></Col>
-                <Col><SmallInformationCard xs={12} title={"Active Users"} value={100} tooltip={"Amount of purchases over given periode"}></SmallInformationCard></Col>
-                <Col><SmallInformationCard xs={12} title={"CTR"} value={100} tooltip={"Click Through Rate"}></SmallInformationCard></Col>
-                <Col><SmallInformationCard xs={12} title={"AR@D"} value={100} tooltip={"Attribution Rate"}></SmallInformationCard></Col>
-                <Col><SmallInformationCard xs={12} title={"ARPU@D"} value={100} tooltip={"Average Revenue Per User"}></SmallInformationCard></Col>
-            </Row>
-            */}
-            </div>
+            </div>}
+            <ServerError error={serverError}/>
         </div>
     );
 };
