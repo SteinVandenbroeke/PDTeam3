@@ -1,4 +1,4 @@
-import {Button} from "react-bootstrap";
+import {Button, Form} from "react-bootstrap";
 import Icon from 'react-eva-icons';
 import {useNavigate } from "react-router-dom";
 import React, {useEffect} from "react";
@@ -8,11 +8,14 @@ import { Line } from 'react-chartjs-2';
 
 const Purchases = (props) => {
     const navigation = useNavigate();
+    const [daysSwitch, setDaysSwitch] = React.useState(false)
     const [labels, Letlabels] = React.useState([]);
     const [datasets, setDatasets]  = React.useState([]);
     const [avargeARD, setavargeARD]  = React.useState([]);
     const [loading, setLoading] = React.useState(true);
     const graphColors = ['#0d6efd', '#84c98b', '#27292d', '#bc1ed7', '#2b2b2b', '#0c1f3d', '#84c98b']
+
+
 
     async function processData(begin, end){
         //TODO check if correct
@@ -27,16 +30,22 @@ const Purchases = (props) => {
         let data = [];
         let colorCounter = 0;
         let value = 0;
-        let thirthyDays = false;
+        const switchDays = () => {
+                    daysSwitch ? setDaysSwitch(true): setDaysSwitch(false);
+                    console.log("bool: "+daysSwitch)
+                }
+
         for(let algorithm in allData.algorithms){
             let data = [];
             let avargeARDTemp = 0;
             allData.algorithms[algorithm].points.slice(begin, end + 1).map((value1, index) =>{
                 if(!thirthyDays){
                     value = value1.ard7
+                    console.log('nr11')
                 }
                 else{
                     value = value1.ard30
+                    console.log('nr2')
                 }
                 data.push(value);
                 avargeARDTemp += value;
@@ -68,10 +77,17 @@ const Purchases = (props) => {
     }, [props.abTestData, props.startDate, props.endDate]);
 
     return (
-        <LargeInformationCard settings={props.slider} loading={loading} title={"Attribution Rate"} tooltip={"Purchases from day x to day y"}>
+        <LargeInformationCard settings={
+            <div>
+                {props.slider}
+                <Form>
+                    7 days {'   '} <Form.Switch inline id="switch30days" label="30 days" onClick={switchDays}/>
+                </Form>
+            </div>}
+                loading={loading} title={"Attribution Rate"} tooltip={"Purchases from day x to day y"}>
             {
                 avargeARD.map((value, index) => {
-                    {return <h5>Avarage AR for {value[0]} from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: {value[1]}</h5>}
+                    {return <h5>Average AR for {value[0]} from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: {value[1]}</h5>}
                 })
             }
             {labels.length < 50 &&
