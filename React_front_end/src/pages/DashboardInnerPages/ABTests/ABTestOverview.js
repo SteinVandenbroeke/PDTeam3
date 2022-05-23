@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Col, Row, Table, Button, Text, Card, Form, Spinner} from "react-bootstrap";
 import Icon from 'react-eva-icons';
 import LogicTable from "../../../components/logicTable"
@@ -32,6 +32,7 @@ import TabelSkeleton from "../../../components/loadingSkeletons/tabelSkeleton";
 import CharSkeleton from "../../../components/loadingSkeletons/charSkeleton";
 import SliderSkeleton from "../../../components/loadingSkeletons/sliderSkeleton";
 import {useNavigate } from "react-router-dom";
+import ServerError from "../../../components/serverError";
 
 ChartJS.register(
 CategoryScale,
@@ -49,6 +50,7 @@ const ABTestOverview = () => {
     const [windowSizeSmoothing, setWindowSizeSmoothing] = React.useState([0]);
     const [values, setValues] = React.useState([0, 1]);
     const [totalUsers, setTotalUsers] = React.useState([0, 1]);
+    const [serverError, setServerError] = useState(false);
     const [abTestData, setAbTestData] = React.useState({
             "algorithms": [],
             "points": [0,0],
@@ -64,7 +66,7 @@ const ABTestOverview = () => {
     function loadData(){
         let getData = {abTestName: abTestId}
         let request = new ServerRequest();
-        request.sendGet("ABTestOverview", getData).then(requestData => {setAbTestData(requestData); setLoading(false);}).catch(error => {toast.error(error.message); /*setLoading(false)*/});
+        request.sendGet("ABTestOverview", getData).then(requestData => {setAbTestData(requestData); setLoading(false);}).catch(error => {toast.error(error.message); setServerError(true) /*setLoading(false)*/});
     }
 
     function loadTotalActiveUsers(){
@@ -105,6 +107,7 @@ const ABTestOverview = () => {
             <div style={{width: "100%", textAlign: "right", paddingBottom: "10px"}}>
                 <Button onClick={()=>deleteABTest()} variant="danger">Delete AB-Test</Button>
             </div>
+            { !serverError &&
             <div style={{paddingTop: 20}}>
                 {sliders}
                 <Row>
@@ -159,18 +162,8 @@ const ABTestOverview = () => {
                         } tooltip={"Purchases from day x to day y"}/>
                     </Col>
                 </Row>
-
-                {/*
-            <h3 style={{textAlign: "left"}}>Quick information</h3>
-            <Row>
-                <Col><SmallInformationCard xs={12} title={"Purchases"} value={100} tooltip={"Amount of purchases over given periode"}></SmallInformationCard></Col>
-                <Col><SmallInformationCard xs={12} title={"Active Users"} value={100} tooltip={"Amount of purchases over given periode"}></SmallInformationCard></Col>
-                <Col><SmallInformationCard xs={12} title={"CTR"} value={100} tooltip={"Click Through Rate"}></SmallInformationCard></Col>
-                <Col><SmallInformationCard xs={12} title={"AR@D"} value={100} tooltip={"Attribution Rate"}></SmallInformationCard></Col>
-                <Col><SmallInformationCard xs={12} title={"ARPU@D"} value={100} tooltip={"Average Revenue Per User"}></SmallInformationCard></Col>
-            </Row>
-            */}
-            </div>
+            </div>}
+            <ServerError error={serverError}/>
         </div>
     );
 };

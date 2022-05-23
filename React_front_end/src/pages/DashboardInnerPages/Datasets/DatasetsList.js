@@ -7,11 +7,13 @@ import {Link, useNavigate} from "react-router-dom";
 import {toast} from "react-toastify";
 import {ServerRequest} from "../../../logic/ServerCommunication";
 import TabelSkeleton from "../../../components/loadingSkeletons/tabelSkeleton";
+import ServerError from "../../../components/serverError";
 
 const DataSetsList = () => {
     const navigation = useNavigate();
     const [loading, setLoading] = useState(false);
     const [datasets, setDatasets] = useState([[]]);
+    const [serverError, setServerError] = useState(false);
     function openDataSet(id){
         navigation("/dashboard/dataSets/overview/" + id);
     }
@@ -20,7 +22,7 @@ const DataSetsList = () => {
         setDatasets([[]])
         setLoading(true);
         let request = new ServerRequest();
-        request.sendGet("getDatasets").then(requestData => {setDatasets([["id", "Created by", "Creation date"]].concat(requestData)); setLoading(false);}).catch(error => {toast.error(error.message); setLoading(false)});
+        request.sendGet("getDatasets").then(requestData => {setDatasets([["id", "Created by", "Creation date"]].concat(requestData)); setLoading(false);}).catch(error => {toast.error(error.message); setLoading(false); setServerError(true)});
     }
 
     useEffect(() => {
@@ -35,6 +37,7 @@ const DataSetsList = () => {
                 </Link>
             </div>
             <TabelSkeleton loading={loading}><LogicTable action={openDataSet} data={datasets}/></TabelSkeleton>
+            <ServerError error={serverError}/>
         </div>
     );
 };
