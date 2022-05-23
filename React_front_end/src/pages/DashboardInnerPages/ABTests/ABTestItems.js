@@ -11,33 +11,12 @@ import {toast} from "react-toastify";
 
 const ABTestItems = (props) => {
     const [loading, setLoading] = useState(false);
-    const [itemData, setItemData] = useState({});
+    const [data1,setData1] = useState([['Item Id', 'Title', 'Total Buy Rate', 'Buy Rate In Range', 'Total Recommend Rate', 'Recommend Rate In Range']])
     const [datasetId, setDatasetId] = useState(null)
-
     const {abTestId, startDate, endDate} = useParams()
+    const [abTestData, setAbTestData] = React.useState({});
+    const [loadusers, setloadusers] = useState(false);
     const navigation = useNavigate();
-
-    const dataItems = {
-        "popularityid1":
-            [
-                {itemId: 1, Title: "titel1", recommendRate: 9, buyRate: 5},
-                {itemId: 2, Title: "titel2", recommendRate: 10, buyRate: 6}
-            ],
-        "recencyid1":
-            [
-                {itemId: 1, Title: "titel1", recommendRate: 9, buyRate: 7},
-                {itemId: 2, Title: "titel2", recommendRate: 10, buyRate: 8},
-                {itemId: 3, Title: "titel1", recommendRate: 4, buyRate: 7},
-                {itemId: 6, Title: "titel2", recommendRate: 0, buyRate: 100}
-            ],
-        "popularityid2":
-            [
-                {itemId: 1, Title: "titel1", recommendRate: 9, buyRate: 5},
-                {itemId: 2, Title: "titel2", recommendRate: 10, buyRate: 6},
-                {itemId: 81, Title: "titel1", recommendRate: 9, buyRate: 7},
-                {itemId: 6, Title: "titel2", recommendRate: 0, buyRate: 0}
-            ]
-    }
 
 
     function openItem(id){
@@ -55,23 +34,39 @@ const ABTestItems = (props) => {
     }
 
 
+    function loadABData(){
+        setLoading(true);
+        let getData = {
+            "abTestName": abTestId
+        };
+        let request = new ServerRequest();
+        request.sendGet("ABTestOverview", getData).then(requestData => {setAbTestData(requestData); setLoading(false)}).catch(error => {toast.error(error.message); /*setLoading(false)*/});
+        setloadusers(true)
+    }
+
     function loadItems(){
-        //setLoading(true);
+        setLoading(true);
+        let begin = parseInt(startDate);
+        let end = parseInt(endDate);
         let getData = {
             "abTestId": abTestId,
-            "startDate": startDate,
-            "endDate": endDate,
+            "startDate": abTestData.points[begin],
+            "endDate": abTestData.points[end],
         }
         let request = new ServerRequest();
-        //request.sendGet("getItemsFromABTest",getData).then(requestData => {setItemData(requestData[0]); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
-        setItemData(dataItems)
+        request.sendGet("getItemsFromABTest",getData).then(requestData => {setData1(oldData=>[...oldData,...requestData]); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
     }
 
 
+    useEffect(()=> {
+        if (loadusers){
+            loadItems();
+        }
+    }, [abTestData])
 
     useEffect(() => {
         getDataSetId()
-        loadItems()
+        loadABData()
     },[]);
 
     return (
@@ -80,20 +75,7 @@ const ABTestItems = (props) => {
             {/*<Slider labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />*/}
             <div className="container">
                 <Row>
-                    {Object.entries(itemData).map(([key, value]) => {
-                        const algoKey = key
-                        const data1 = [['Item Id', 'Title', 'Recommend Rate', 'Buy Rate']]
-                        for(const x of value){
-                            const tempArray = Object.values(x)
-                            data1.push(tempArray)
-                        }
-                        return(
-                        <Col>
-                            <header><h1>{algoKey}</h1></header>
-                            <LogicTable action={openItem} data={data1}/>
-                        </Col>
-                        )}
-                    )}
+                    <LogicTable action={openItem} data={data1}/>
                 </Row>
 
             </div>

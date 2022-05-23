@@ -10,27 +10,14 @@ import {Button, Card, Form, Modal, Spinner} from "react-bootstrap";
 
 const ABTestPersons = (props) => {
     const [loading, setLoading] = useState(false);
-    const [personData, setPersonData] = useState([]);
     const [datasetId, setDatasetId] = useState(null)
-    const [data1,setData1] = useState([["User Id","Purchase Amount"]])
-    const {abTestId, startDate, endDate} = useParams()
+    const [data1,setData1] = useState([["User Id","Purchase Amount", "Total Purchases", "Purchases in Range"]])
+    let {abTestId, startDate, endDate} = useParams()
     const navigation = useNavigate();
-    const [paramSelect, setParamSelect] = useState(-1);
     const [modal, setModal] = useState(false);
     const [personID, setPersonID] = useState(-1);
-
-    //static
-    const [abTestData, setAbTestData] = useState({
-        "algorithms": [],
-        "points": [0,10],
-        "parameters": {
-            "topK": null,
-            "stepSize": null,
-            "datasetId": null
-        },
-        "NotAlgDependent":[]
-    });
-
+    const [abTestData, setAbTestData] = React.useState({});
+    const [loadusers, setloadusers] = useState(false);
 
     function openUser(id){
         navigation("/dashboard/dataSets/overview/"+ datasetId + "/person/"+ id);
@@ -42,41 +29,49 @@ const ABTestPersons = (props) => {
     }
 
     function getDataSetId(){
-        setDatasetId(null)
-        setLoading(true)
+        setDatasetId(null);
+        setLoading(true);
         let getData = {
             "abTestId": abTestId,
-        }
+        };
         let request = new ServerRequest();
         request.sendGet("getDatasetIdFromABTest",getData).then(requestData => {setDatasetId(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
     }
 
-    function loadUsers(id){
+    function loadABData(){
         setLoading(true);
         let getData = {
-            "abTestId": abTestId,
-            "startDate": startDate,
-            "endDate": endDate,
-        }
+            "abTestName": abTestId
+        };
         let request = new ServerRequest();
-        request.sendGet("getUsersFromABTest",getData).then(requestData => {setPersonData(requestData[0]); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+        request.sendGet("ABTestOverview", getData).then(requestData => {setAbTestData(requestData); setLoading(false)}).catch(error => {toast.error(error.message); /*setLoading(false)*/});
+        setloadusers(true)
     }
 
+    function loadUsers(){
+        setLoading(true);
+        let begin = parseInt(startDate);
+        let end = parseInt(endDate);
+        let getData = {
+            "abTestId": abTestId,
+            "startDate": abTestData.points[begin],
+            "endDate": abTestData.points[end],
+        };
+        let request = new ServerRequest();
+        request.sendGet("getUsersFromABTest",getData).then(requestData => {setData1(oldData=>[...oldData,...requestData[0]]); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+    }
 
-    useEffect(()=>{
-        let temp = []
-        for(var i = 0; i < personData.length; i++){
-            let data = [personData[i]["personid"],personData[i]["purchaseAmount"]]
-            temp.push(data)
+    useEffect(()=> {
+        if (loadusers){
+            loadUsers();
         }
-        setData1(oldData=>[...oldData,...temp])
-    },[personData]);
+    }, [abTestData])
 
 
 
     useEffect(() => {
-        getDataSetId()
-        loadUsers()
+        getDataSetId();
+        loadABData();
     },[]);
 
     return (

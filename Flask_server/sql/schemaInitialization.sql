@@ -12,6 +12,9 @@ CREATE TABLE users(
 
 CREATE TABLE datasets(
   "name" varchar PRIMARY KEY,
+  "customerAmount" int,
+  "itemAmount" int,
+  "purchaseAmount" int,
   "createdBy" varchar REFERENCES users("username") ON DELETE CASCADE,
   "creationDate" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

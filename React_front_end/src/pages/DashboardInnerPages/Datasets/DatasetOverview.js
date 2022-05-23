@@ -9,6 +9,7 @@ import Icon from "react-eva-icons";
 import {toast} from "react-toastify";
 import {ServerRequest} from "../../../logic/ServerCommunication";
 import {useNavigate } from "react-router-dom";
+import SmallInformationCard from "../../../components/smallInformationCard"
 
 const DataSetOverview = () => {
     const navigation = useNavigate();
@@ -22,6 +23,10 @@ const DataSetOverview = () => {
     const listPeople = people.map((d) => <PersonCard id={d.personid} setid={setid}/>);
     const [itemOffset, setItemOffset] = useState(0);
     const [peopleOffset, setPeopleOffset] = useState(0);
+
+    const [customerAmount,setCustomerAmount] = useState(0);
+    const [itemAmount,setItemAmount] = useState(0);
+    const [purchaseAmount,setPurchaseAmount] = useState(0);
 
     function loadItems(){
         setLoading(true);
@@ -45,6 +50,15 @@ const DataSetOverview = () => {
         setPeopleOffset(peopleOffset+10);
     }
 
+    function loadAmounts(){
+        setLoading(true);
+        let request = new ServerRequest();
+        let getData = {
+            "dataSet": setid
+        }
+        request.sendGet("getDatasetAmounts",getData).then(requestData => {setCustomerAmount(requestData[0]); setItemAmount(requestData[1]); setPurchaseAmount(requestData[2]); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+    }
+
     function deleteDataset(){
         setLoading(true);
         let request = new ServerRequest();
@@ -58,18 +72,32 @@ const DataSetOverview = () => {
     useEffect(() => {
         loadItems()
         loadPeople()
+        loadAmounts()
     },[]);
 
     return (
         <div>
-             <div style={{width: "100%", textAlign: "right", paddingBottom: "10px"}}>
-                 <Link to={"/dashboard/dataSets/overview/" + setid + "/edit"} class={"btn"}>
-                     <Button variant="primary">Edit Data<Icon name="edit-outline"/></Button>
-                 </Link>
-                 <Button onClick={()=>deleteDataset()} variant="danger">Delete Dataset</Button>
-            </div>
+            <h2> This is dataset {setid} </h2>
+            <Row>
+                <Col>
+                    <div style={{width: "100%", textAlign: "left", paddingBottom: "10px"}}>
+                        <Row>
+                            <Col><SmallInformationCard xs={12} title={"customers"} value={customerAmount} tooltip={"Amount of customers"}></SmallInformationCard></Col>
+                            <Col><SmallInformationCard xs={12} title={"items"} value={itemAmount} tooltip={"Amount of Items"}></SmallInformationCard></Col>
+                            <Col><SmallInformationCard xs={12} title={"purchases"} value={purchaseAmount} tooltip={"Amount of purchases"}></SmallInformationCard></Col>
+                        </Row>
+                    </div>
+                </Col>
+                <Col>
+                    <div style={{width: "100%", textAlign: "right", paddingBottom: "10px"}}>
+                         <Link to={"/dashboard/dataSets/overview/" + setid + "/edit"} class={"btn"}>
+                             <Button variant="primary">Edit Data<Icon name="edit-outline"/></Button>
+                         </Link>
+                         <Button onClick={()=>deleteDataset()} variant="danger">Delete Dataset</Button>
+                    </div>
+                </Col>
+            </Row>
             <div>
-                <h2> This is dataset {setid} </h2>
                 <Row>
                     <Col>
                         <Card className={"shadow-lg"}  style={{paddingTop: 10}}>

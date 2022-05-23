@@ -68,8 +68,8 @@ const ABTestOverview = () => {
     }
 
     function loadTotalActiveUsers(){
-        setTotalUsers(<Spinner animation="grow" size="sm" />)
-        let getData = {abTestName: abTestId, startDate: abTestData.points[values[0]],endDate: abTestData.points[values[1]]}
+        setTotalUsers(<Spinner animation="grow" size="sm" />);
+        let getData = {abTestName: abTestId, startDate: abTestData.points[values[0]],endDate: abTestData.points[values[1]]};
         let request = new ServerRequest();
         request.sendGet("totalActiveUserAmount", getData).then(requestData => {setTotalUsers(requestData); setLoading(false);}).catch(error => {toast.error(error.message); setLoading(false);});
     }

@@ -310,6 +310,17 @@ def getPeopleList():
     returnValue = dataset.getPeopleList(request.args.get("dataSet"), request.args.get("offset"))
     return make_response(returnValue[0],returnValue[1])
 
+@app.route('/api/getDatasetAmounts', methods=['GET'])
+def getDatasetAmounts():
+    print("a")
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    dataset = Dataset()
+    returnValue = dataset.getAmounts(request.args.get("dataSet"))
+    return make_response(returnValue[0], returnValue[1])
+
 @app.route('/api/getABtests', methods=['GET'])
 def getABtests():
     user = User(app)
@@ -427,8 +438,8 @@ def getItemsFromABTest():
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
 
-    abtest = ABTest()
-    returnValue = abtest.getItemsFromABTest(request.args.get("abTestId"),request.args.get("offset"), request.args.get("startDate"), request.args.get("endDate"))
+    abtest = ABTest(request.args.get("abTestId"),)
+    returnValue = abtest.getItemsFromABTest(request.args.get("startDate"), request.args.get("endDate"))
     return make_response(returnValue[0], returnValue[1])
 
 @app.route('/api/getDatasetIdFromABTest', methods=['GET'])

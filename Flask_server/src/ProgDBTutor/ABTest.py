@@ -157,8 +157,8 @@ class ABTest():
         """
         overviewPageData: gives a json format for the overview page in the interface
         """
-        print(self.abTestId)
-        print(self.dataset)
+        # print(self.abTestId)
+        # print(self.dataset)
         dataSet = Dataset()
         allPoints = dataSet.getTimeStampList(self.dataset, list)
 
@@ -189,6 +189,7 @@ class ABTest():
         self.cursor.execute(sql.SQL(query), [self.abTestId])
         itemssql = self.cursor.fetchall()
         counter = 0
+        # print(algoritms)
         for itemsql in itemssql:
             if itemsql[1].strftime("%d/%m/%Y %H:%M:%S") not in algoritms[itemsql[0]]["points"]:
                 algoritms[itemsql[0]]["points"][itemsql[1].strftime("%d/%m/%Y %H:%M:%S")] = {"ctr": 0, "ard7": 0, "ard30": 0, "arpu7": 0, "arpu30":0}
@@ -238,12 +239,11 @@ class ABTest():
                 NotAlgDependentList.append({"Purchases": 0, "Revenue": 0, "activeUsersAmount": 0})
 
         returnDict = {"NotAlgDependent":NotAlgDependentList, "parameters":parameters, "algorithms": algoritmsList, "points": allPoints}
-        print(returnDict)
+
         return (returnDict, 200)
 
     def getTotalActiveUsers(self, fromDate, toDate):
         query = 'SELECT count(user_id) AS activeUsersAmount FROM (SELECT DISTINCT user_id FROM {dataset}_purchases WHERE {dataset}_purchases.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') and {dataset}_purchases.timestamp <= to_date(%s, \'DD/MM/YYYY HH24:MI:SS\')) AS temp;'.format(dataset=self.dataset.lower())
-        print(fromDate, toDate)
         self.cursor.execute(sql.SQL(query), [fromDate, toDate])
         itemsql = self.cursor.fetchone()
         return (json.dumps(itemsql[0]), 200)
@@ -293,25 +293,19 @@ class ABTest():
         return (json.dumps(returnList), 200)
 
     def getUsersFromABTest(self, startDate, endDate):
-        self.cursor.execute(sql.SQL('SELECT id, SUM(parameter) FROM {table}_customers,{table}_purchases  WHERE id = user_id GROUP BY id'.format(table=self.dataset))) #ORDER BY totalAmount DESC LIMIT 40 OFFSET {offset}
+        self.cursor.execute(sql.SQL('SELECT id, SUM(p.parameter),COUNT(p.user_id),SUM(case when p.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND p.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) FROM {table}_customers,{table}_purchases AS p WHERE id = user_id GROUP BY id'.format(table=self.dataset)), [startDate,endDate])
         users = self.cursor.fetchall()
         returnList = []
         for row in users:
-            item = {"personid":row[0],
-                    "purchaseAmount":row[1]}
-            returnList.append(item)
+            returnList.append(row)
         return (json.dumps([returnList]), 200)
 
-    def getItemsFromABTest(self, abTestId, offset, startDate, endDate):
-        self.cursor.execute(sql.SQL('SELECT dataset FROM "abtest" WHERE test_name=%s'),[abTestId])
-        setId = self.cursor.fetchall()[0][0]
-        query = 'SELECT id FROM '+ setId +'_articles LIMIT 40 OFFSET '+offset
-        self.cursor.execute(sql.SQL(query))
+    def getItemsFromABTest(self, startDate, endDate):
+        self.cursor.execute(sql.SQL('SELECT a.id,a.title, COUNT(p.item_id), SUM(case when p.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND p.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) FROM {table}_articles AS a, {table}_purchases AS p WHERE p.item_id = a.id GROUP BY a.id'.format(table=self.dataset)), [startDate,endDate])
         items = self.cursor.fetchall()
         returnList = []
         for row in items:
-            item = {"itemid": row[0]}
-            returnList.append(item)
+            returnList.append(row)
         return (json.dumps(returnList), 200)
 
     def getDatasetIdFromABTest(self, abTestId):
