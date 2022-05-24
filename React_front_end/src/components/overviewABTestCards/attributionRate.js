@@ -9,27 +9,13 @@ import SmoothingLineCard from "../smoothingLineChar";
 
 const Purchases = (props) => {
     const navigation = useNavigate();
-    const [daysSwitch, setDaysSwitch] = React.useState(true) // false = 7 dagen
+    const [daysSwitch, setDaysSwitch] = React.useState(false) // false = 7 dagen
     const [labels, Letlabels] = React.useState([]);
     const [datasets, setDatasets]  = React.useState([]);
     const [averageARD, setaverageARD]  = React.useState([]);
     const [loading, setLoading] = React.useState(true);
     const [showAllDataPoints, setShowAllDataPoints] = React.useState(false);
     const graphColors = ['#0d6efd', '#84c98b', '#27292d', '#bc1ed7', '#2b2b2b', '#0c1f3d', '#84c98b']
-
-    const switchDays = (pm1) => {
-
-        console.log("bool1: "+daysSwitch + pm1)
-        setDaysSwitch(pm1)
-        /*if(daysSwitch){
-            setDaysSwitch(false)
-        } else{
-            setDaysSwitch(true)*/
-        //setDaysSwitch(!daysSwitch)
-        console.log("bool2: "+daysSwitch)
-        processData(props.startDate,props.endDate);
-
-    }
 
     async function processData(begin, end){
         setShowAllDataPoints(false)
@@ -46,18 +32,15 @@ const Purchases = (props) => {
         let colorCounter = 0;
         let value = 0;
 
-
         for(let algorithm in allData.algorithms){
             let data = [];
             let averageARDTemp = 0;
             allData.algorithms[algorithm].points.slice(begin, end + 1).map((value1, index) =>{
                 if(!daysSwitch){
                     value = value1.ard7
-                    console.log('ar is 7 days')
                 }
                 else{
                     value = value1.ard30
-                    console.log('ar is 30 days')
                 }
                 data.push(value);
                 averageARDTemp += value;
@@ -86,7 +69,7 @@ const Purchases = (props) => {
 
     useEffect(() => {
         processData(props.startDate,props.endDate);
-    }, [props.abTestData, props.startDate, props.endDate]);
+    }, [props.abTestData, props.startDate, props.endDate, daysSwitch]);
 
     return (
         <LargeInformationCard settings={
@@ -94,11 +77,7 @@ const Purchases = (props) => {
                 {props.slider}
                 <Form>
                     7 days {'   '} <Form.Switch inline id="switch7or30days" label="30 days"
-                                                onChange={
-                                                (e) => {
-                                                switchDays(e.target.checked);
-                                                console.log(e.target.checked);
-                                                }}
+                                                onChange={(e) => {setDaysSwitch(e.target.checked);}}
                                                 checked={daysSwitch} />
                 </Form>
             </div>}
