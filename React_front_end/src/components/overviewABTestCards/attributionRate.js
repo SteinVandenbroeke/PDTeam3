@@ -9,22 +9,34 @@ import SmoothingLineCard from "../smoothingLineChar";
 
 const Purchases = (props) => {
     const navigation = useNavigate();
-    const [daysSwitch, setDaysSwitch] = React.useState(false)
+    const [daysSwitch, setDaysSwitch] = React.useState(true) // false = 7 dagen
     const [labels, Letlabels] = React.useState([]);
     const [datasets, setDatasets]  = React.useState([]);
-    const [avargeARD, setavargeARD]  = React.useState([]);
+    const [averageARD, setaverageARD]  = React.useState([]);
     const [loading, setLoading] = React.useState(true);
     const [showAllDataPoints, setShowAllDataPoints] = React.useState(false);
     const graphColors = ['#0d6efd', '#84c98b', '#27292d', '#bc1ed7', '#2b2b2b', '#0c1f3d', '#84c98b']
 
+    const switchDays = (pm1) => {
 
+        console.log("bool1: "+daysSwitch + pm1)
+        setDaysSwitch(pm1)
+        /*if(daysSwitch){
+            setDaysSwitch(false)
+        } else{
+            setDaysSwitch(true)*/
+        //setDaysSwitch(!daysSwitch)
+        console.log("bool2: "+daysSwitch)
+        processData(props.startDate,props.endDate);
+
+    }
 
     async function processData(begin, end){
         setShowAllDataPoints(false)
         //TODO check if correct
         setLoading(true);
         setDatasets([]);
-        setavargeARD([]);
+        setaverageARD([]);
         Letlabels([])
         let allData = props.abTestData;
 
@@ -33,25 +45,22 @@ const Purchases = (props) => {
         let data = [];
         let colorCounter = 0;
         let value = 0;
-        const switchDays = () => {
-                    daysSwitch ? setDaysSwitch(true): setDaysSwitch(false);
-                    console.log("bool: "+daysSwitch)
-                }
+
 
         for(let algorithm in allData.algorithms){
             let data = [];
-            let avargeARDTemp = 0;
+            let averageARDTemp = 0;
             allData.algorithms[algorithm].points.slice(begin, end + 1).map((value1, index) =>{
-                if(!thirthyDays){
+                if(!daysSwitch){
                     value = value1.ard7
-                    console.log('nr11')
+                    console.log('ar is 7 days')
                 }
                 else{
                     value = value1.ard30
-                    console.log('nr2')
+                    console.log('ar is 30 days')
                 }
                 data.push(value);
-                avargeARDTemp += value;
+                averageARDTemp += value;
             });
 
             let colorGraph = graphColors[colorCounter];
@@ -62,9 +71,9 @@ const Purchases = (props) => {
                   borderColor: colorGraph + 80,
                 }]);
 
-            let avarge = (avargeARDTemp/props.abTestData.points.slice(begin, end + 1).length).toFixed(2);
-            setavargeARD(avargeARD => [...avargeARD,
-                  [algorithm, avarge]
+            let average = (averageARDTemp/props.abTestData.points.slice(begin, end + 1).length).toFixed(2);
+            setaverageARD(averageARD => [...averageARD,
+                  [algorithm, average]
                 ]);
 
             colorCounter++;
@@ -84,12 +93,18 @@ const Purchases = (props) => {
             <div>
                 {props.slider}
                 <Form>
-                    7 days {'   '} <Form.Switch inline id="switch30days" label="30 days" onClick={switchDays}/>
+                    7 days {'   '} <Form.Switch inline id="switch7or30days" label="30 days"
+                                                onChange={
+                                                (e) => {
+                                                switchDays(e.target.checked);
+                                                console.log(e.target.checked);
+                                                }}
+                                                checked={daysSwitch} />
                 </Form>
             </div>}
                 loading={loading} title={"Attribution Rate"} tooltip={"Purchases from day x to day y"}>
             {
-                avargeARD.map((value, index) => {
+                averageARD.map((value, index) => {
                     {return <h5>Average AR for {value[0]} from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: {value[1]}</h5>}
                 })
             }
