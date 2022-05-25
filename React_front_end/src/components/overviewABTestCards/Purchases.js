@@ -6,7 +6,6 @@ import LargeInformationCard from "../largeInformationCard";
 import { Line } from 'react-chartjs-2';
 import SmoothingLineCard from "../smoothingLineChar";
 
-
 const Purchases = (props) => {
     const navigation = useNavigate();
     const [labels, letlabels] = React.useState([]);
