@@ -60,8 +60,6 @@ class ABTest():
                         sql.SQL('insert into "abrec" ("abtest_algorithms_id","timestamp") values (%s,%s) RETURNING "idAbRec"'),
                         [algo[3], time + datetime.timedelta(days=algo[1])])
                     idAbRec = self.cursor.fetchone()[0]
-
-
                     '''self.cursor.execute(sql.SQL(
                         'insert into abrecid_personrecid("idAbRec", personid, test_name) SELECT abrec."idAbRec" ,id AS userId, test_name FROM {table}_customers,abrec,abtest WHERE abrec."idAbRec"=%s AND abtest.test_name=%s'.format(table=self.dataset)),
                                         [idAbRec, self.abTestId])'''
@@ -83,8 +81,15 @@ class ABTest():
                     psycopg2.extras.execute_batch(self.cursor, 'insert into "abreclist" ("idAbRec","itemId") values (%s,%s)', sqlInstert)
 
                 elif algo[0] == 2:
-                    exit("knn moet nog geimplement worden")
-                    #knn
+                    for customer, result in enumerate(results):
+                        self.cursor.execute(sql.SQL('insert into "abrec" ("abtest_algorithms_id","timestamp") values (%s,%s) RETURNING "idAbRec"'), [
+                                            algo[0], time + datetime.timedelta(days=algo[1])])
+                        idAbRec = self.cursor.fetchone()[0]
+                        self.cursor.execute(sql.SQL('insert into "abrecid_personrecid" ("idAbRec","personid","test_name") values (%s,%s,%s)'), [
+                                            idAbRec, customer, self.abTestId])
+                        for item in result:
+                            self.cursor.execute(sql.SQL(
+                                'insert into "abreclist" ("idAbRec","itemId") values (%s,%s)'), [idAbRec, item])
 
                 time += datetime.timedelta(days=self.stepSize)
 
@@ -319,7 +324,7 @@ class ABTest():
         """
         initializes the ABTest information, by default it will load the date on abTestId from the database
         @param abTestId: the id (name) of the ABTest
-        @param algorithms: list of algoritmhs ([["name",[k]],["name",[k]]])
+        @param algorithms: list of algoritmhs ([["name",interval, K],["name",interval, K]])
         @param dataset: the dataset id (name)
         @param beginTs: startdate
         @param endTs: endDate
@@ -329,12 +334,12 @@ class ABTest():
 
         if self.abTestId == None and abTestId != None:
             self.abTestId = abTestId
-            select = 'INSERT INTO abtest ("test_name", "dataset", "begin_ts", "end_ts", "topK", "stepsize") VALUES (%s,%s,to_date(%s, \'DD/MM/YYYY\'),to_date(%s, \'DD/MM/YYYY\'),%s,%s);'
+            select = 'INSERT INTO abtest ("test_name", "dataset", "begin_ts", "end_ts", "topK", "stepsize") VALUES (%s,%s,%s, %s,%s,%s);'
             self.cursor.execute(sql.SQL(select), [abTestId, dataset, beginTs, endTs, topK, stepSize])
 
             for algorithm in algorithms:
                 select = 'INSERT INTO abtest_algorithms ("test_name", "algorithmid", "interval", "K") VALUES (%s,%s,%s,%s);'
-                self.cursor.execute(sql.SQL(select), [abTestId, algorithm[0], algorithm[1][0], algorithm[2]])
+                self.cursor.execute(sql.SQL(select), [abTestId, algorithm[0], algorithm[1], algorithm[2]])
             self.connection.commit()
         elif self.abTestId == None and abTestId == None:
             exit("No data to initialize")
@@ -344,7 +349,7 @@ class ABTest():
         data = self.cursor.fetchone()
 
         self.algorithms = []
-        select = 'SELECT algorithmid, "interval", "K", id FROM abtest_algorithms WHERE test_name=%s;'
+        select = 'SELECT algorithmid, "interval", "K", "id" FROM abtest_algorithms WHERE test_name=%s;'
         self.cursor.execute(sql.SQL(select).format(), [self.abTestId])
         algdata = self.cursor.fetchall()
         for item in algdata:

@@ -151,7 +151,11 @@ def uploadDataset():
 
 @app.route('/api/create', methods=['GET', 'POST'])
 def create():
-    ABTest().execute(2, "2019-01-01", "2021-01-01", 2, "data")
+    user = User(app)
+    abtest = ABTest()
+    abtest.initialize("1", [[2, 1, 1]], "small", "2019-01-01", "2021-01-01",
+                      1, 1)
+    abtest.create()
 
 @app.route('/api/createAbTest', methods=['GET', 'POST'])
 def createAbTest():
