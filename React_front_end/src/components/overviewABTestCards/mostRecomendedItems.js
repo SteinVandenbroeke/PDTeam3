@@ -8,12 +8,19 @@ import LogicTable from "../logicTable";
 const ABTestInformation = (props) => {
     const navigation = useNavigate();
 
+    const [itemsAmount, setItemsAmount] = React.useState(5)
     const [labels, Letlabels] = React.useState([]);
     const [datasets, setDatasets]  = React.useState([]);
     const [logicTableData, setLogicTableData]  = React.useState([[]]);
     const [loading, setLoading] = React.useState(true);
 
+    const changeItemsAmount = (pm1) => {
+        console.log(pm1)
+        setItemsAmount(pm1)
+    }
+
     async function processData(begin, end){
+        console.log("begin")
         setLoading(true);
         setLogicTableData([[]])
         let allData = props.abTestData;
@@ -50,7 +57,7 @@ const ABTestInformation = (props) => {
         }
         logicTableData.push(header);
 
-        for(let i = 0; i < 5; i++){
+        for(let i = 0; i < itemsAmount; i++){
             let row = []
             for(let alg in allData.algorithms){
                 row.push(data[alg][i][0])
@@ -65,21 +72,35 @@ const ABTestInformation = (props) => {
 
     useEffect(() => {
         processData(props.startDate,props.endDate);
-    }, [props.abTestData, props.startDate, props.endDate]);
+    }, [props.abTestData, props.startDate, props.endDate, changeItemsAmount]);
 
     return (
-        <LargeInformationCard settings={props.slider} loading={loading} title={"Most recommended items"} tooltip={"The products that are the most recommended over the x days"}>
-              <Row>
-                  <Col sm={12}>
-                    <LogicTable data={logicTableData}/>
-                  </Col>
-              </Row>
-            <Row>
-                  <Col sm={12}>
-                      <Button>Full list</Button>
-                  </Col>
-              </Row>
+        <LargeInformationCard settings={
+            <div>
+                {props.slider}
 
+            </div>
+            }
+                loading={loading} title={"Most recommended items"} tooltip={"The products that are the most recommended over the x days"}>
+            <Row>
+                <Col>
+                    test
+                    <input type="number" onChange={(value) => changeItemsAmount(value)}
+                           mobile min={0} max={50} value={5} size={1} title="Amount of top items to show" />
+                </Col>
+            </Row>
+
+            <Row>
+                <Col sm={12}>
+                    <LogicTable data={logicTableData}/>
+
+                </Col>
+            </Row>
+            <Row>
+                <Col sm={12}>
+                    <Button>Full list</Button>
+                </Col>
+            </Row>
         </LargeInformationCard>
         )
 };
