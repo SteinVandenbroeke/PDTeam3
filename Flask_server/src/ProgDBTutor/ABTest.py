@@ -49,6 +49,9 @@ class ABTest():
         print("nu aan het doen!")
 
     def create(self):
+        """
+        Create and runs the AB test. After running the algorithms, calculated information is inserted into the database.
+        """
         for algo in self.algorithms:
             time = self.beginTs
             print(self.topK)
@@ -104,6 +107,9 @@ class ABTest():
         print("nice")
 
     def delete(self):
+        """
+        Deletes the AB test.
+        """
         message = '{"message": "ABTest succesfully Deleted"}'
         errorCode = 201
         try:
@@ -248,6 +254,11 @@ class ABTest():
         return (returnDict, 200)
 
     def getTotalActiveUsers(self, fromDate, toDate):
+        """
+        getTotalActiveUsers: Returns a json format containing the number of active users within the given time interval
+        @param fromDate The starting date of the time interval
+        @param toDate  The ending date of the time interval
+        """
         query = 'SELECT count(user_id) AS activeUsersAmount FROM (SELECT DISTINCT user_id FROM {dataset}_purchases WHERE {dataset}_purchases.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') and {dataset}_purchases.timestamp <= to_date(%s, \'DD/MM/YYYY HH24:MI:SS\')) AS temp;'.format(dataset=self.dataset.lower())
         self.cursor.execute(sql.SQL(query), [fromDate, toDate])
         itemsql = self.cursor.fetchone()
@@ -298,6 +309,12 @@ class ABTest():
         return (json.dumps(returnList), 200)
 
     def getUsersFromABTest(self, startDate, endDate):
+        """
+        getUsersFromABTest: Returns a json format for the most active users page of the AB Test.
+                            Certain data is calculated within the given time interval
+        @param startDate The starting date of the time interval
+        @param endDate  The ending date of the time interval
+        """
         self.cursor.execute(sql.SQL('SELECT stepsize FROM "abtest" WHERE test_name=%s;'),[self.abTestId])
         stepSize = self.cursor.fetchone()[0]
         self.cursor.execute(sql.SQL('SELECT id, SUM(p.parameter),COUNT(p.user_id),SUM(case when p.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND p.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) FROM {table}_customers,{table}_purchases AS p WHERE id = user_id GROUP BY id'.format(table=self.dataset)), [startDate,endDate])
@@ -317,6 +334,12 @@ class ABTest():
         return (json.dumps([returnList]), 200)
 
     def getItemsFromABTest(self, startDate, endDate):
+        """
+        getItemsFromABTest: Returns a json format for the most bought items page of the AB test.
+                            Certain data is calculated within the given time interval
+        @param startDate The starting date of the time interval
+        @param endDate  The ending date of the time interval
+        """
         self.cursor.execute(sql.SQL('SELECT a.id,a.title, COUNT(p.item_id), SUM(case when p.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND p.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) FROM {table}_articles AS a, {table}_purchases AS p WHERE p.item_id = a.id GROUP BY a.id'.format(table=self.dataset)), [startDate,endDate])
         items = self.cursor.fetchall()
         self.cursor.execute(sql.SQL('SELECT i."itemId", algs.id, COUNT(i."itemId"), SUM(case when ab.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND ab.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) FROM "abreclist" AS i, "abtest_algorithms" AS algs, "abrec" as ab WHERE algs.test_name=%s AND i."idAbRec"=ab."idAbRec" AND ab.abtest_algorithms_id=algs.id GROUP BY i."itemId", algs.id;'), [startDate,endDate, self.abTestId])
@@ -329,6 +352,10 @@ class ABTest():
         return (json.dumps(returnList), 200)
 
     def getDatasetIdFromABTest(self, abTestId):
+        """
+        getDatasetIdFromABTest: Returns a json format containing the identifier for the dataset used by this AB test.
+        @param abTestId The ID of this AB test
+        """
         self.cursor.execute(sql.SQL('SELECT dataset FROM "abtest" WHERE test_name=%s'), [abTestId])
         setId = self.cursor.fetchall()[0][0]
         return (json.dumps(setId), 200)

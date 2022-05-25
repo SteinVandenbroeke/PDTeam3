@@ -21,6 +21,17 @@ class Dataset():
 
     def add(self, datasetName, customerCSV, articleCSV, purchasesCSV, customerConnections, articleConnections,
             purchaseConnections, userName):
+        """
+        add: Adds a dataset with the given parameters to the database
+        @param datasetName: Name of the dataset
+        @param customerCSV: csv file containing customer information
+        @param articleCSV: csv file containing article information
+        @param purchasesCSV: csv file contianing customer/article interactions
+        @param customerConnections:
+        @param articleConnections:
+        @param purchaseConnections:
+        @param userName: username of the user creating the dataset
+        """
 
         # customer table:
         print("customers toevoegen")
@@ -155,6 +166,15 @@ class Dataset():
         self.cursor.close()
 
     def change(self, datasetName, table, colm, value, id):
+        """
+        Edits a record in the dataset.
+        The value of the given column of the row with the given id in the given table of the dataset is changed to the given value.
+        @param datasetName Name of the dataset
+        @param table Name of the table
+        @param colm Name of the column
+        @param value Value to change to
+        @param id Identifier to match the row with
+        """
 
         if not table in ["articles", "customers"]:
             return ('{"message": "Worng table type"}', 500)
@@ -167,6 +187,9 @@ class Dataset():
         return ('{"message": "Record succesfully edit"}', 201)
 
     def changeApiWrapper(self, request):
+        """
+
+        """
         if request.method == 'POST':
             if 'dataSet' not in request.form or 'id' not in request.form or 'table' not in request.form or 'colmName' not in request.form or 'value' not in request.form:
                 return ('"message":{"Missing form data."}', 400)
@@ -182,6 +205,9 @@ class Dataset():
             return ('"message":{"Wrong request"}', 400)
 
     def getRecordById(self, datasetName, table, id):
+        """
+
+        """
         if not table in ["articles", "customers", "purchases"]:
             return ('Worng table type', 500)
         table = datasetName + "_" + table
@@ -208,6 +234,10 @@ class Dataset():
         return (json.dumps(returnObject), 200)
 
     def getColumnNames(self, table):
+        """
+        Return a list of all column names of the given table of the dataset
+        @param table: name of the table
+        """
         select = 'SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N%s;'
         self.cursor.execute(sql.SQL(select).format(), [table])
         allrows = self.cursor.fetchall()
@@ -217,6 +247,9 @@ class Dataset():
         return returnList
 
     def getDatasets(self):
+        """
+        Return the list of dataset names of all datasets in the database
+        """
         self.cursor.execute(sql.SQL('SELECT * FROM "datasets"'))
         data = self.cursor.fetchall()
         returnList = []
@@ -226,6 +259,10 @@ class Dataset():
         return (json.dumps(returnList), 200)
 
     def deleteDataset(self, datasetName):
+        """
+        Deletes the dataset with the given name
+        @param datasetName: Name of the dataset
+        """
         message = '{"message": "Dataset succesfully Deleted"}'
         errorCode = 201
         try:
@@ -261,6 +298,11 @@ class Dataset():
         return (message, errorCode)
 
     def deletePerson(self, personId, setId):
+        """
+        Deletes a person from the given dataset
+        @param personId: Identifier for the person
+        @param setId: Identifier for the dataset (name)
+        """
         query = 'DELETE FROM '+setId+'_customers WHERE id='+ personId
         try:
             self.cursor.execute(sql.SQL(query))
@@ -273,6 +315,11 @@ class Dataset():
         return ('{"message": "User succesfully deleted"}', 201)
 
     def deleteItem(self, itemId, setId):
+        """
+        Deletes an item from the given dataset
+        @param itemId: Identifier for the item
+        @param setId: Identifier for the dataset (name)
+        """
         query = 'DELETE FROM '+setId+'_articles WHERE id='+ itemId
         try:
             self.cursor.execute(sql.SQL(query))
@@ -286,6 +333,11 @@ class Dataset():
 
 
     def getItemList(self, datasetName, offset):
+        """
+        Gets a list of items in the given dataset, limited to 40 from the given offset
+        @param datasetName: Name of the dataset
+        @param offset: Given offset to start list from
+        """
         query = 'SELECT id,title,description FROM '+ datasetName +'_articles LIMIT 40 OFFSET '+offset
         self.cursor.execute(sql.SQL(query))
         data = self.cursor.fetchall()
@@ -296,6 +348,11 @@ class Dataset():
         return (json.dumps(returnList), 200)
 
     def getPeopleList(self, datasetName, offset):
+        """
+        Gets a list of people in the given dataset, limited to 40 from the given offset
+        @param datasetName: Name of the dataset
+        @param offset: Given offset to start list from
+        """
         query = 'SELECT id FROM '+ datasetName +'_customers LIMIT 40 OFFSET '+offset
         self.cursor.execute(sql.SQL(query))
         data = self.cursor.fetchall()
@@ -306,6 +363,11 @@ class Dataset():
         return (json.dumps(returnList), 200)
 
     def getPurchases(self, userName, dataset):
+        """
+        Gets a list of interactions (purchases) in the given dataset, limited to 40 from the given offset
+        @param datasetName: Name of the dataset
+        @param offset: Given offset to start list from
+        """
         columnNames = self.getColumnNames(dataset+'_purchases')
         query = 'SELECT * FROM ' + dataset + '_purchases WHERE user_id='+userName
         self.cursor.execute(sql.SQL(query))
@@ -322,6 +384,14 @@ class Dataset():
         return (json.dumps(returnList), 200)
 
     def getTimeStampList(self, dataset, format=list, fromDate = None, toDate = None):
+        """
+        Returns an ordered list of the different timestamps that are present in the dataset between the given starting
+        and ending dates.
+        @param dataset: Name of the dataset
+        @param format: format to return list in (json or python list)
+        @param fromDate: starting date
+        @param toDate: ending date
+        """
         #if dataset != None and not dataset.isalnum():
            # return ('"message":{"Wrong dataset name"}', 412)
 
@@ -344,16 +414,28 @@ class Dataset():
             return ('"message":{"Wrong dataset name"}', 412)
 
     def getArticleCount(self, datasetId):
+        """
+        Returns total amount of articles in the given dataset
+        @param datasetId: Identifier for the dataset (name)
+        """
         self.cursor.execute(sql.SQL('SELECT COUNT(id) FROM '+datasetId+'_articles'))
         count = self.cursor.fetchall()[0][0]
         return (json.dumps(count), 200)
 
     def getCustomerCount(self, datasetId):
+        """
+        Returns total amount of customers in the given dataset
+        @param datasetId: Identifier for the dataset (name)
+        """
         self.cursor.execute(sql.SQL('SELECT COUNT(id) FROM '+datasetId+'_customers'))
         count = self.cursor.fetchall()[0][0]
         return (json.dumps(count), 200)
 
     def getAmounts(self, datasetId):
+        """
+        Returns total amount of articles, customers and purchases in the given dataset
+        @param datasetId: Identifier for the dataset (name)
+        """
         print(datasetId)
         self.cursor.execute(sql.SQL('SELECT "customerAmount", "itemAmount", "purchaseAmount" FROM datasets WHERE name=%s'),[datasetId])
         amounts = self.cursor.fetchall()

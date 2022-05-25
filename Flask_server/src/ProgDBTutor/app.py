@@ -38,6 +38,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 DEBUG = False
 HOST = "127.0.0.1" if DEBUG else "0.0.0.0"
 
+"""
+Functions within this file link a GET request to the correct python function.
+These functions also check if the user, that sends the GET request, is logged in. 
+Where necessary, the admin status of the user is also checked.
+"""
+
 @app.route('/api/getCurrentUserInformation', methods =['GET'])
 def getUserInformation():
     user = User(app)
