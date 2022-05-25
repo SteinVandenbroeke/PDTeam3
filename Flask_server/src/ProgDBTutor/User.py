@@ -80,6 +80,12 @@ class User():
             returnList.append(item)
         return (json.dumps(returnList), 200)
 
+    def changeAdminPermission(self, userName, permission):
+        self.cursor.execute(sql.SQL('UPDATE Users SET admin=%s WHERE username=%s'),[permission,userName])
+        self.connection.commit()
+        return ('{"message": "Permission successfully changed."}', 201)
+
+
     def deleteUser(self, userName):
         self.cursor.execute(sql.SQL('SELECT name from datasets Where "createdBy" =%s'),[userName])
         datasets = self.cursor.fetchall()

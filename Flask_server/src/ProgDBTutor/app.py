@@ -405,6 +405,24 @@ def reactApp(path):
 
     return app.send_static_file(path)
 
+@app.route('/api/changeAdminPermission', methods=['GET'])
+def changeAdminPermission():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    elif not user.admin:
+        return make_response('you must be admin to perform this action', 500)
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    if user.username == request.args.get("userName"):
+        return make_response('{"message": Cannot change user u are logged in with."}', 500)
+    returnValue = user.changeAdminPermission(request.args.get("userName"), request.args.get("permission"))
+    return make_response(returnValue[0], returnValue[1])
+
+
 @app.route('/api/deleteUser', methods=['GET'])
 def deleteUser():
     user = User(app)

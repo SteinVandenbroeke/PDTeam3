@@ -7,9 +7,19 @@ import Icon from "react-eva-icons";
 import {toast} from "react-toastify";
 import {ServerRequest} from "../../logic/ServerCommunication";
 import TabelSkeleton from "../../components/loadingSkeletons/tabelSkeleton";
+import {valueOrDefault} from "chart.js/helpers";
 
 const UserList = () => {
     const [loading, setLoading] = useState(false);
+
+    function changeAdmin(username, permission){
+        let request = new ServerRequest();
+        let getData = {
+            "userName": username,
+            "permission": permission,
+        }
+        request.sendGet("changeAdminPermission",getData).then(message => {toast.success(message.message); loadUsers()}).catch(error => {toast.error(error.message); setLoading(false)});
+    }
 
     function deleteUser(username){
         let request = new ServerRequest();
@@ -19,11 +29,6 @@ const UserList = () => {
         request.sendGet("deleteUser",getData).then(message => {toast.success(message.message); loadUsers()}).catch(error => {toast.error(error.message); setLoading(false)});
     }
 
-
-    let Permission= (<Form.Check
-        type="switch"
-        id="Permission-switch"
-    />);
 
     const [userData,setUserData] = useState([])
     const [TableData, setTableData] = useState([["UserName","First Name", "Last Name","Date of Birth", "Admin Permissions",""]])
@@ -38,8 +43,20 @@ const UserList = () => {
     }
 
     useEffect(() => {
+        console.log(userData)
         for(var i = 0; i < userData.length; i++){
             let temp = userData[i]
+            console.log(!userData[i][4])
+            let permission = userData[i][4]
+            let Admin=(
+              <Form.Check
+                  onChange={()=>{changeAdmin(temp[0], !permission)}}
+                  type="switch"
+                  id="custom-switch"
+                  checked={permission}
+              />
+            );
+            temp[4] = Admin;
             let Delete=(
                 <Button onClick={()=>deleteUser(temp[0])} variant="outline-danger"><Icon
                     fill="#dc3545"
@@ -47,6 +64,7 @@ const UserList = () => {
                 /></Button>
             );
             temp.push(Delete)
+            console.log(temp)
             setTableData(oldData=>[...oldData,temp])
         }
     },[userData]);

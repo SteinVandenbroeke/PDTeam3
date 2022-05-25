@@ -298,19 +298,34 @@ class ABTest():
         return (json.dumps(returnList), 200)
 
     def getUsersFromABTest(self, startDate, endDate):
+        self.cursor.execute(sql.SQL('SELECT stepsize FROM "abtest" WHERE test_name=%s;'),[self.abTestId])
+        stepSize = self.cursor.fetchone()[0]
         self.cursor.execute(sql.SQL('SELECT id, SUM(p.parameter),COUNT(p.user_id),SUM(case when p.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND p.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) FROM {table}_customers,{table}_purchases AS p WHERE id = user_id GROUP BY id'.format(table=self.dataset)), [startDate,endDate])
         users = self.cursor.fetchall()
+        self.cursor.execute(sql.SQL('SELECT id FROM abtest_algorithms WHERE test_name=%s'),[self.abTestId])
+        algorithms = self.cursor.fetchall()
+        CTR = {}
+        for algoId in algorithms:
+            self.cursor.execute(sql.SQL('SELECT DIV(SUM(case when p.item_id in(SELECT i."itemId" FROM abreclist as i, "abtest_algorithms" AS algs, "abrec" as ab WHERE algs.test_name=%s AND i."idAbRec"=ab."idAbRec" AND ab.abtest_algorithms_id=algs.id AND algs.id = %s AND ab.timestamp<=p.timestamp AND ab.timestamp + INTERVAL \'%s days\'>p.timestamp) then 1 else 0 end)*100,COUNT(p.user_id)) FROM {table}_customers, {table}_purchases AS p WHERE id = user_id GROUP BY id;'.format(table=self.dataset)),[self.abTestId, algoId[0], stepSize,])
+            CTR[algoId[0]] = self.cursor.fetchall()
         returnList = []
-        for row in users:
-            returnList.append(row)
+        for i in range(len(users)):
+            item = list(users[i])
+            for algoId in algorithms:
+                item.append(int(CTR[algoId[0]][i][0]))
+            returnList.append(item)
         return (json.dumps([returnList]), 200)
 
     def getItemsFromABTest(self, startDate, endDate):
         self.cursor.execute(sql.SQL('SELECT a.id,a.title, COUNT(p.item_id), SUM(case when p.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND p.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) FROM {table}_articles AS a, {table}_purchases AS p WHERE p.item_id = a.id GROUP BY a.id'.format(table=self.dataset)), [startDate,endDate])
         items = self.cursor.fetchall()
+        self.cursor.execute(sql.SQL('SELECT i."itemId", algs.id, COUNT(i."itemId"), SUM(case when ab.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND ab.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) FROM "abreclist" AS i, "abtest_algorithms" AS algs, "abrec" as ab WHERE algs.test_name=%s AND i."idAbRec"=ab."idAbRec" AND ab.abtest_algorithms_id=algs.id GROUP BY i."itemId", algs.id;'), [startDate,endDate, self.abTestId])
+        recommendedItems = self.cursor.fetchall()
+        print(items, recommendedItems)
         returnList = []
         for row in items:
-            returnList.append(row)
+            item = row
+            returnList.append(item)
         return (json.dumps(returnList), 200)
 
     def getDatasetIdFromABTest(self, abTestId):

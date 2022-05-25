@@ -11,7 +11,7 @@ import {Button, Card, Form, Modal, Spinner} from "react-bootstrap";
 const ABTestPersons = (props) => {
     const [loading, setLoading] = useState(false);
     const [datasetId, setDatasetId] = useState(null)
-    const [data1,setData1] = useState([["User Id","Purchase Amount", "Total Purchases", "Purchases in Range"]])
+    const [data1,setData1] = useState([["User Id","Purchase Amount", "Total Purchases", "Purchases In Range", "Total CTR", "CTR In Range"]])
     let {abTestId, startDate, endDate} = useParams()
     const navigation = useNavigate();
     const [modal, setModal] = useState(false);
