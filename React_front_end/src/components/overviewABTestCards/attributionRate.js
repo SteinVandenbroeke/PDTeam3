@@ -15,7 +15,7 @@ const Purchases = (props) => {
     const [averageARD, setaverageARD]  = React.useState([]);
     const [loading, setLoading] = React.useState(true);
     const [showAllDataPoints, setShowAllDataPoints] = React.useState(false);
-    const graphColors = ['#0d6efd', '#84c98b', '#27292d', '#bc1ed7', '#2b2b2b', '#0c1f3d', '#84c98b']
+    const graphColors =  ['#84c98b', '#27292d', '#bc1ed7', '#2b2b2b', '#0c1f3d', '#84c98b']
 
     async function processData(begin, end){
         setShowAllDataPoints(false)

@@ -422,13 +422,15 @@ class Dataset():
         count = self.cursor.fetchall()[0][0]
         return (json.dumps(count), 200)
 
-    def getCustomerCount(self, datasetId):
+    def getCustomerCount(self, datasetId, webReturn=True):
         """
         Returns total amount of customers in the given dataset
         @param datasetId: Identifier for the dataset (name)
         """
         self.cursor.execute(sql.SQL('SELECT COUNT(id) FROM '+datasetId+'_customers'))
         count = self.cursor.fetchall()[0][0]
+        if not webReturn:
+            return count
         return (json.dumps(count), 200)
 
     def getAmounts(self, datasetId):

@@ -54,6 +54,7 @@ class ABTest():
         """
         for algo in self.algorithms:
             time = self.beginTs
+            print("algo id" + str(algo))
             print(self.topK)
             while (time < self.endTs):
                 results = self.execute(self.topK, time, time + datetime.timedelta(days=algo[1]), algo[0])
@@ -86,21 +87,21 @@ class ABTest():
                 elif algo[0] == 2:
                     for customer, result in enumerate(results):
                         self.cursor.execute(sql.SQL('insert into "abrec" ("abtest_algorithms_id","timestamp") values (%s,%s) RETURNING "idAbRec"'), [
-                                            algo[0], time + datetime.timedelta(days=algo[1])])
+                                            algo[3], time + datetime.timedelta(days=algo[1])])
                         idAbRec = self.cursor.fetchone()[0]
                         self.cursor.execute(sql.SQL('insert into "abrecid_personrecid" ("idAbRec","personid","test_name") values (%s,%s,%s)'), [
                                             idAbRec, customer, self.abTestId])
                         for item in result:
                             self.cursor.execute(sql.SQL(
                                 'insert into "abreclist" ("idAbRec","itemId") values (%s,%s)'), [idAbRec, item])
-
+                print(time, "done")
                 time += datetime.timedelta(days=self.stepSize)
 
         print("start")
         self.connection.commit()
 
-        query = 'insert into abrecmetric(abtest_algorithms_id, timestamp, ctr, atr7, atr30, avargeuserrevenuectr, avargeuserrevenue7, avargeuserrevenue30) SELECT CTRTable.abtest_algorithms_id, CTRTable.timeStamp, (CTRTable.CTR::float/totalRecomendationsTable.totalRecomendations) * 100 AS CTR, (AR7Table.AR7::float)/(totalRecomendationsTable.totalRecomendations*7) * 100 AS AR7, (AR30Table.AR30::float)/(totalRecomendationsTable.totalRecomendations*30) * 100 AS AR30, (AR0UTable.avaragePriceAR0/totalRecomendationsTable.totalRecomendations) AS avaragePriceAR0, (AR7UTable.avaragePriceAR7/(totalRecomendationsTable.totalRecomendations*7)) AS avaragePriceAR7, (AR30UTable.avaragePriceAR30/(totalRecomendationsTable.totalRecomendations*30)) AS avaragePriceAR30 FROM ( SELECT abrec."idAbRec", abrec.timestamp AS timeStamp, COUNT("itemId") as CTR, abtest_algorithms_id FROM abrec, abreclist, abrecid_personrecid, {table}_purchases, abtest_algorithms WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and abtest_algorithms.id = abrec.abtest_algorithms_id and (abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) and abrec.timestamp={table}_purchases.timestamp GROUP BY abrec.timestamp, personid, abtest_algorithms.algorithmid, abrec."idAbRec") AS CTRTable, (SELECT abrec."idAbRec", abrec.timestamp, COUNT("itemId") as AR7 FROM abrec, abreclist, abrecid_personrecid, {table}_purchases, abtest_algorithms WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and abtest_algorithms.id = abrec.abtest_algorithms_id and (abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) and {table}_purchases.timestamp>=abrec.timestamp and {table}_purchases.timestamp<abrec.timestamp + INTERVAL \'7 days\' GROUP BY abrec.timestamp, personid, abtest_algorithms.algorithmid, abrec."idAbRec") AS AR7Table, (SELECT abrec."idAbRec", abrec.timestamp, COUNT("itemId") as AR30 FROM abrec, abreclist, abrecid_personrecid, {table}_purchases, abtest_algorithms WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and abtest_algorithms.id = abrec.abtest_algorithms_id and (abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1)and {table}_purchases.timestamp>=abrec.timestamp and {table}_purchases.timestamp<abrec.timestamp + INTERVAL \'30 days\' GROUP BY abrec.timestamp, personid, abtest_algorithms.algorithmid, abrec."idAbRec") AS AR30Table, (SELECT abrec."idAbRec", abrec.timestamp, SUM({table}_purchases."parameter") as avaragePriceAR0 FROM abrec, abreclist, abrecid_personrecid, {table}_purchases, abtest_algorithms WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and abtest_algorithms.id = abrec.abtest_algorithms_id and (abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) and {table}_purchases.timestamp=abrec.timestamp GROUP BY abrec.timestamp, personid, abtest_algorithms.algorithmid, abrec."idAbRec") AS AR0UTable, (SELECT abrec."idAbRec", abrec.timestamp, SUM({table}_purchases."parameter") as avaragePriceAR7 FROM abrec, abreclist, abrecid_personrecid, {table}_purchases, abtest_algorithms WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and abtest_algorithms.id = abrec.abtest_algorithms_id and (abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) and {table}_purchases.timestamp>=abrec.timestamp and {table}_purchases.timestamp<abrec.timestamp + INTERVAL \'7 days\' GROUP BY abrec.timestamp, personid, abtest_algorithms.algorithmid, abrec."idAbRec") AS AR7UTable, (SELECT abrec."idAbRec", abrec.timestamp, SUM({table}_purchases."parameter") as avaragePriceAR30 FROM abrec, abreclist, abrecid_personrecid, {table}_purchases, abtest_algorithms WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and abtest_algorithms.id = abrec.abtest_algorithms_id and (abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) and {table}_purchases.timestamp>=abrec.timestamp and {table}_purchases.timestamp<abrec.timestamp + INTERVAL \'30 days\' GROUP BY abrec.timestamp, personid, abtest_algorithms.algorithmid, abrec."idAbRec") AS AR30UTable, (SELECT test."topK" * test1.totalUserCount AS totalRecomendations FROM (SELECT "topK" FROM abtest WHERE test_name=%s) as test, (SELECT COUNT("id") AS totalUserCount FROM {table}_customers) AS test1) AS totalRecomendationsTable WHERE CTRTable."idAbRec" = AR7Table."idAbRec" and AR7Table."idAbRec" = AR30Table."idAbRec" and AR30Table."idAbRec" = AR0UTable."idAbRec" and AR0UTable."idAbRec" = AR7UTable."idAbRec" and AR7UTable."idAbRec" = AR30UTable."idAbRec";'.format(
-            table=self.dataset)
+        #query = 'insert into abrecmetric(abtest_algorithms_id, timestamp, ctr, atr7, atr30, avargeuserrevenuectr, avargerevenue7, avargerevenue30) SELECT CTRTable.abtest_algorithms_id, CTRTable.timeStamp, (CTRTable.CTR::float/totalRecomendationsTable.totalRecomendations) * 100 AS CTR, (AR7Table.AR7::float)/(totalRecomendationsTable.totalRecomendations*7) * 100 AS AR7, (AR30Table.AR30::float)/(totalRecomendationsTable.totalRecomendations*30) * 100 AS AR30, (AR0UTable.avaragePriceAR0/totalRecomendationsTable.totalRecomendations) AS avaragePriceAR0, (AR7UTable.avaragePriceAR7/(totalRecomendationsTable.totalRecomendations*7)) AS avaragePriceAR7, (AR30UTable.avaragePriceAR30/(totalRecomendationsTable.totalRecomendations*30)) AS avaragePriceAR30 FROM ( SELECT abrec."idAbRec", abrec.timestamp AS timeStamp, COUNT("itemId") as CTR, abtest_algorithms_id FROM abrec, abreclist, abrecid_personrecid, {table}_purchases, abtest_algorithms WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and abtest_algorithms.id = abrec.abtest_algorithms_id and (abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) and abrec.timestamp={table}_purchases.timestamp GROUP BY abrec.timestamp, personid, abtest_algorithms.algorithmid, abrec."idAbRec") AS CTRTable, (SELECT abrec."idAbRec", abrec.timestamp, COUNT("itemId") as AR7 FROM abrec, abreclist, abrecid_personrecid, {table}_purchases, abtest_algorithms WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and abtest_algorithms.id = abrec.abtest_algorithms_id and (abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) and {table}_purchases.timestamp>=abrec.timestamp and {table}_purchases.timestamp<abrec.timestamp + INTERVAL \'7 days\' GROUP BY abrec.timestamp, personid, abtest_algorithms.algorithmid, abrec."idAbRec") AS AR7Table, (SELECT abrec."idAbRec", abrec.timestamp, COUNT("itemId") as AR30 FROM abrec, abreclist, abrecid_personrecid, {table}_purchases, abtest_algorithms WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and abtest_algorithms.id = abrec.abtest_algorithms_id and (abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1)and {table}_purchases.timestamp>=abrec.timestamp and {table}_purchases.timestamp<abrec.timestamp + INTERVAL \'30 days\' GROUP BY abrec.timestamp, personid, abtest_algorithms.algorithmid, abrec."idAbRec") AS AR30Table, (SELECT abrec."idAbRec", abrec.timestamp, SUM({table}_purchases."parameter") as avaragePriceAR0 FROM abrec, abreclist, abrecid_personrecid, {table}_purchases, abtest_algorithms WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and abtest_algorithms.id = abrec.abtest_algorithms_id and (abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) and {table}_purchases.timestamp=abrec.timestamp GROUP BY abrec.timestamp, personid, abtest_algorithms.algorithmid, abrec."idAbRec") AS AR0UTable, (SELECT abrec."idAbRec", abrec.timestamp, SUM({table}_purchases."parameter") as avaragePriceAR7 FROM abrec, abreclist, abrecid_personrecid, {table}_purchases, abtest_algorithms WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and abtest_algorithms.id = abrec.abtest_algorithms_id and (abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) and {table}_purchases.timestamp>=abrec.timestamp and {table}_purchases.timestamp<abrec.timestamp + INTERVAL \'7 days\' GROUP BY abrec.timestamp, personid, abtest_algorithms.algorithmid, abrec."idAbRec") AS AR7UTable, (SELECT abrec."idAbRec", abrec.timestamp, SUM({table}_purchases."parameter") as avaragePriceAR30 FROM abrec, abreclist, abrecid_personrecid, {table}_purchases, abtest_algorithms WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and abtest_algorithms.id = abrec.abtest_algorithms_id and (abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) and {table}_purchases.timestamp>=abrec.timestamp and {table}_purchases.timestamp<abrec.timestamp + INTERVAL \'30 days\' GROUP BY abrec.timestamp, personid, abtest_algorithms.algorithmid, abrec."idAbRec") AS AR30UTable, (SELECT test."topK" * test1.totalUserCount AS totalRecomendations FROM (SELECT "topK" FROM abtest WHERE test_name=%s) as test, (SELECT COUNT("id") AS totalUserCount FROM {table}_customers) AS test1) AS totalRecomendationsTable WHERE CTRTable."idAbRec" = AR7Table."idAbRec" and AR7Table."idAbRec" = AR30Table."idAbRec" and AR30Table."idAbRec" = AR0UTable."idAbRec" and AR0UTable."idAbRec" = AR7UTable."idAbRec" and AR7UTable."idAbRec" = AR30UTable."idAbRec";'.format(
+        #    table=self.dataset)
         self.cursor.execute(sql.SQL(query), [self.abTestId] * 7)
 
         self.connection.commit()
@@ -162,6 +163,7 @@ class ABTest():
             alg.train(items)
             histories = self.history_from_subset_interactions(items, amt_users=users)
             recommendations = alg.recommend_all(histories, topKItemsCount)
+            print(recommendations)
             return recommendations
 
     def overviewPageData(self):
@@ -173,7 +175,7 @@ class ABTest():
         dataSet = Dataset()
         allPoints = dataSet.getTimeStampList(self.dataset, list)
 
-        query = 'SELECT abrecmetric.abtest_algorithms_id,timestamp,ctr,atr7,atr30, avargeuserrevenuectr, avargeuserrevenue7, avargeuserrevenue30, "interval", "K",name FROM abrecmetric, abtest_algorithms, algorithms WHERE abtest_algorithms.id=abrecmetric.abtest_algorithms_id and algorithms.id=abtest_algorithms.algorithmid and test_name=%s'
+        query = 'SELECT abrecmetric.abtest_algorithms_id,timestamp,ctr,atr7,atr30, revenuectr,revenue7, revenue30, purchases, "interval", "K",name FROM abrecmetric, abtest_algorithms, algorithms WHERE abtest_algorithms.id=abrecmetric.abtest_algorithms_id and algorithms.id=abtest_algorithms.algorithmid and test_name=%s'
         self.cursor.execute(sql.SQL(query), [self.abTestId])
         itemssql = self.cursor.fetchall()
 
@@ -184,15 +186,15 @@ class ABTest():
             timeItem["ctr"] = itemsql[2]
             timeItem["ard7"] = itemsql[3]
             timeItem["ard30"] = itemsql[4]
-            timeItem["arpu7"] = itemsql[5]
-            timeItem["arpu30"] = itemsql[6]
+            timeItem["revenue0"] = itemsql[5]
+            timeItem["revenue7"] = itemsql[6]
+            timeItem["revenue30"] = itemsql[7]
+            timeItem["purchases"] = itemsql[8]
             timeItem["mostRecomendedItems"] = []
-            #timeItem["ctr"] = itemsql[2]
-            #timeItem["ctr"] = itemsql[2]
 
             if itemsql[0] not in algoritms:
                 algoritms[itemsql[0]] = {}
-                algoritms[itemsql[0]]["trainingInterval"] = itemsql[8]
+                algoritms[itemsql[0]]["trainingInterval"] = itemsql[9]
                 algoritms[itemsql[0]]["points"] = {}
             algoritms[itemsql[0]]["points"][itemsql[1].strftime("%d/%m/%Y %H:%M:%S")] = timeItem
 
@@ -203,7 +205,7 @@ class ABTest():
         # print(algoritms)
         for itemsql in itemssql:
             if itemsql[1].strftime("%d/%m/%Y %H:%M:%S") not in algoritms[itemsql[0]]["points"]:
-                algoritms[itemsql[0]]["points"][itemsql[1].strftime("%d/%m/%Y %H:%M:%S")] = {"ctr": 0, "ard7": 0, "ard30": 0, "arpu7": 0, "arpu30":0}
+                algoritms[itemsql[0]]["points"][itemsql[1].strftime("%d/%m/%Y %H:%M:%S")] = {"ctr": 0, "ard7": 0, "ard30": 0, "arpu7": 0, "arpu30":0, "revenue0":0, "revenue7": 0,"revenue30": 0,"purchases": 0}
             if "mostRecomendedItems" not in algoritms[itemsql[0]]["points"][itemsql[1].strftime("%d/%m/%Y %H:%M:%S")]:
                 algoritms[itemsql[0]]["points"][itemsql[1].strftime("%d/%m/%Y %H:%M:%S")]["mostRecomendedItems"] = []
             algoritms[itemsql[0]]["points"][itemsql[1].strftime("%d/%m/%Y %H:%M:%S")]["mostRecomendedItems"].append(itemsql[2])
@@ -217,6 +219,7 @@ class ABTest():
         parameters["datasetId"] = itemsql[0]
         parameters["stepSize"] = itemsql[1]
         parameters["topK"] = itemsql[2]
+        parameters["userCount"] = Dataset().getCustomerCount(self.dataset, False)
 
         query = 'SELECT abtest_algorithms.id, algorithms.name FROM abtest_algorithms, algorithms WHERE abtest_algorithms.algorithmid=algorithms.id and abtest_algorithms.test_name=%s;'
         self.cursor.execute(sql.SQL(query), [self.abTestId])
@@ -242,7 +245,7 @@ class ABTest():
                 if date in algoritmKeyValue["points"]:
                     algoritmsList[algoritmKey]["points"].append(algoritmKeyValue["points"][date])
                 else:
-                    algoritmsList[algoritmKey]["points"].append({"ctr": 0, "ard7": 0, "ard30": 0, "arpu7": 0, "arpu30":0, "mostRecomendedItems": []})
+                    algoritmsList[algoritmKey]["points"].append({"ctr": 0, "ard7": 0, "ard30": 0, "arpu7": 0, "arpu30":0, "mostRecomendedItems": [], "revenue0":0, "revenue7": 0,"revenue30": 0,"purchases": 0})
 
             if date in NotAlgDependent:
                 NotAlgDependentList.append(NotAlgDependent[date])
@@ -360,7 +363,6 @@ class ABTest():
         setId = self.cursor.fetchall()[0][0]
         return (json.dumps(setId), 200)
 
-
     def initialize(self, abTestId=None, algorithms=None, dataset=None, beginTs=None, endTs=None, stepSize=None,
                    topK=None):
         """
@@ -376,12 +378,12 @@ class ABTest():
 
         if self.abTestId == None and abTestId != None:
             self.abTestId = abTestId
-            select = 'INSERT INTO abtest ("test_name", "dataset", "begin_ts", "end_ts", "topK", "stepsize") VALUES (%s,%s,%s, %s,%s,%s);'
+            select = 'INSERT INTO abtest ("test_name", "dataset", "begin_ts", "end_ts", "topK", "stepsize") VALUES (%s,%s,to_date(%s, \'DD/MM/YYYY\'),to_date(%s, \'DD/MM/YYYY\'),%s,%s);';
             self.cursor.execute(sql.SQL(select), [abTestId, dataset, beginTs, endTs, topK, stepSize])
 
             for algorithm in algorithms:
                 select = 'INSERT INTO abtest_algorithms ("test_name", "algorithmid", "interval", "K") VALUES (%s,%s,%s,%s);'
-                self.cursor.execute(sql.SQL(select), [abTestId, algorithm[0], algorithm[1], algorithm[2]])
+                self.cursor.execute(sql.SQL(select), [abTestId, algorithm[0], algorithm[1][0], algorithm[2]])
             self.connection.commit()
         elif self.abTestId == None and abTestId == None:
             exit("No data to initialize")

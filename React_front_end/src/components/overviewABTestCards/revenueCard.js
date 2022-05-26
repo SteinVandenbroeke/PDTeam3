@@ -1,4 +1,4 @@
-import {Button} from "react-bootstrap";
+import {Form} from "react-bootstrap";
 import Icon from 'react-eva-icons';
 import {useNavigate } from "react-router-dom";
 import React, {useEffect} from "react";
@@ -21,8 +21,10 @@ const RevenueCard = (props) => {
     const navigation = useNavigate();
     const [labels, Letlabels] = React.useState([]);
     const [datasets, setDatasets]  = React.useState([]);
-    const [totalRevenue, setTotalRevenue]  = React.useState(0);
+    const [totalRevenue, setTotalRevenue]  = React.useState([]);
     const [loading, setLoading] = React.useState(true);
+    const [daySelector, setDaySelector] = React.useState("revenue0");
+    const graphColors = ['#84c98b', '#27292d', '#bc1ed7', '#2b2b2b', '#0c1f3d', '#84c98b']
 
 
     function sleep(ms) {
@@ -32,6 +34,7 @@ const RevenueCard = (props) => {
     async function processData(begin, end){
         setLoading(true);
         setDatasets([]);
+        setTotalRevenue([]);
         let allData = props.abTestData;
 
         Letlabels(allData.points.slice(begin, end + 1));
@@ -43,21 +46,68 @@ const RevenueCard = (props) => {
                     totalRev += value.Revenue;
                 });
 
-        setTotalRevenue(totalRev);
+        setTotalRevenue(totalRevenue => [...totalRevenue,
+                  ["Total", totalRev.toFixed(2)]
+                ]);
+
         setDatasets(datasets => [...datasets, {
                   label: "Revenue",
                   data: data,
                 }]);
+
+        let colorCounter = 0;
+        for(let algorithm in allData.algorithms){
+            let data = [];
+            let avargeRevenuePerUserTemp = 0;
+            allData.algorithms[algorithm].points.slice(begin, end + 1).map((value1, index) =>{
+                data.push(value1[daySelector]);
+                avargeRevenuePerUserTemp += value1[daySelector];
+            });
+
+            let colorGraph = graphColors[colorCounter];
+            setDatasets(datasets => [...datasets, {
+                  label: algorithm,
+                  data: data,
+                  backgroundColor: colorGraph,
+                  borderColor: colorGraph + 80,
+                }]);
+
+            let avarge = (avargeRevenuePerUserTemp/props.abTestData.points.slice(begin, end + 1).length).toFixed(2);
+            setTotalRevenue(totalRevenue => [...totalRevenue,
+                  [algorithm, avarge]
+                ]);
+            colorCounter++;
+            if(colorCounter >= graphColors.length){
+                colorCounter = 0;
+            }
+        }
+
         setLoading(false);
     }
 
     useEffect(() => {
         processData(props.startDate,props.endDate);
-    }, [props.abTestData, props.startDate, props.endDate]);
+    }, [props.abTestData, props.startDate, props.endDate, daySelector]);
 
     return (
-        <LargeInformationCard settings={props.slider} loading={loading} title={"Revenue"} tooltip={"Revenue from day x to day y"}>
-            <h5>Total from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: € {totalRevenue.toFixed(2)}</h5>
+        <LargeInformationCard
+            settings={
+            <div>
+                {props.slider}
+                <Form.Select aria-label="Default select example" onChange={(e)=>{setDaySelector(e.target.value)}}>
+                  <option value="revenue0">Aanbevolen dezelfde dag</option>
+                  <option value="revenue7">Aanbevolen binnen 7 dagen</option>
+                  <option value="revenue30">Aanbevolen binnen 30 dagen</option>
+                </Form.Select>
+            </div>
+            } loading={loading} title={"Revenue"} tooltip={"Revenue from day x to day y"}>
+            <h5>
+                {
+                    totalRevenue.map((value, index) => {
+                        {return <h5>Revenue for {value[0]} from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}:€ {value[1]}</h5>}
+                    })
+                }
+            </h5>
             {labels.length < 500 &&
             <SmoothingLineCard height={"100%"} smoothingWindow={props.smoothingWindow} options={{
                 backgroundColor: 'rgba(13,110,253,1)',

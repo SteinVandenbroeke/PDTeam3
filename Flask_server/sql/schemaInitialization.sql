@@ -64,9 +64,10 @@ CREATE TABLE "abrecmetric" (
     ctr float,
     atr7 float,
     atr30 float,
-    avargeUserRevenueCTR float,
-    avargeUserRevenue7 float,
-    avargeUserRevenue30 float,
+    RevenueCTR float,
+    Revenue7 float,
+    Revenue30 float,
+    Purchases int,
     PRIMARY KEY ("timestamp","abtest_algorithms_id")
 );
 

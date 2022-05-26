@@ -111,38 +111,38 @@ const ABTestOverview = () => {
             <div style={{paddingTop: 20}}>
                 {sliders}
                 <Row>
-                    <Col sm={4}>
+                    <Col xs={12} md={6} lg={4}>
                         <TabelSkeleton loading={loading}><ABTestInformation algorithms={abTestData.algorithms} parameters={abTestData.parameters}/></TabelSkeleton>
                     </Col>
-                    <Col xs={12} md={4}>
-                        <CharSkeleton loading={loading}><Purchases smoothingWindow={windowSizeSmoothing} slider={sliders} purchases={abTestData.NotAlgDependent.Purchases}
-                                                                    abTestData={abTestData} startDate={values[0]} endDate={values[1]}/></CharSkeleton>
-                    </Col>
-                    <Col xs={12} md={4}>
+                    <Col xs={12} md={6} lg={4}>
                         <CharSkeleton loading={loading}><ActiveUserCard smoothingWindow={windowSizeSmoothing} totalUsers={totalUsers} slider={sliders} abTestData={abTestData} startDate={values[0]}
                                                                      endDate={values[1]}/></CharSkeleton>
                     </Col>
-                    <Col xs={12} md={4}>
+                    <Col xs={12} md={6} lg={4}>
+                        <CharSkeleton loading={loading}><Purchases smoothingWindow={windowSizeSmoothing} slider={sliders} purchases={abTestData.NotAlgDependent.Purchases}
+                                                                    abTestData={abTestData} startDate={values[0]} endDate={values[1]}/></CharSkeleton>
+                    </Col>
+                    <Col xs={12} md={6} lg={4}>
                         <CharSkeleton loading={loading}><RevenueCard smoothingWindow={windowSizeSmoothing} slider={sliders} abTestData={abTestData} startDate={values[0]}
                                                                      endDate={values[1]}/></CharSkeleton>
                     </Col>
-                    <Col xs={12} md={4}>
+                    <Col xs={12} md={6} lg={4}>
                         <CharSkeleton loading={loading}><AverageRevenueUser smoothingWindow={windowSizeSmoothing} slider={sliders} abTestData={abTestData} startDate={values[0]}
                                                                             endDate={values[1]}/></CharSkeleton>
                     </Col>
-                    <Col xs={12} md={4}>
+                    <Col xs={12} md={6} lg={4}>
                         <CharSkeleton loading={loading}><ClickTroughRate smoothingWindow={windowSizeSmoothing} slider={sliders} abTestData={abTestData} startDate={values[0]}
                                                                          endDate={values[1]}/></CharSkeleton>
                     </Col>
-                    <Col xs={12} md={4}>
+                    <Col xs={12} md={6} lg={4}>
                         <CharSkeleton loading={loading}><AttributionRate smoothingWindow={windowSizeSmoothing} slider={sliders} abTestData={abTestData} startDate={values[0]}
                                                                          endDate={values[1]}/></CharSkeleton>
                     </Col>
-                    <Col xs={12} md={4}>
+                    <Col xs={12} md={6} lg={4}>
                         <TabelSkeleton loading={loading}><MostRecomendedItems slider={sliders} abTestData={abTestData} startDate={values[0]}
                                                                               endDate={values[1]}/></TabelSkeleton>
                     </Col>
-                    <Col xs={2}>
+                    <Col xs={6} md={3} lg={2}>
                         <SmallInformationCard title={"Most buyed items"} value={
                             <Link
                                 to={"/dashboard/abTests/overview/" + abTestId + "/items/" + values[0] + "&" + values[1]}
@@ -152,7 +152,7 @@ const ABTestOverview = () => {
                         } tooltip={"Purchases from day x to day y"}/>
 
                     </Col>
-                    <Col xs={2}>
+                    <Col xs={6} md={3} lg={2}>
                         <SmallInformationCard title={"Most active users"} value={
                             <Link
                                 to={"/dashboard/abTests/overview/" + abTestId + "/persons/" + values[0] + "&" + values[1]}

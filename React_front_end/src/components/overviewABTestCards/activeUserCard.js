@@ -33,14 +33,23 @@ const ActiveUserCard = (props) => {
         Letlabels(allData.points.slice(begin, end + 1));
 
         let data = [];
+        let data1 = [];
 
         allData.NotAlgDependent.slice(begin, end + 1).map((value, index) =>{
                     data.push(value.activeUsersAmount);
+                    data1.push(allData.parameters.userCount)
                 });
 
         setDatasets(datasets => [...datasets, {
-                  label: "Revenue",
+                  label: "Active users",
                   data: data,
+                }]);
+        setDatasets(datasets => [...datasets, {
+                  label: "Total users",
+                  data: data1,
+                  backgroundColor: '#84c98b',
+                  borderColor: '#84c98b' + 80,
+                  hidden: true
                 }]);
         setLoading(false)
     }
