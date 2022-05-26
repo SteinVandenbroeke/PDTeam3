@@ -7,6 +7,7 @@ import Slider from "../../../components/slider";
 import {ServerRequest} from "../../../logic/ServerCommunication";
 import {toast} from "react-toastify";
 import {Button, Card, Form, Modal, Spinner} from "react-bootstrap";
+import TabelSkeleton from "../../../components/loadingSkeletons/tabelSkeleton";
 
 const ABTestPersons = (props) => {
     const [loading, setLoading] = useState(false);
@@ -94,7 +95,7 @@ const ABTestPersons = (props) => {
             {/*    </Modal.Body>*/}
             {/*</Modal>*/}
             {/*<Slider labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />*/}
-            <LogicTable action={openUser} data={data1}/>
+            <TabelSkeleton loading={loading}><LogicTable action={openUser} data={data1}/></TabelSkeleton>
         </div>
     );
 };

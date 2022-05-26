@@ -8,6 +8,7 @@ import Slider from "../../../components/slider"
 import {Row,Col} from "react-bootstrap";
 import {ServerRequest} from "../../../logic/ServerCommunication";
 import {toast} from "react-toastify";
+import TabelSkeleton from "../../../components/loadingSkeletons/tabelSkeleton";
 
 const ABTestItems = (props) => {
     const [loading, setLoading] = useState(false);
@@ -75,7 +76,7 @@ const ABTestItems = (props) => {
             {/*<Slider labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />*/}
             <div className="container">
                 <Row>
-                    <LogicTable action={openItem} data={data1}/>
+                    <TabelSkeleton loading={loading}><LogicTable action={openItem} data={data1}/></TabelSkeleton>
                 </Row>
 
             </div>
