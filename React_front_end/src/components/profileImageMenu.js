@@ -38,13 +38,14 @@ const ProfileImageMenu = () => {
                     <Card className={"shadow-lg"} style={{ width: '18rem', position: "absolute", top: 60 }}>
                         <Card.Body>
                             <ListGroup variant="flush">
-                                <ListGroup.Item action >
+                                {/*<ListGroup.Item action >
                                     <Icon
                                         fill="#000000"
                                         name="settings-outline"
                                     />
                                     Settings
                                 </ListGroup.Item>
+                                */}
                                 <ListGroup.Item action onClick={() => { logout(); }}>
                                     <Icon
                                         fill="#000000"

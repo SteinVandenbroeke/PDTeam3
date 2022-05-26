@@ -24,7 +24,6 @@ const ABTestsList = () => {
         let list = ["name", "dataset", "stepsize"]
         let count = data.at(-1)
         for (let i=1; i < count + 1; i++) {
-            // console.log("test")
             list.push("algorithm" + i)
         }
         setHeader([list])

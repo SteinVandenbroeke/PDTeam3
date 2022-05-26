@@ -43,10 +43,8 @@ const UserList = () => {
     }
 
     useEffect(() => {
-        console.log(userData)
         for(var i = 0; i < userData.length; i++){
             let temp = userData[i]
-            console.log(!userData[i][4])
             let permission = userData[i][4]
             let Admin=(
               <Form.Check
@@ -64,7 +62,6 @@ const UserList = () => {
                 /></Button>
             );
             temp.push(Delete)
-            console.log(temp)
             setTableData(oldData=>[...oldData,temp])
         }
     },[userData]);
