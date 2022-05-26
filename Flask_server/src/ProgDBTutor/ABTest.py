@@ -58,7 +58,7 @@ class ABTest():
             print(self.topK)
             while (time < self.endTs):
                 results = self.execute(self.topK, time, time + datetime.timedelta(days=algo[1]), algo[0])
-                if (algo[0] == 0 or algo[0] == 1):
+                if (algo[0] == 0 or algo[0] == 1) and len(results) != 0:
                     #niet knn
                     self.cursor.execute(
                         sql.SQL('insert into "abrec" ("abtest_algorithms_id","timestamp") values (%s,%s) RETURNING "idAbRec"'),
@@ -82,8 +82,7 @@ class ABTest():
                     sqlInstert = []
                     for item in results:
                         sqlInstert.append([idAbRec, item])
-                    if len(results) != 0:
-                        psycopg2.extras.execute_batch(self.cursor, 'insert into "abreclist" ("idAbRec","itemId") values (%s,%s)', sqlInstert)
+                    psycopg2.extras.execute_batch(self.cursor, 'insert into "abreclist" ("idAbRec","itemId") values (%s,%s)', sqlInstert)
 
                 elif algo[0] == 2:
                     for customer, result in enumerate(results):
