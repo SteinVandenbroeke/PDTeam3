@@ -64,7 +64,7 @@ const CSVUploadSettings = (props) => {
                 </Col>
                 <Col xs={12} md={8}>
                     <Card className={"shadow-lg"}>
-                        <Card.Body>
+                        <Card.Body style={{overflowY: "auto", height: "80vh"}}>
                             <h5>Preview table</h5>
                             <LogicTable data={tabelPreview}/>
                         </Card.Body>

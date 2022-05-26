@@ -47,13 +47,13 @@ Legend
 const ABTestOverview = () => {
     const navigation = useNavigate();
     const {abTestId} = useParams()
-    const [windowSizeSmoothing, setWindowSizeSmoothing] = React.useState([0]);
+    const [windowSizeSmoothing, setWindowSizeSmoothing] = React.useState([1]);
     const [values, setValues] = React.useState([0, 1]);
     const [totalUsers, setTotalUsers] = React.useState([0, 1]);
     const [serverError, setServerError] = useState(false);
     const [abTestData, setAbTestData] = React.useState({
             "algorithms": [],
-            "points": [0,0],
+            "points": [0,0,0],
             "parameters": {
                 "topK": null,
                 "stepSize": null,
