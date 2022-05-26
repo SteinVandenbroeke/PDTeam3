@@ -73,6 +73,9 @@ export class ServerRequest{
 		if(response.status === 201 ||response.status === 200){
 			return await response.json();
 		}
+		else if(response.headers.get('content-type') == "text/html"){
+			throw Error(("Internal server error, check python logbooks ") + response.status);
+		}
 		else{
 			throw Error((await response.text()) + " " + response.status)
 		}

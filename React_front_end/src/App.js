@@ -85,7 +85,7 @@ function App() {
                           <Route index element={<UserList />}/>
                           <Route path="add" element={<AddUsers />}/>
                       </Route>
-                      <Route path="page404" element={<Page404 />} />
+                      <Route path="*" element={<Page404 />} />
                   </Route>
               </Routes>
           </BrowserRouter>

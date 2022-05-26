@@ -1,43 +1,64 @@
 import {Button, Col, Form, Row} from "react-bootstrap";
 import Icon from 'react-eva-icons';
 import {useNavigate } from "react-router-dom";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { Range } from 'react-range';
+import SliderSkeleton from "./loadingSkeletons/sliderSkeleton";
 
 const Slider = (props) => {
-    let values = props.values;
-    let setValues = props.setValues;
-    let labels = props.labels;
+    let [labels , setLabels] = useState(null);
+    let [startProcent , setStartProcent] = useState(0);
+    let [endProcent , setEndProcent] = useState(0);
 
-    if(labels === undefined || labels === null){
-            labels = Array(props.max - props.min + 1).fill().map((_, idx) => props.min + idx)
+    function updateLabels(){
+        if(props.labels === undefined || props.labels === null) {
+            let labelsTemp = Array(props.max).fill().map((_, idx) => (idx).toString())
+            setLabels(labelsTemp);
         }
-
-    let startProcent = 0;
-    let endProcent = 0;
-
-    if(values.length > 1){
-        startProcent = (values[0] / props.max) * 100;
-        endProcent = (values[1] / props.max) * 100;
+        else
+        {
+            setLabels(props.labels);
+        }
     }
-    else {
-        startProcent = 0;
-        endProcent = (values[0] / props.max) * 100;
+
+    function updateColor(){
+        if(props.values.length > 1){
+            setStartProcent((props.values[0] / props.max) * 100);
+            setEndProcent((props.values[1] / props.max) * 100);
+        }
+        else {
+            setStartProcent(0);
+            setEndProcent((props.values[0] / props.max) * 100);
+        }
+    }
+
+    useEffect(() => {
+        updateLabels();
+    },[props.labels, props.max, props.min]);
+
+    useEffect(() => {
+        updateColor();
+    },[props.values, props.max, props.min]);
+
+    if(labels == null){
+        return(
+          <SliderSkeleton loading={true}></SliderSkeleton>
+        );
     }
 
     return (
         <Row style={{paddingTop: 20}}>
             <Col sm={2}>
-                {values.length == 1 && <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={labels[values[0]]} onChange={(e)=>{setValues([labels.indexOf(e.target.value)])}} />}
-                {values.length > 1 && <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={labels[values[0]]} onChange={(e)=>{setValues([labels.indexOf(e.target.value), values[1]])}} />}
+                {props.values.length == 1 && <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={labels[props.values[0]]} onChange={(e)=>{props.setValues([labels.indexOf(e.target.value)])}} />}
+                {props.values.length > 1 && <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={labels[props.values[0]]} onChange={(e)=>{props.setValues([labels.indexOf(e.target.value), props.values[1]])}} />}
             </Col>
             <Col sm={8}>
                 <Range
-                    values={values}
+                    values={props.values}
                     step={props.step}
                     min={props.min}
                     max={props.max}
-                    onChange={(values) => setValues(values)}
+                    onChange={(values) => props.setValues(values)}
                     onFinalChange={(values) => {try{props.onFinalChange()}catch{}}}
                     renderTrack={({ props, children }) => (
                       <div
@@ -93,11 +114,11 @@ const Slider = (props) => {
                           }}
                         >
                           {
-                              labels == null && values[index].toFixed(1)
+                              labels == null && props.values != undefined  && props.values[index].toFixed(1)
 
                           }
                           {
-                              labels != null && labels[values[index].toFixed(0)]
+                              labels != null && props.values != undefined && labels[props.values[index].toFixed(0)]
                           }
 
                         </div>
@@ -114,7 +135,7 @@ const Slider = (props) => {
                 />
             </Col>
             <Col sm={2}>
-                {values.length > 1 && <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={labels[values[1]]} onChange={(e)=>{setValues([values[0], labels.indexOf(e.target.value)])}} />}
+                {props.values.length > 1 && <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={labels[props.values[1]]} onChange={(e)=>{props.setValues([props.values[0], labels.indexOf(e.target.value)])}} />}
             </Col>
         </Row>
     )
