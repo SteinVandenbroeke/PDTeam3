@@ -88,7 +88,7 @@ const ABTestOverview = () => {
                     </Col>
                     <Col sm={12}>
                         <SliderSkeleton loading={loading}>
-                            <Slider max={abTestData.points.length - 1} min={0} step={1} values={windowSizeSmoothing} setValues={setWindowSizeSmoothing} />
+                            <Slider max={abTestData.points.length - 1} min={1} step={1} values={windowSizeSmoothing} setValues={setWindowSizeSmoothing} />
                         </SliderSkeleton>
                     </Col>
                 </Row>;
