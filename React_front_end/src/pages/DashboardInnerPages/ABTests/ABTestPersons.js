@@ -14,8 +14,8 @@ const ABTestPersons = (props) => {
     const [data1,setData1] = useState([["User Id","Purchase Amount", "Total Purchases", "Purchases In Range", "Total CTR", "CTR In Range"]])
     let {abTestId, startDate, endDate} = useParams()
     const navigation = useNavigate();
-    const [modal, setModal] = useState(false);
-    const [personID, setPersonID] = useState(-1);
+    // const [modal, setModal] = useState(false);
+    // const [personID, setPersonID] = useState(-1);
     const [abTestData, setAbTestData] = React.useState({});
     const [loadusers, setloadusers] = useState(false);
 
@@ -23,10 +23,10 @@ const ABTestPersons = (props) => {
         navigation("/dashboard/dataSets/overview/"+ datasetId + "/person/"+ id);
     }
 
-    function openModal(id){
-        setModal(true);
-        setPersonID(id);
-    }
+    // function openModal(id){
+    //     setModal(true);
+    //     setPersonID(id);
+    // }
 
     function getDataSetId(){
         setDatasetId(null);
@@ -77,24 +77,24 @@ const ABTestPersons = (props) => {
     return (
         <div className="App">
             <BackButton/>
-            <Modal show={modal} fullscreen={true}>
-                <Modal.Header closeButton onClick={()=>setModal(false)}>
-                  <Modal.Title>Person Metrics for Person {personID}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <div style={{paddingTop: 20}}>
-                        <Card className={"shadow"} style={{textAlign: "left", maxHeight: "80vh", borderWidth: 0}}>
-                            <Card.Body style={{height: "100%"}}>
-                                {props.loading === true && <Spinner style={{position: "absolute", right: 0, margin: 10, top: 0}} animation="grow" size="sm" />}
-                                TEST
-                            </Card.Body>
-                            <Button variant="primary" onClick={()=>openUser(personID)} style={{borderWidth: 0}}>Person Page</Button>
-                        </Card>
-                    </div>
-                </Modal.Body>
-            </Modal>
+            {/*<Modal show={modal} fullscreen={true}>*/}
+            {/*    <Modal.Header closeButton onClick={()=>setModal(false)}>*/}
+            {/*      <Modal.Title>Person Metrics for Person {personID}</Modal.Title>*/}
+            {/*    </Modal.Header>*/}
+            {/*    <Modal.Body>*/}
+            {/*        <div style={{paddingTop: 20}}>*/}
+            {/*            <Card className={"shadow"} style={{textAlign: "left", maxHeight: "80vh", borderWidth: 0}}>*/}
+            {/*                <Card.Body style={{height: "100%"}}>*/}
+            {/*                    {props.loading === true && <Spinner style={{position: "absolute", right: 0, margin: 10, top: 0}} animation="grow" size="sm" />}*/}
+            {/*                    TEST*/}
+            {/*                </Card.Body>*/}
+            {/*                <Button variant="primary" onClick={()=>openUser(personID)} style={{borderWidth: 0}}>Person Page</Button>*/}
+            {/*            </Card>*/}
+            {/*        </div>*/}
+            {/*    </Modal.Body>*/}
+            {/*</Modal>*/}
             {/*<Slider labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />*/}
-            <LogicTable action={openModal} data={data1}/>
+            <LogicTable action={openUser} data={data1}/>
         </div>
     );
 };
