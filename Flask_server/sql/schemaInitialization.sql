@@ -106,11 +106,11 @@ ALTER TABLE "abrecid_personrecid" ADD FOREIGN KEY ("idAbRec") REFERENCES "abrec"
 
 ALTER TABLE "abreclist" ADD FOREIGN KEY ("idAbRec") REFERENCES "abrec" ("idAbRec") ON DELETE CASCADE;
 
-ALTER TABLE "abreclist" ADD FOREIGN KEY ("itemId") REFERENCES "setname_items" ("item_id") ON DELETE CASCADE;
+--ALTER TABLE "abreclist" ADD FOREIGN KEY ("itemId") REFERENCES "setname_items" ("item_id") ON DELETE CASCADE;
 
 ALTER TABLE "abrecid_personrecid" ADD FOREIGN KEY ("test_name") REFERENCES "abtest" ("test_name") ON DELETE CASCADE;
 
-ALTER TABLE "abrecid_personrecid" ADD FOREIGN KEY ("personid") REFERENCES "setname_people" ("person_id") ON DELETE CASCADE;
+--ALTER TABLE "abrecid_personrecid" ADD FOREIGN KEY ("personid") REFERENCES "setname_people" ("person_id") ON DELETE CASCADE;
 
 create sequence "abrec_idAbRec_seq"
 	as integer;

@@ -12,7 +12,7 @@ import TabelSkeleton from "../../../components/loadingSkeletons/tabelSkeleton";
 
 const ABTestItems = (props) => {
     const [loading, setLoading] = useState(false);
-    const [data1,setData1] = useState([['Item Id', 'Title', 'Total Buy Rate', 'Buy Rate In Range', 'Total Recommend Rate', 'Recommend Rate In Range']])
+    const [data1,setData1] = useState([['Item Id', 'Title', 'Total Buy Rate', 'Buy Rate In Range']])
     const [datasetId, setDatasetId] = useState(null)
     const {abTestId, startDate, endDate} = useParams()
     const [abTestData, setAbTestData] = React.useState({});
@@ -55,9 +55,8 @@ const ABTestItems = (props) => {
             "endDate": abTestData.points[end],
         }
         let request = new ServerRequest();
-        request.sendGet("getItemsFromABTest",getData).then(requestData => {setData1(oldData=>[...oldData,...requestData]); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+        request.sendGet("getItemsFromABTest",getData).then(requestData => {setData1(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
     }
-
 
     useEffect(()=> {
         if (loadusers){
