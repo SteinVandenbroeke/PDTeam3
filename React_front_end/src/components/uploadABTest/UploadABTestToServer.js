@@ -12,13 +12,6 @@ const UploadABTestToServer = (props) => {
         setUploading(1);
         let request = new ServerRequest();
         var formData = new FormData();
-        /*
-        console.log(dataSetId)
-        console.log(JSON.stringify(periodValues))
-        console.log(topKValues[0])
-        console.log(stepSizeValue[0])
-        console.log(JSON.stringify(algorithms))*/
-        console.log(algorithms)
         formData.append("abTestName", abTestName)
         formData.append("dataSetId", dataSetId);
         formData.append("periodValues", JSON.stringify(periodValues));

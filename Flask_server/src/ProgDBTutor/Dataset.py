@@ -138,8 +138,9 @@ class Dataset():
 
         tableDict = {'timestamp': "timestamp timestamp", 'user_id': " user_id int",'item_id': "item_id int",'parameter': " parameter float",'timestamp': "timestamp timestamp"}
         volgordeTables = ""
-        for  param in purchaseConnections['csv']:
-            volgordeTables += tableDict[purchaseConnections['connections'][param]] + ', '
+        for param in purchaseConnections['csv']:
+            if param in purchaseConnections['connections']:
+                volgordeTables += tableDict[purchaseConnections['connections'][param]] + ', '
 
         createCustomersTable = 'CREATE TABLE ' + purchaseTableName + '(' + volgordeTables + 'FOREIGN KEY (user_id) REFERENCES ' + customerTableName + '(id) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (item_id) REFERENCES ' + articleTableName + '(id) ON UPDATE CASCADE ON DELETE CASCADE);'
         self.cursor.execute(sql.SQL(createCustomersTable))
@@ -212,12 +213,19 @@ class Dataset():
             return ('Worng table type', 500)
         table = datasetName + "_" + table
         columnNames = self.getColumnNames(table)
+        columnString = ''
+        for column in columnNames:
+            columnString += column
+            columnString += ', '
+        columnString = columnString[:-2]
+        print(columnString)
         if table == datasetName + "_purchases":
-            select = 'SELECT * FROM {table} WHERE user_id=%s; '
+            select = 'SELECT '+columnString+' FROM {table} WHERE user_id=%s; '
         else:
-            select = 'SELECT * FROM {table} WHERE id=%s; '
+            select = 'SELECT '+columnString+' FROM {table} WHERE id=%s; '
         self.cursor.execute(sql.SQL(select).format(table=sql.Identifier(table)), [id])
         allrows = self.cursor.fetchall()
+        print(allrows)
 
         if len(allrows) <= 0:
             return ("Id {id} not found in {table}".format(id=id, table=table), 400)
@@ -241,6 +249,7 @@ class Dataset():
         select = 'SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N%s;'
         self.cursor.execute(sql.SQL(select).format(), [table])
         allrows = self.cursor.fetchall()
+        print(allrows)
         returnList = []
         for row in allrows:
             returnList.append(row[0])
@@ -418,7 +427,7 @@ class Dataset():
         Returns total amount of articles in the given dataset
         @param datasetId: Identifier for the dataset (name)
         """
-        self.cursor.execute(sql.SQL('SELECT COUNT(id) FROM '+datasetId+'_articles'))
+        self.cursor.execute(sql.SQL('SELECT "itemAmount" FROM datasets WHERE name=%s'),[datasetId])
         count = self.cursor.fetchall()[0][0]
         return (json.dumps(count), 200)
 
@@ -427,7 +436,7 @@ class Dataset():
         Returns total amount of customers in the given dataset
         @param datasetId: Identifier for the dataset (name)
         """
-        self.cursor.execute(sql.SQL('SELECT COUNT(id) FROM '+datasetId+'_customers'))
+        self.cursor.execute(sql.SQL('SELECT "customerAmount" FROM datasets WHERE name=%s'),[datasetId])
         count = self.cursor.fetchall()[0][0]
         if not webReturn:
             return count
