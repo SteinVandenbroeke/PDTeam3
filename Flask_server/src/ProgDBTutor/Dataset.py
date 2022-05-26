@@ -263,7 +263,7 @@ class Dataset():
         data = self.cursor.fetchall()
         returnList = []
         for row in data:
-            item = [row[0], row[4], row[5].strftime("%m/%d/%Y %H:%M:%S")]
+            item = [row[0], row[4], row[5].strftime("%d/%m/%Y %H:%M:%S")]
             returnList.append(item)
         return (json.dumps(returnList), 200)
 
@@ -386,7 +386,7 @@ class Dataset():
             returnItem = {}
             for i in range(len(row)):
                 if type(row[i]) is datetime:
-                    returnItem[columnNames[i]] = row[i].strftime("%s/%m/%Y %H:%M:%S")
+                    returnItem[columnNames[i]] = row[i].strftime("%d/%m/%Y %H:%M:%S")
                 else:
                     returnItem[columnNames[i]] = row[i]
             returnList.append(returnItem)
