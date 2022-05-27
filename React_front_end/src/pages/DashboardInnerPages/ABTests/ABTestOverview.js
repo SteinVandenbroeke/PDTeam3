@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, {useEffect, useState} from 'react';
-import {Col, Row, Table, Button, Text, Card, Form, Spinner} from "react-bootstrap";
+import {Col, Row, Table, Button, Text, Card, Form, Spinner, Modal} from "react-bootstrap";
 import Icon from 'react-eva-icons';
 import LogicTable from "../../../components/logicTable"
 import SmallInformationCard from "../../../components/smallInformationCard"
@@ -47,6 +47,7 @@ Legend
 const ABTestOverview = () => {
     const navigation = useNavigate();
     const {abTestId} = useParams()
+    const [currentPage, setCurrentPage] = React.useState("overview");
     const [windowSizeSmoothing, setWindowSizeSmoothing] = React.useState([1]);
     const [values, setValues] = React.useState([0, 1]);
     const [totalUsers, setTotalUsers] = React.useState([0, 1]);
@@ -62,8 +63,12 @@ const ABTestOverview = () => {
             "NotAlgDependent":[]
         });
     const [loading, setLoading] = React.useState(true);
+    const [loadingModelData, setLoadingModelData] = React.useState(true);
+    const [userdata,setUserData] = useState([["User Id","Purchase Amount", "Total Purchases", "Purchases In Range", "Total CTR", "CTR In Range"]])
+    const [itemData,setItemData] = useState([['Item Id', 'Title', 'Total Buy Rate', 'Buy Rate In Range', 'Total Recommend Rate', 'Recommend Rate In Range']])
+    const [data1,setData1] = useState([["User Id","Purchase Amount", "Total Purchases", "Purchases In Range", "Total CTR", "CTR In Range"]])
 
-    function loadData(){
+    async function loadData(){
         let getData = {abTestName: abTestId}
         let request = new ServerRequest();
         request.sendGet("ABTestOverview", getData).then(requestData => {setAbTestData(requestData); setLoading(false);}).catch(error => {toast.error(error.message); setServerError(true) /*setLoading(false)*/});
@@ -76,6 +81,22 @@ const ABTestOverview = () => {
         request.sendGet("totalActiveUserAmount", getData).then(requestData => {setTotalUsers(requestData); setLoading(false);}).catch(error => {toast.error(error.message); setLoading(false);});
     }
 
+    function sliderOrPageChange(){
+        if(currentPage === "overview"){
+            loadTotalActiveUsers();
+        }
+        else if(currentPage === "persons"){
+            loadUsers();
+        }
+        else if(currentPage === "items"){
+            loadItems();
+        }
+    }
+
+    useEffect(() => {
+        sliderOrPageChange();
+    }, [currentPage]);
+
     useEffect(() => {
         loadData();
     }, []);
@@ -83,7 +104,7 @@ const ABTestOverview = () => {
     let sliders = <Row style={{paddingTop: 20}}>
                     <Col sm={12}>
                         <SliderSkeleton loading={loading}>
-                            <Slider onFinalChange={loadTotalActiveUsers} labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />
+                            <Slider onFinalChange={sliderOrPageChange} labels={abTestData.points} max={abTestData.points.length - 1} min={0} step={1} values={values} setValues={setValues} />
                         </SliderSkeleton>
                     </Col>
                     <Col sm={12}>
@@ -102,6 +123,44 @@ const ABTestOverview = () => {
         request.sendGet("deleteABTest",getData).then(message => {toast.success(message.message); navigation('/dashboard/abTests', { replace: true }); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
     }
 
+    function openUser(id){
+        //navigation("/dashboard/dataSets/overview/"+ datasetId + "/person/"+ id);
+    }
+
+    function openItem(id){
+        //navigation("/dashboard/dataSets/overview/"+ datasetId + "/item/"+ id);
+    }
+
+    async function loadItems(){
+        setLoadingModelData(true);
+        let begin = values[0];
+        let end = values[1];
+        let getData = {
+            "abTestId": abTestId,
+            "startDate": abTestData.points[begin],
+            "endDate": abTestData.points[end],
+        }
+        let request = new ServerRequest();
+        request.sendGet("getItemsFromABTest",getData).then(requestData => {setItemData(oldData=>[...oldData,...requestData]); setLoadingModelData(false)}).catch(error => {toast.error(error.message); setLoadingModelData(false)});
+    }
+
+    async function loadUsers(){
+        setLoadingModelData(true);
+        let begin = values[0];
+        let end = values[1];
+        let getData = {
+            "abTestId": abTestId,
+            "startDate": abTestData.points[begin],
+            "endDate": abTestData.points[end],
+        };
+        let request = new ServerRequest();
+        request.sendGet("getUsersFromABTest",getData).then(requestData => {setUserData(oldData=>[...oldData,...requestData[0]]); setLoadingModelData(false)}).catch(error => {toast.error(error.message); setLoadingModelData(false)});
+    }
+
+    function openFullItemList(){
+        setCurrentPage("items");
+    }
+
     return (
         <div>
             <div style={{width: "100%", textAlign: "right", paddingBottom: "10px"}}>
@@ -109,56 +168,83 @@ const ABTestOverview = () => {
             </div>
             { !serverError &&
             <div style={{paddingTop: 20}}>
+                <Modal show={currentPage === "persons" || currentPage === "items"} fullscreen={true}>
+                    <Modal.Header closeButton onClick={()=>setCurrentPage("overview")}>
+                      <Modal.Title>{currentPage}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div style={{paddingTop: 20}}>
+                            <Card className={"shadow"} style={{textAlign: "left", maxHeight: "80vh", marginBottom: 10}}>
+                              <Card.Body style={{height: "100%"}}>
+                                  {sliders}
+                              </Card.Body>
+                            </Card>
+                            <Card className={"shadow"} style={{textAlign: "left", maxHeight: "80vh", borderWidth: 0, borderLeftWidth: 8, borderLeftColor: "#0d6efd"}}>
+                              <Card.Body style={{height: "100%"}}>
+                                  <div style={{width: "100%", textAlign: "right", paddingBottom: "10px"}}>
+                                      {currentPage === "persons" && <TabelSkeleton loading={loadingModelData}><LogicTable action={openItem} data={userdata}/></TabelSkeleton>}
+                                      {currentPage === "items" && <TabelSkeleton loading={loadingModelData}><LogicTable action={openUser} data={itemData}/></TabelSkeleton>}
+                                  </div>
+                              </Card.Body>
+                            </Card>
+                        </div>
+                    </Modal.Body>
+                </Modal>
                 {sliders}
                 <Row>
                     <Col xs={12} md={6} lg={4}>
-                        <TabelSkeleton loading={loading}><ABTestInformation algorithms={abTestData.algorithms} parameters={abTestData.parameters}/></TabelSkeleton>
+                        <TabelSkeleton loading={loading}><ABTestInformation algorithms={abTestData.algorithms}
+                                                                            parameters={abTestData.parameters}/></TabelSkeleton>
                     </Col>
                     <Col xs={12} md={6} lg={4}>
-                        <CharSkeleton loading={loading}><ActiveUserCard smoothingWindow={windowSizeSmoothing} totalUsers={totalUsers} slider={sliders} abTestData={abTestData} startDate={values[0]}
+                        <CharSkeleton loading={loading}><ActiveUserCard smoothingWindow={windowSizeSmoothing}
+                                                                        totalUsers={totalUsers} slider={sliders}
+                                                                        abTestData={abTestData}
+                                                                        startDate={values[0]}
+                                                                        endDate={values[1]}/></CharSkeleton>
+                    </Col>
+                    <Col xs={12} md={6} lg={4}>
+                        <CharSkeleton loading={loading}><Purchases smoothingWindow={windowSizeSmoothing}
+                                                                   slider={sliders}
+                                                                   purchases={abTestData.NotAlgDependent.Purchases}
+                                                                   abTestData={abTestData} startDate={values[0]}
+                                                                   endDate={values[1]}/></CharSkeleton>
+                    </Col>
+                    <Col xs={12} md={6} lg={4}>
+                        <CharSkeleton loading={loading}><RevenueCard smoothingWindow={windowSizeSmoothing}
+                                                                     slider={sliders} abTestData={abTestData}
+                                                                     startDate={values[0]}
                                                                      endDate={values[1]}/></CharSkeleton>
                     </Col>
                     <Col xs={12} md={6} lg={4}>
-                        <CharSkeleton loading={loading}><Purchases smoothingWindow={windowSizeSmoothing} slider={sliders} purchases={abTestData.NotAlgDependent.Purchases}
-                                                                    abTestData={abTestData} startDate={values[0]} endDate={values[1]}/></CharSkeleton>
-                    </Col>
-                    <Col xs={12} md={6} lg={4}>
-                        <CharSkeleton loading={loading}><RevenueCard smoothingWindow={windowSizeSmoothing} slider={sliders} abTestData={abTestData} startDate={values[0]}
-                                                                     endDate={values[1]}/></CharSkeleton>
-                    </Col>
-                    <Col xs={12} md={6} lg={4}>
-                        <CharSkeleton loading={loading}><AverageRevenueUser smoothingWindow={windowSizeSmoothing} slider={sliders} abTestData={abTestData} startDate={values[0]}
+                        <CharSkeleton loading={loading}><AverageRevenueUser smoothingWindow={windowSizeSmoothing}
+                                                                            slider={sliders} abTestData={abTestData}
+                                                                            startDate={values[0]}
                                                                             endDate={values[1]}/></CharSkeleton>
                     </Col>
                     <Col xs={12} md={6} lg={4}>
-                        <CharSkeleton loading={loading}><ClickTroughRate smoothingWindow={windowSizeSmoothing} slider={sliders} abTestData={abTestData} startDate={values[0]}
+                        <CharSkeleton loading={loading}><ClickTroughRate smoothingWindow={windowSizeSmoothing}
+                                                                         slider={sliders} abTestData={abTestData}
+                                                                         startDate={values[0]}
                                                                          endDate={values[1]}/></CharSkeleton>
                     </Col>
                     <Col xs={12} md={6} lg={4}>
-                        <CharSkeleton loading={loading}><AttributionRate smoothingWindow={windowSizeSmoothing} slider={sliders} abTestData={abTestData} startDate={values[0]}
+                        <CharSkeleton loading={loading}><AttributionRate smoothingWindow={windowSizeSmoothing}
+                                                                         slider={sliders} abTestData={abTestData}
+                                                                         startDate={values[0]}
                                                                          endDate={values[1]}/></CharSkeleton>
                     </Col>
                     <Col xs={12} md={6} lg={4}>
-                        <TabelSkeleton loading={loading}><MostRecomendedItems slider={sliders} abTestData={abTestData} startDate={values[0]}
+                        <TabelSkeleton loading={loading}><MostRecomendedItems
+                                                                              showFullList={openFullItemList}
+                                                                              slider={sliders}
+                                                                              abTestData={abTestData}
+                                                                              startDate={values[0]}
                                                                               endDate={values[1]}/></TabelSkeleton>
                     </Col>
                     <Col xs={6} md={3} lg={2}>
-                        <SmallInformationCard title={"Most buyed items"} value={
-                            <Link
-                                to={"/dashboard/abTests/overview/" + abTestId + "/items/" + values[0] + "&" + values[1]}
-                                class={"btn"}>
-                                <Button>Full list</Button>
-                            </Link>
-                        } tooltip={"Purchases from day x to day y"}/>
-
-                    </Col>
-                    <Col xs={6} md={3} lg={2}>
                         <SmallInformationCard title={"Most active users"} value={
-                            <Link
-                                to={"/dashboard/abTests/overview/" + abTestId + "/persons/" + values[0] + "&" + values[1]}
-                                class={"btn"}>
-                                <Button>Full list</Button>
-                            </Link>
+                            <Button onClick={()=>{setCurrentPage("persons")}}>Full list</Button>
                         } tooltip={"Purchases from day x to day y"}/>
                     </Col>
                 </Row>

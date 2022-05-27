@@ -347,7 +347,6 @@ class ABTest():
         items = self.cursor.fetchall()
         self.cursor.execute(sql.SQL('SELECT i."itemId", algs.id, COUNT(i."itemId"), SUM(case when ab.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND ab.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) FROM "abreclist" AS i, "abtest_algorithms" AS algs, "abrec" as ab WHERE algs.test_name=%s AND i."idAbRec"=ab."idAbRec" AND ab.abtest_algorithms_id=algs.id GROUP BY i."itemId", algs.id;'), [startDate,endDate, self.abTestId])
         recommendedItems = self.cursor.fetchall()
-        print(items, recommendedItems)
         returnList = []
         for row in items:
             item = row

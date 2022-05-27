@@ -100,7 +100,7 @@ const ABTestInformation = (props) => {
             </Row>
             <Row>
                 <Col sm={12}>
-                    <Button>Full list</Button>
+                    <Button onClick={()=>{props.showFullList()}}>Full list</Button>
                 </Col>
             </Row>
         </LargeInformationCard>
