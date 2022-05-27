@@ -343,14 +343,29 @@ class ABTest():
         @param startDate The starting date of the time interval
         @param endDate  The ending date of the time interval
         """
-        self.cursor.execute(sql.SQL('SELECT a.id,a.title, COUNT(p.item_id), SUM(case when p.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND p.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) FROM {table}_articles AS a, {table}_purchases AS p WHERE p.item_id = a.id GROUP BY a.id'.format(table=self.dataset)), [startDate,endDate])
+        self.cursor.execute(sql.SQL('SELECT algId.id, algName.name, algId.interval FROM abtest_algorithms as algId, algorithms as algName WHERE test_name=%s AND algId.algorithmid=algName.id'),[self.abTestId])
+        algorithms = self.cursor.fetchall()
+        self.cursor.execute(sql.SQL('SELECT * FROM (SELECT a.id,a.title, COUNT(p.item_id), SUM(case when p.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND p.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) FROM {table}_articles AS a LEFT OUTER JOIN  {table}_purchases AS p ON a.id=p.item_id GROUP BY a.id) as items LEFT OUTER JOIN (SELECT i."itemId", algs.id as algorithmID, COUNT(i."itemId"), SUM(case when ab.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND ab.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) FROM "abreclist" AS i, "abtest_algorithms" AS algs, "abrec" as ab WHERE algs.test_name=%s AND i."idAbRec"=ab."idAbRec" AND ab.abtest_algorithms_id=algs.id GROUP BY i."itemId", algs.id) AS algorithms ON items.id=algorithms."itemId"'.format(table=self.dataset)), [startDate,endDate,startDate,endDate, self.abTestId])
         items = self.cursor.fetchall()
-        self.cursor.execute(sql.SQL('SELECT i."itemId", algs.id, COUNT(i."itemId"), SUM(case when ab.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND ab.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) FROM "abreclist" AS i, "abtest_algorithms" AS algs, "abrec" as ab WHERE algs.test_name=%s AND i."idAbRec"=ab."idAbRec" AND ab.abtest_algorithms_id=algs.id GROUP BY i."itemId", algs.id;'), [startDate,endDate, self.abTestId])
-        recommendedItems = self.cursor.fetchall()
-        returnList = []
+        itemsOnId = {}
         for row in items:
-            item = row
-            returnList.append(item)
+            if not not row[0] not in  itemsOnId:
+                itemsOnId[row[0]] = {"info": row[0:4]}
+            itemsOnId[row[0]][row[5]] = [row[6],row[7]]
+        returnList = []
+        header = ['Item Id', 'Title', 'Total Buy Rate', 'Buy Rate In Range']
+        for algo in algorithms:
+            header.append('Total Recommend Rate '+str(algo[1])+'('+str(algo[0])+')')
+            header.append('Recommend Rate in Interval '+str(algo[1])+'('+str(algo[0])+')')
+        returnList.append(header)
+        for row in itemsOnId:
+            fullRow = list(itemsOnId[row]["info"])
+            for alg in algorithms:
+                if alg[0] in itemsOnId[row]:
+                    fullRow.extend(itemsOnId[row][alg[0]])
+                else:
+                    fullRow.extend([0,0])
+            returnList.append(fullRow)
         return (json.dumps(returnList), 200)
 
     def getDatasetIdFromABTest(self, abTestId):
