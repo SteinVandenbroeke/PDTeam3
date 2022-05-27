@@ -1,6 +1,5 @@
 import json
-from datetime import datetime
-
+from datetime import datetime,timedelta
 import pandas as pd
 from quote_data_access import DBConnection
 from config import config_data
@@ -404,17 +403,20 @@ class Dataset():
         #if dataset != None and not dataset.isalnum():
            # return ('"message":{"Wrong dataset name"}', 412)
 
+
         try:
             if fromDate == None:
-                selectTimeStamps = 'SELECT DISTINCT timestamp FROM {table}_purchases ORDER BY timestamp ASC'.format(table=dataset)
-                self.cursor.execute(sql.SQL(selectTimeStamps))
-            else:
-                selectTimeStamps = 'SELECT DISTINCT timestamp FROM {table}_purchases WHERE "timestamp" >= %s  AND "timestamp" <= %s ORDER BY timestamp ASC'.format(table=dataset)
-                self.cursor.execute(sql.SQL(selectTimeStamps), [fromDate, toDate])
-            data = self.cursor.fetchall()
-            returnList = []
-            for row in data:
-                returnList.append(row[0].strftime("%d/%m/%Y %H:%M:%S"))
+                self.cursor.execute(sql.SQL('SELECT timestamp FROM  {table}_purchases ORDER BY timestamp ASC LIMIT 1'.format(table=dataset)))
+                fromDate = self.cursor.fetchone()[0]
+            if toDate == None:
+                self.cursor.execute(sql.SQL('SELECT timestamp FROM  {table}_purchases ORDER BY timestamp DESC LIMIT 1'.format(table=dataset)))
+                toDate = self.cursor.fetchone()[0]
+
+            print("oki")
+            delta = toDate - fromDate  # as timedelta
+            print(delta)
+            returnList = [(fromDate + timedelta(days=i)).strftime("%d/%m/%Y %H:%M:%S") for i in range(delta.days + 1)]
+            print(returnList)
             if format == json:
                 return (json.dumps(returnList), 200)
             elif format == list:
