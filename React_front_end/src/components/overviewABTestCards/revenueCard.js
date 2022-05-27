@@ -24,7 +24,7 @@ const RevenueCard = (props) => {
     const [totalRevenue, setTotalRevenue]  = React.useState([]);
     const [loading, setLoading] = React.useState(true);
     const [daySelector, setDaySelector] = React.useState("revenue0");
-    const graphColors = ['#84c98b', '#27292d', '#bc1ed7', '#2b2b2b', '#0c1f3d', '#84c98b']
+    const graphColors =  ['#84c98b', '#ED5C77', '#bc1ed7', '#0c1f3d', '#D4A418', '#00AAB5', '#D9730C', '#A7AABD','#328984']
 
 
     function sleep(ms) {
@@ -47,7 +47,7 @@ const RevenueCard = (props) => {
                 });
 
         setTotalRevenue(totalRevenue => [...totalRevenue,
-                  ["Total", totalRev.toFixed(2)]
+                  ["total", totalRev.toFixed(2)]
                 ]);
 
         setDatasets(datasets => [...datasets, {
@@ -74,7 +74,7 @@ const RevenueCard = (props) => {
 
             let avarge = (avargeRevenuePerUserTemp/props.abTestData.points.slice(begin, end + 1).length).toFixed(2);
             setTotalRevenue(totalRevenue => [...totalRevenue,
-                  [algorithm, avarge]
+                  ["alg id " + algorithm, avarge]
                 ]);
             colorCounter++;
             if(colorCounter >= graphColors.length){
@@ -104,7 +104,7 @@ const RevenueCard = (props) => {
             <h5>
                 {
                     totalRevenue.map((value, index) => {
-                        {return <h5>Revenue for {value[0]} from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}:€ {value[1]}</h5>}
+                        {return <h5>Revenue for {value[0]} in interval:€ {value[1]}</h5>}
                     })
                 }
             </h5>

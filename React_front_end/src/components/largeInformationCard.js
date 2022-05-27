@@ -24,7 +24,7 @@ const LargeInformationCard = (props) => {
                               {props.settings}
                           </Card.Body>
                         </Card>}
-                        <Card className={"shadow"} style={{textAlign: "left", maxHeight: "80vh", borderWidth: 0, borderLeftWidth: 8, borderLeftColor: "#0d6efd"}}>
+                        <Card className={"shadow"} style={{textAlign: "left", borderWidth: 0, borderLeftWidth: 8, borderLeftColor: "#0d6efd"}}>
                           <Card.Body style={{height: "100%"}}>
                               {props.loading === true && <Spinner style={{position: "absolute", right: 0, margin: 10, top: 0}} animation="grow" size="sm" />}
                               {props.children}

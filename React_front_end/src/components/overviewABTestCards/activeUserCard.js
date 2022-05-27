@@ -60,7 +60,7 @@ const ActiveUserCard = (props) => {
 
     return (
         <LargeInformationCard settings={props.slider} loading={loading} title={"Users"} value={20} tooltip={"Purchases from day x to day y"}>
-            <h5>Total from {props.abTestData.points[props.startDate]} to {props.abTestData.points[props.endDate]}: {props.totalUsers}</h5>
+            <h5>Total active users in interval: {props.totalUsers}</h5>
             {labels.length < 500 &&
             <SmoothingLineCard height={"100%"} smoothingWindow={props.smoothingWindow} options={{
                 backgroundColor: 'rgba(13,110,253,1)',
