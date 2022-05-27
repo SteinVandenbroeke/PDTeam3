@@ -7,6 +7,7 @@ import NavbarComp from "../components/Navbar";
 import {Link, Outlet, Route, Router} from "react-router-dom";
 import Welcome from "./Welcome";
 import Icon from 'react-eva-icons';
+import Slider from "../components/slider";
 
 const Dashboard = () => {
     let [showMenu , setShowMenu] = useState(true);

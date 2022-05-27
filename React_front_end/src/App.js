@@ -33,6 +33,7 @@ import ABTestItems from "./pages/DashboardInnerPages/ABTests/ABTestItems";
 import ABTestInformation from "./components/overviewABTestCards/ABTestInformation";
 import ABTestPersons from "./pages/DashboardInnerPages/ABTests/ABTestPersons";
 import DatasetEdit from "./pages/DashboardInnerPages/Datasets/DatasetEdit";
+import ErrorBoundary from "./components/ErrorBoundary"
 
 
 let userSession = createContext();
@@ -54,41 +55,43 @@ function App() {
   return (
       <userSession.Provider value={ {user , setUser } }>
           <ToastContainer />
-          <BrowserRouter>
-              <Routes>
-                  <Route path="/" element={<NavbarComp />}>
-                      <Route index element={<Welcome />} />
+          <ErrorBoundary>
+              <BrowserRouter>
+                  <Routes>
+                      <Route path="/" element={<NavbarComp />}>
+                          <Route index element={<Welcome />} />
 
-                      <Route path="dashboard" element={<Dashboard />}>
-                          <Route index element={<HomeDashboardPage />} />
+                          <Route path="dashboard" element={<Dashboard />}>
+                              <Route index element={<HomeDashboardPage />} />
 
-                          <Route path="abTests" element={<ABTestsIndex />}>
-                              <Route index element={<ABTestsList />}/>
-                              <Route path="add" element={<AddABTest />}/>
-                              <Route path="overview/:abTestId/items/:startDate&:endDate" element={<ABTestItems />}/>
-                              <Route path="overview/:abTestId/persons/:startDate&:endDate" element={<ABTestPersons />}/>
-                              <Route path="overview/:abTestId" element={<ABTestOverview />}/>
+                              <Route path="abTests" element={<ABTestsIndex />}>
+                                  <Route index element={<ABTestsList />}/>
+                                  <Route path="add" element={<AddABTest />}/>
+                                  <Route path="overview/:abTestId/items/:startDate&:endDate" element={<ABTestItems />}/>
+                                  <Route path="overview/:abTestId/persons/:startDate&:endDate" element={<ABTestPersons />}/>
+                                  <Route path="overview/:abTestId" element={<ABTestOverview />}/>
+                              </Route>
+
+                              <Route path="dataSets" element={<DatasetsIndex />}>
+                                  <Route index element={<DataSetsList />}/>
+                                  <Route path="add" element={<AddDataset />}/>
+                                  <Route path="overview/:setid" element={<DataSetOverview />}/>
+                                  <Route path="overview/:setid/item/:itemid" element={<ItemOverview />}/>
+                                  <Route path="overview/:setid/person/:personid" element={<PersonOverview />}/>
+                                  <Route path="overview/:setid/edit/" element={<DatasetEdit />}/>
+                              </Route>
+                              <Route path="vbPagina" element={<Home />} />
                           </Route>
 
-                          <Route path="dataSets" element={<DatasetsIndex />}>
-                              <Route index element={<DataSetsList />}/>
-                              <Route path="add" element={<AddDataset />}/>
-                              <Route path="overview/:setid" element={<DataSetOverview />}/>
-                              <Route path="overview/:setid/item/:itemid" element={<ItemOverview />}/>
-                              <Route path="overview/:setid/person/:personid" element={<PersonOverview />}/>
-                              <Route path="overview/:setid/edit/" element={<DatasetEdit />}/>
+                          <Route path="users" element={<Users />} >
+                              <Route index element={<UserList />}/>
+                              <Route path="add" element={<AddUsers />}/>
                           </Route>
-                          <Route path="vbPagina" element={<Home />} />
+                          <Route path="*" element={<Page404 />} />
                       </Route>
-
-                      <Route path="users" element={<Users />} >
-                          <Route index element={<UserList />}/>
-                          <Route path="add" element={<AddUsers />}/>
-                      </Route>
-                      <Route path="*" element={<Page404 />} />
-                  </Route>
-              </Routes>
-          </BrowserRouter>
+                  </Routes>
+              </BrowserRouter>
+          </ErrorBoundary>
       </userSession.Provider>
   );
 }

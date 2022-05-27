@@ -12,6 +12,9 @@ const SmoothingLineCard = (props) => {
     async function smoothing(){
         console.log("smoothing")
         let windowSmootingSize = parseInt(props.smoothingWindow)
+        if(windowSmootingSize <= 0){
+            return
+        }
         let newLabels = []
         console.log("object to json to object");
         let dataCp = JSON.parse(JSON.stringify(props.data));
