@@ -366,6 +366,7 @@ class ABTest():
                 else:
                     fullRow.extend([0,0])
             returnList.append(fullRow)
+        print(returnList)
         return (json.dumps(returnList), 200)
 
     def getDatasetIdFromABTest(self, abTestId):
