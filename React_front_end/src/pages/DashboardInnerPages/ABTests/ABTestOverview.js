@@ -65,7 +65,7 @@ const ABTestOverview = () => {
     const [loading, setLoading] = React.useState(true);
     const [loadingModelData, setLoadingModelData] = React.useState(true);
     const [userdata,setUserData] = useState([["User Id","Purchase Amount", "Total Purchases", "Purchases In Range", "Total CTR", "CTR In Range"]])
-    const [itemData,setItemData] = useState([['Item Id', 'Title', 'Total Buy Rate', 'Buy Rate In Range', 'Total Recommend Rate', 'Recommend Rate In Range']])
+    const [itemData,setItemData] = useState()
     const [data1,setData1] = useState([["User Id","Purchase Amount", "Total Purchases", "Purchases In Range", "Total CTR", "CTR In Range"]])
 
     async function loadData(){
@@ -141,7 +141,7 @@ const ABTestOverview = () => {
             "endDate": abTestData.points[end],
         }
         let request = new ServerRequest();
-        request.sendGet("getItemsFromABTest",getData).then(requestData => {setItemData(oldData=>[...oldData,...requestData]); setLoadingModelData(false)}).catch(error => {toast.error(error.message); setLoadingModelData(false)});
+        request.sendGet("getItemsFromABTest",getData).then(requestData => {setItemData(requestData); setLoadingModelData(false)}).catch(error => {toast.error(error.message); setLoadingModelData(false)});
     }
 
     async function loadUsers(){
