@@ -56,7 +56,7 @@ class ABTest():
             time = self.beginTs
             print("algo id" + str(algo))
             print(self.topK)
-            while (time < self.endTs):
+            while (time + datetime.timedelta(days=algo[1]) <= self.endTs):
                 results = self.execute(self.topK, time, time + datetime.timedelta(days=algo[1]), algo[0])
                 if (algo[0] == 0 or algo[0] == 1) and len(results) != 0:
                     #niet knn
@@ -347,6 +347,7 @@ class ABTest():
         algorithms = self.cursor.fetchall()
         self.cursor.execute(sql.SQL('SELECT * FROM (SELECT a.id,a.title, COUNT(p.item_id), SUM(case when p.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND p.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) FROM {table}_articles AS a LEFT OUTER JOIN  {table}_purchases AS p ON a.id=p.item_id GROUP BY a.id) as items LEFT OUTER JOIN (SELECT i."itemId", algs.id as algorithmID, COUNT(i."itemId"), SUM(case when ab.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND ab.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) FROM "abreclist" AS i, "abtest_algorithms" AS algs, "abrec" as ab WHERE algs.test_name=%s AND i."idAbRec"=ab."idAbRec" AND ab.abtest_algorithms_id=algs.id GROUP BY i."itemId", algs.id) AS algorithms ON items.id=algorithms."itemId"'.format(table=self.dataset)), [startDate,endDate,startDate,endDate, self.abTestId])
         items = self.cursor.fetchall()
+        print(items)
         itemsOnId = {}
         for row in items:
             if not not row[0] not in  itemsOnId:
@@ -366,7 +367,6 @@ class ABTest():
                 else:
                     fullRow.extend([0,0])
             returnList.append(fullRow)
-        print(returnList)
         return (json.dumps(returnList), 200)
 
     def getDatasetIdFromABTest(self, abTestId):
