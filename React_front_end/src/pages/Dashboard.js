@@ -30,6 +30,7 @@ const Dashboard = () => {
                                 {showMenu &&
                                 <ListGroup variant="flush" style={{marginTop: 20}}>
                                     <ListGroup.Item action ><Link to="/dashboard/abTests" class={"btn"}>A/B tests</Link></ListGroup.Item>
+                                    <ListGroup.Item action ><Link to="/dashboard/abTestUploads" class={"btn"}>A/B test progress</Link></ListGroup.Item>
                                     <ListGroup.Item action ><Link to="/dashboard/dataSets" class={"btn"}>Datasets</Link></ListGroup.Item>
                                 </ListGroup>}
                             </Card>

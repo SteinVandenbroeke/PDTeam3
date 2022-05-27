@@ -4,10 +4,12 @@ import { Col, Row, Table, Button, Form, Card, Container, Badge, Tabs, Tab, Spinn
 import { ServerRequest } from '../../logic/ServerCommunication';
 import { toast } from 'react-toastify';
 import LogicTable from "../logicTable";
+import AbtestLoading from "../AbtestLoading";
+import { useNavigate } from "react-router-dom";
 
 const UploadABTestToServer = (props) => {
     let [uploading, setUploading] = useState(0);
-
+    const navigate = useNavigate();
     function upload(abTestName, dataSetId, periodValues, topKValues, stepSizeValue, algorithms){
         setUploading(1);
         let request = new ServerRequest();
@@ -18,7 +20,7 @@ const UploadABTestToServer = (props) => {
         formData.append("topKValues", topKValues);
         formData.append('stepSizeValue', stepSizeValue);
         formData.append('algorithms', JSON.stringify(algorithms));
-        request.sendPost("createAbTest",formData, true).then(message => {toast.success(message.message); setUploading(2)}).catch(error => {toast.error(error.message); setUploading(3)});
+        request.sendPost("createAbTest",formData, true).then(message => {toast.success(message.message);  navigate("/dashboard/abTestUploads");}).catch(error => {toast.error(error.message); setUploading(2)});
     }
 
     return (
@@ -54,7 +56,7 @@ const UploadABTestToServer = (props) => {
                             <Card.Body>
                                 <h5>Upload to server</h5>
                                 <div style={{ paddingRight: "50%", paddingTop: 20, paddingBottom: 20 }}>
-                                    <h1>Bestanden uploaden</h1>
+                                    <h1>ABTest aanmaken</h1>
                                     <Spinner animation="border" role="status">
                                         <span className="visually-hidden">Loading...</span>
                                     </Spinner>
@@ -62,15 +64,6 @@ const UploadABTestToServer = (props) => {
                             </Card.Body>
                         }
                         {uploading === 2 &&
-                            <Card.Body>
-                                <h5>Upload to server</h5>
-                                <div style={{ paddingRight: "50%", paddingTop: 20, paddingBottom: 20 }}>
-                                    <h1>Bestanden zijn succesvol geupload, u vindt de A/B test onder 'A/B Tests'</h1>
-                                </div>
-                            </Card.Body>
-                        }
-
-                        {uploading === 3 &&
                             <Card.Body>
                                 <h5>Upload to server</h5>
                                 <div style={{ paddingRight: "50%", paddingTop: 20, paddingBottom: 20 }}>

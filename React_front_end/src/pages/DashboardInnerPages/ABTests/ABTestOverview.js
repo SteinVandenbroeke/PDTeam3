@@ -174,7 +174,7 @@ const ABTestOverview = () => {
                     </Modal.Header>
                     <Modal.Body>
                         <div style={{paddingTop: 20}}>
-                            <Card className={"shadow"} style={{textAlign: "left", maxHeight: "80vh", marginBottom: 10}}>
+                            <Card className={"shadow"} style={{textAlign: "left", marginBottom: 10}}>
                               <Card.Body style={{height: "100%"}}>
                                   {sliders}
                               </Card.Body>

@@ -34,6 +34,7 @@ import ABTestInformation from "./components/overviewABTestCards/ABTestInformatio
 import ABTestPersons from "./pages/DashboardInnerPages/ABTests/ABTestPersons";
 import DatasetEdit from "./pages/DashboardInnerPages/Datasets/DatasetEdit";
 import ErrorBoundary from "./components/ErrorBoundary"
+import AbTestUploadsPage from "./pages/DashboardInnerPages/abTestUploadsPage";
 
 
 let userSession = createContext();
@@ -80,7 +81,7 @@ function App() {
                                   <Route path="overview/:setid/person/:personid" element={<PersonOverview />}/>
                                   <Route path="overview/:setid/edit/" element={<DatasetEdit />}/>
                               </Route>
-                              <Route path="vbPagina" element={<Home />} />
+                              <Route path="abTestUploads" element={<AbTestUploadsPage />} />
                           </Route>
 
                           <Route path="users" element={<Users />} >

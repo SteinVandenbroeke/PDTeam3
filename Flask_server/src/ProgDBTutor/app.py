@@ -4,10 +4,10 @@
 # TUTORIAL geeksforgeeks
 # see https://www.geeksforgeeks.org/using-jwt-for-user-authentication-in-flask/
 import json
+from threading import Thread
 
 from flask import Flask, request, jsonify, make_response, session, flash, redirect, url_for
 from flask.templating import render_template
-
 import uuid # for public id
 
 from sqlalchemy.sql.functions import current_user
@@ -26,7 +26,7 @@ from User import User
 
 from Dataset import Dataset
 from ABTest import *
-
+from flask_socketio import SocketIO, send, emit
 
 # INITIALIZE SINGLETON SERVICES
 app = Flask('Tutorial ', static_url_path="/stop/", static_folder="react_build/")
@@ -34,6 +34,8 @@ app.config['SECRET_KEY'] = '*^*(*&)(*)(*afafafaSDD47j\3yX R~X@H!jmM]Lwf/,?KT'
 # database name
 app.config['SQLALCHEMY_DATABASE_URI'] = config_data['uri']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+
+socketio = SocketIO(app)
 
 DEBUG = False
 HOST = "127.0.0.1" if DEBUG else "0.0.0.0"
@@ -177,9 +179,11 @@ def createAbTest():
     algorithms = json.loads(request.form.get("algorithms"))
     abtest = ABTest()
     abtest.initialize(request.form.get("abTestName"), algorithms,request.form.get("dataSetId"), period[0], period[1], request.form.get("stepSizeValue"), request.form.get("topKValues"))
-    abtest.create()
 
-    return make_response('{"message": "Created."}', 201)
+    thread = Thread(target=abtest.create, kwargs={'loadingSocket': socketio})
+    thread.start()
+
+    return make_response('{"message": "ABTest word aangemaakt, ik kan de pagina verlaten."}', 201)
 
 
 @app.route('/api/ABTestOverview', methods=['GET', 'POST'])
@@ -480,6 +484,15 @@ def getDatasetIdFromABTest():
     returnValue = abtest.getDatasetIdFromABTest(request.args.get("abTestId"))
     return make_response(returnValue[0], returnValue[1])
 
+@app.route('/api/testSocket', methods=['GET'])
+def testSocket():
+    test = ABTest(None,socketio)
+    test.sendTimeEstimation("lallala")
+    #socketio.emit('newData', "test")
+    return make_response("ok", 200)
+
+
 # RUN DEV SERVER
 if __name__ == "__main__":
-    app.run(HOST, debug=DEBUG, port=8000)
+    #app.run(HOST, debug=DEBUG, port=8000)
+    socketio.run(app,  debug=DEBUG, port=8000)
