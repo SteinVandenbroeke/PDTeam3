@@ -53,6 +53,7 @@ const ABTestOverview = () => {
     const [totalUsers, setTotalUsers] = React.useState([0, 1]);
     const [serverError, setServerError] = useState(false);
     const [abTestData, setAbTestData] = React.useState({
+            "dataSet": null,
             "algorithms": [],
             "points": [0,0,0],
             "parameters": {
@@ -64,9 +65,8 @@ const ABTestOverview = () => {
         });
     const [loading, setLoading] = React.useState(true);
     const [loadingModelData, setLoadingModelData] = React.useState(true);
-    const [userdata,setUserData] = useState([["User Id","Purchase Amount", "Total Purchases", "Purchases In Range", "Total CTR", "CTR In Range"]])
+    const [userdata,setUserData] = useState()
     const [itemData,setItemData] = useState()
-    const [data1,setData1] = useState([["User Id","Purchase Amount", "Total Purchases", "Purchases In Range", "Total CTR", "CTR In Range"]])
 
     async function loadData(){
         let getData = {abTestName: abTestId}
@@ -94,6 +94,7 @@ const ABTestOverview = () => {
     }
 
     useEffect(() => {
+        setLoadingModelData(true)
         sliderOrPageChange();
     }, [currentPage]);
 
@@ -124,11 +125,13 @@ const ABTestOverview = () => {
     }
 
     function openUser(id){
-        //navigation("/dashboard/dataSets/overview/"+ datasetId + "/person/"+ id);
+        window.open("/full/dataSets/overview/"+ abTestData.dataSet + "/person/"+ id, '_blank', 'resizable=yes,scrollbars=yes,status=yes')
+        //navigation("/dashboard/dataSets/overview/"+ abTestData.dataSet + "/person/"+ id);
     }
 
     function openItem(id){
-        //navigation("/dashboard/dataSets/overview/"+ datasetId + "/item/"+ id);
+        window.open("/full/dataSets/overview/"+ abTestData.dataSet + "/item/"+ id, '_blank', 'resizable=yes,scrollbars=yes,status=yes')
+        //navigation("/dashboard/dataSets/overview/"+ abTestData.dataSet + "/item/"+ id);
     }
 
     async function loadItems(){
@@ -154,11 +157,15 @@ const ABTestOverview = () => {
             "endDate": abTestData.points[end],
         };
         let request = new ServerRequest();
-        request.sendGet("getUsersFromABTest",getData).then(requestData => {setUserData(oldData=>[...oldData,...requestData[0]]); setLoadingModelData(false)}).catch(error => {toast.error(error.message); setLoadingModelData(false)});
+        request.sendGet("getUsersFromABTest",getData).then(requestData => {setUserData(requestData); setLoadingModelData(false)}).catch(error => {toast.error(error.message); setLoadingModelData(false)});
     }
 
     function openFullItemList(){
         setCurrentPage("items");
+    }
+
+    function openFullPersonList(){
+        setCurrentPage("persons");
     }
 
     return (
@@ -174,7 +181,7 @@ const ABTestOverview = () => {
                     </Modal.Header>
                     <Modal.Body>
                         <div style={{paddingTop: 20}}>
-                            <Card className={"shadow"} style={{textAlign: "left", maxHeight: "80vh", marginBottom: 10}}>
+                            <Card className={"shadow"} style={{textAlign: "left", marginBottom: 10}}>
                               <Card.Body style={{height: "100%"}}>
                                   {sliders}
                               </Card.Body>

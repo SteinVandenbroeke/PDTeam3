@@ -29,11 +29,10 @@ import AddUsers from "./pages/Users/AddUser";
 import UserList from "./pages/Users/UserList";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import ABTestItems from "./pages/DashboardInnerPages/ABTests/ABTestItems";
 import ABTestInformation from "./components/overviewABTestCards/ABTestInformation";
-import ABTestPersons from "./pages/DashboardInnerPages/ABTests/ABTestPersons";
 import DatasetEdit from "./pages/DashboardInnerPages/Datasets/DatasetEdit";
 import ErrorBoundary from "./components/ErrorBoundary"
+import AbTestUploadsPage from "./pages/DashboardInnerPages/abTestUploadsPage";
 
 
 let userSession = createContext();
@@ -58,6 +57,14 @@ function App() {
           <ErrorBoundary>
               <BrowserRouter>
                   <Routes>
+                      <Route path="full">
+                          <Route path="dataSets">
+                              <Route path="overview/:setid" element={<DataSetOverview />}/>
+                              <Route path="overview/:setid/item/:itemid" element={<ItemOverview />}/>
+                              <Route path="overview/:setid/person/:personid" element={<PersonOverview />}/>
+                              <Route path="overview/:setid/edit/" element={<DatasetEdit />}/>
+                          </Route>
+                      </Route>
                       <Route path="/" element={<NavbarComp />}>
                           <Route index element={<Welcome />} />
 
@@ -67,8 +74,6 @@ function App() {
                               <Route path="abTests" element={<ABTestsIndex />}>
                                   <Route index element={<ABTestsList />}/>
                                   <Route path="add" element={<AddABTest />}/>
-                                  <Route path="overview/:abTestId/items/:startDate&:endDate" element={<ABTestItems />}/>
-                                  <Route path="overview/:abTestId/persons/:startDate&:endDate" element={<ABTestPersons />}/>
                                   <Route path="overview/:abTestId" element={<ABTestOverview />}/>
                               </Route>
 
@@ -80,7 +85,7 @@ function App() {
                                   <Route path="overview/:setid/person/:personid" element={<PersonOverview />}/>
                                   <Route path="overview/:setid/edit/" element={<DatasetEdit />}/>
                               </Route>
-                              <Route path="vbPagina" element={<Home />} />
+                              <Route path="abTestUploads" element={<AbTestUploadsPage />} />
                           </Route>
 
                           <Route path="users" element={<Users />} >

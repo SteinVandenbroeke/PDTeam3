@@ -10,13 +10,14 @@ import numpy
 from psycopg2.extensions import register_adapter, AsIs
 
 class Dataset():
-    def __init__(self):
+    def __init__(self, datasetId = None):
         # connect to self.database
         database = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'],
                                 userPassword=config_data['password'], dbhost=config_data['host'],
                                 dbport=config_data['port'])
         self.connection = database.get_connection()
         self.cursor = self.connection.cursor()
+        self.datasetId = datasetId
 
     def add(self, datasetName, customerCSV, articleCSV, purchasesCSV, customerConnections, articleConnections,
             purchaseConnections, userName):
@@ -184,6 +185,8 @@ class Dataset():
         self.connection.commit()
         self.connection.close()
         self.cursor.close()
+        if(colm == "id"):
+            self.setAllABTestsOutdated()
         return ('{"message": "Record succesfully edit"}', 201)
 
     def changeApiWrapper(self, request):
@@ -320,6 +323,7 @@ class Dataset():
         finally:
             self.connection.close()
             self.cursor.close()
+            self.setAllABTestsOutdated()
         return ('{"message": "User succesfully deleted"}', 201)
 
     def deleteItem(self, itemId, setId):
@@ -337,6 +341,7 @@ class Dataset():
         finally:
             self.connection.close()
             self.cursor.close()
+            self.setAllABTestsOutdated()
         return ('{"message": "User succesfully deleted"}', 201)
 
 
@@ -412,7 +417,6 @@ class Dataset():
                 self.cursor.execute(sql.SQL('SELECT timestamp FROM  {table}_purchases ORDER BY timestamp DESC LIMIT 1'.format(table=dataset)))
                 toDate = self.cursor.fetchone()[0]
 
-            print("oki")
             delta = toDate - fromDate  # as timedelta
             print(delta)
             returnList = [(fromDate + timedelta(days=i)).strftime("%d/%m/%Y %H:%M:%S") for i in range(delta.days + 1)]
@@ -455,11 +459,16 @@ class Dataset():
         print(amounts[0])
         return (json.dumps(amounts[0]), 200)
 
+    def setAllABTestsOutdated(self, dataset):
+        self.cursor.execute(sql.SQL('UPDATE "abtest" SET "abtest".status=0 WHERE "abtest".test_name=%s'), [dataset])
+        self.connection.commit()
+
     def addapt_numpy_float64(numpy_float64):
         return AsIs(numpy_float64)
 
     def addapt_numpy_int64(numpy_int64):
         return AsIs(numpy_int64)
+
 
     register_adapter(numpy.float64, addapt_numpy_float64)
     register_adapter(numpy.int64, addapt_numpy_int64)

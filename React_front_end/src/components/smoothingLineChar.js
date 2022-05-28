@@ -45,22 +45,12 @@ const SmoothingLineCard = (props) => {
     useEffect(() => {
         setData(props.data);
         setLabels(props.labels);
-        /*
-        if(props.data !== null && props.data !== undefined && props.data !== [] && props.smoothingWindow !== 0){
-            console.log("smooting" + props.smoothingWindow)
-            smoothing();
-        }*/
-    }, [props.data]);
-
-    useEffect(() => {
-        setData(props.data);
-        setLabels(props.labels);
         console.log(props.smoothingWindow)
         if(props.data !== null && props.data !== undefined && props.data !== [] && props.smoothingWindow !== 0 && props.smoothingWindow != "0"){
             console.log("smooting" + props.smoothingWindow)
             smoothing().then(r => console.log("jeeej"));
         }
-    }, [props.smoothingWindow]);
+    }, [props.smoothingWindow,props.data]);
 
     return (
         <div>

@@ -38,7 +38,12 @@ const AverageRevenueUser = (props) => {
         let data = [];
         let totalAverageRevenue = 0;
         allData.NotAlgDependent.slice(begin, end + 1).map((value, index) =>{
-                    data.push(value.Revenue/value.activeUsersAmount);
+                    if(value.activeUsersAmount===0){
+                        data.push(0)
+                    }
+                    else{
+                        data.push(value.Revenue/value.activeUsersAmount);
+                    }
                     if(value.activeUsersAmount > 0){
                         totalAverageRevenue += value.Revenue/value.activeUsersAmount;
                     }
@@ -61,8 +66,13 @@ const AverageRevenueUser = (props) => {
             let data = [];
             let avargeRevenuePerUserTemp = 0;
             allData.algorithms[algorithm].points.slice(begin, end + 1).map((value1, index) =>{
-                data.push(value1[daySelector]/allData.NotAlgDependent[index].activeUsersAmount);
-                avargeRevenuePerUserTemp += value1[daySelector]/allData.NotAlgDependent[index].activeUsersAmount;
+                 if(allData.NotAlgDependent[index].activeUsersAmount===0){
+                     data.push(0)
+                 }
+                 else {
+                     data.push(value1[daySelector] / allData.NotAlgDependent[index].activeUsersAmount);
+                     avargeRevenuePerUserTemp += value1[daySelector] / allData.NotAlgDependent[index].activeUsersAmount;
+                 }
             });
 
             let colorGraph = graphColors[colorCounter];

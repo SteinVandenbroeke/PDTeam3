@@ -12,7 +12,7 @@ const Slider = (props) => {
 
     function updateLabels(){
         if(props.labels === undefined || props.labels === null) {
-            let labelsTemp = Array(props.max).fill().map((_, idx) => (idx).toString())
+            let labelsTemp = Array(props.max+1).fill().map((_, idx) => (idx).toString())
             setLabels(labelsTemp);
         }
         else
@@ -49,7 +49,7 @@ const Slider = (props) => {
     return (
         <Row style={{paddingTop: 20}}>
             <Col sm={2}>
-                {props.values.length == 1 && <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={labels[props.values[0]]} onChange={(e)=>{props.setValues([labels.indexOf(e.target.value)])}} />}
+                {props.values.length == 1 && <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={labels[props.values[0]]} onChange={(e)=>{props.setValues([labels.indexOf((Math.max(Math.min(parseInt(e.target.value), props.max),props.min)).toString())])}} />}
                 {props.values.length > 1 && <Form.Control size="sm" type="text" style={{textAlign: "center"}} placeholder="Start" value={labels[props.values[0]]} onChange={(e)=>{props.setValues([labels.indexOf(e.target.value), props.values[1]])}} />}
             </Col>
             <Col sm={8}>
