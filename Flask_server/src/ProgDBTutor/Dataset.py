@@ -183,10 +183,10 @@ class Dataset():
         table = datasetName + "_" + table
         self.cursor.execute(sql.SQL("UPDATE {table} SET {col}=%s WHERE id=%s").format(table=sql.Identifier(table), col=sql.Identifier(colm)),[value, id])
         self.connection.commit()
+        if(colm == "id"):
+            self.setAllABTestsOutdated(datasetName)
         self.connection.close()
         self.cursor.close()
-        if(colm == "id"):
-            self.setAllABTestsOutdated()
         return ('{"message": "Record succesfully edit"}', 201)
 
     def changeApiWrapper(self, request):
@@ -321,9 +321,9 @@ class Dataset():
         except:
             return ('{"message": "Could not delete user: "'+personId+'}', 500)
         finally:
+            self.setAllABTestsOutdated(setId)
             self.connection.close()
             self.cursor.close()
-            self.setAllABTestsOutdated()
         return ('{"message": "User succesfully deleted"}', 201)
 
     def deleteItem(self, itemId, setId):
@@ -339,9 +339,9 @@ class Dataset():
         except:
             return ('{"message": "Could not delete item: "'+itemId+'}', 500)
         finally:
+            self.setAllABTestsOutdated(setId)
             self.connection.close()
             self.cursor.close()
-            self.setAllABTestsOutdated()
         return ('{"message": "User succesfully deleted"}', 201)
 
 
@@ -460,7 +460,7 @@ class Dataset():
         return (json.dumps(amounts[0]), 200)
 
     def setAllABTestsOutdated(self, dataset):
-        self.cursor.execute(sql.SQL('UPDATE abtest SET status=0 WHERE test_name=%s'), [dataset])
+        self.cursor.execute(sql.SQL('UPDATE abtest SET status=0 WHERE dataset=%s'), [dataset])
         self.connection.commit()
 
     def addapt_numpy_float64(numpy_float64):

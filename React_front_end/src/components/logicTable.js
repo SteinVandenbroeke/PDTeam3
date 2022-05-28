@@ -18,8 +18,10 @@ const LogicTable = (props) => {
     const [displayData, setDisplayData] = useState([])
     const [currentSortparam, setCurrentSortParam] = useState(0)
     const [currentSortHighest, setCurrentSortHighest] = useState(false)
+    const [tableIndex, setTableIndex] = useState(0)
     //let header = props.data[0];
     let action = props.action;
+
 
     function sortOnParameter(parameter) {
         let currentPar = currentSortparam
@@ -48,6 +50,9 @@ const LogicTable = (props) => {
     }
 
     useEffect(() => {
+        if(props.tableIndex > 0){
+            setTableIndex(props.tableIndex)
+        }
         if (props.data[0].length === 0) {
             return;
         }
@@ -77,7 +82,7 @@ const LogicTable = (props) => {
                 </thead>
                 <tbody>
                 {displayData.map((valueRow) => {
-                    let idForFunction = valueRow[0];
+                    let idForFunction = valueRow[tableIndex];
                     return (
                         <tr onClick={() => action(idForFunction)} style={{cursor: "pointer"}}>
                             {valueRow.map((value, index) => {

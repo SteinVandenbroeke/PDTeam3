@@ -327,7 +327,7 @@ class ABTest():
         max_alg_count = 0
         for row in data:
             alg_count = 0
-            item = [row[0], row[1], row[4]]
+            item = [row[6], row[0], row[1], row[4]]
             query = 'SELECT * FROM "abtest_algorithms" WHERE test_name=%s'
             self.cursor.execute(sql.SQL(query), [row[0]])
             alg_data = self.cursor.fetchall()
@@ -438,7 +438,8 @@ class ABTest():
 
     def updateStatus(self, statusCode):
         if statusCode in range(3):
-            self.cursor.execute(sql.SQL('UPDATE "abtest" SET "abtest".status=%s WHERE "abtest".test_name=%s'), [statusCode, self.abTestId])
+            self.cursor.execute(sql.SQL('UPDATE abtest SET status=%s WHERE abtest.test_name=%s'), [statusCode, self.abTestId])
+            self.connection.commit()
             return True
         return False
 

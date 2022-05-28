@@ -186,7 +186,7 @@ const ABTestOverview = () => {
                                   {sliders}
                               </Card.Body>
                             </Card>
-                            <Card className={"shadow"} style={{textAlign: "left", maxHeight: "80vh", borderWidth: 0, borderLeftWidth: 8, borderLeftColor: "#0d6efd"}}>
+                            <Card className={"shadow"} style={{textAlign: "left", borderWidth: 0, borderLeftWidth: 8, borderLeftColor: "#0d6efd"}}>
                               <Card.Body style={{height: "100%"}}>
                                   <div style={{width: "100%", textAlign: "right", paddingBottom: "10px"}}>
                                       {currentPage === "persons" && <TabelSkeleton loading={loadingModelData}><LogicTable action={openItem} data={userdata}/></TabelSkeleton>}

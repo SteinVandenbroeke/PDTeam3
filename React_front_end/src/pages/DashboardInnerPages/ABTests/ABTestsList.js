@@ -15,20 +15,28 @@ const ABTestsList = () => {
     const navigation = useNavigate();
     const [loading, setLoading] = useState(false);
     const [serverError, setServerError] = useState(false);
-    const [header, setHeader] = useState([[]]);
+    const [listData, setListData] = useState([[]]);
     function openAbTest(id){
         navigation("/dashboard/abTests/overview/" + id);
     }
 
     function handleRequestData(data){
-        let list = ["name", "dataset", "stepsize"]
+        let list = ["Status","Name", "Dataset", "Stepsize"]
         let count = data.at(-1)
         for (let i=1; i < count + 1; i++) {
             list.push("algorithm" + i)
         }
-        setHeader([list])
+        setListData([list])
         for(let i=0; i<data.length-1; i++) {
-            setHeader(oldData=>[...oldData,data[i]])
+            let Status=(
+                <div style={{verticalAlign:"middle"}}>
+                    {data[i][0] === 0 && <Icon fill="#dc3545" name="close-outline"/>}
+                    {data[i][0] === 1 && <Icon fill="#07AD19" name="checkmark-outline"/>}
+                    {data[i][0] === 2 && <Icon fill="#FFA212" name="clock-outline"/>}
+                </div>
+            )
+            data[i][0] = Status
+            setListData(oldData=>[...oldData,data[i]])
             // header.push(data[i])
         }
     }
@@ -50,7 +58,7 @@ const ABTestsList = () => {
                     <Button variant="primary">Add new <Icon name="plus-circle-outline"/></Button>
                 </Link>
             </div>
-            <TabelSkeleton loading={loading}><LogicTable action={openAbTest} data={header}/></TabelSkeleton>
+            <TabelSkeleton loading={loading}><LogicTable action={openAbTest} data={listData} tableIndex={1}/></TabelSkeleton>
             <ServerError error={serverError}/>
         </div>
     );
