@@ -64,9 +64,8 @@ const ABTestOverview = () => {
         });
     const [loading, setLoading] = React.useState(true);
     const [loadingModelData, setLoadingModelData] = React.useState(true);
-    const [userdata,setUserData] = useState([["User Id","Purchase Amount", "Total Purchases", "Purchases In Range", "Total CTR", "CTR In Range"]])
+    const [userdata,setUserData] = useState()
     const [itemData,setItemData] = useState()
-    const [data1,setData1] = useState([["User Id","Purchase Amount", "Total Purchases", "Purchases In Range", "Total CTR", "CTR In Range"]])
 
     async function loadData(){
         let getData = {abTestName: abTestId}
@@ -94,6 +93,7 @@ const ABTestOverview = () => {
     }
 
     useEffect(() => {
+        setLoadingModelData(true)
         sliderOrPageChange();
     }, [currentPage]);
 
@@ -154,11 +154,15 @@ const ABTestOverview = () => {
             "endDate": abTestData.points[end],
         };
         let request = new ServerRequest();
-        request.sendGet("getUsersFromABTest",getData).then(requestData => {setUserData(oldData=>[...oldData,...requestData[0]]); setLoadingModelData(false)}).catch(error => {toast.error(error.message); setLoadingModelData(false)});
+        request.sendGet("getUsersFromABTest",getData).then(requestData => {setUserData(requestData); setLoadingModelData(false)}).catch(error => {toast.error(error.message); setLoadingModelData(false)});
     }
 
     function openFullItemList(){
         setCurrentPage("items");
+    }
+
+    function openFullPersonList(){
+        setCurrentPage("persons");
     }
 
     return (
