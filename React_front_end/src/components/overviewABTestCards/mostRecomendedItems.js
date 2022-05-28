@@ -1,16 +1,18 @@
-import {Button, Card, Col, Row} from "react-bootstrap";
+import {Button, Card, Col, Row, Form} from "react-bootstrap";
 import Icon from 'react-eva-icons';
 import {useNavigate } from "react-router-dom";
 import React, {useEffect} from "react";
 import LargeInformationCard from "../largeInformationCard";
 import LogicTable from "../logicTable";
 
-const ABTestInformation = (props) => {
-    console.log("beginV12")
 
+
+
+const ABTestInformation = (props) => {
+    console.log("beginV23")
     const navigation = useNavigate();
 
-    const [itemsAmount, setItemsAmount] = React.useState(5)
+    const [itemsAmount, setItemsAmount] = React.useState(3)
     const [labels, Letlabels] = React.useState([]);
     const [datasets, setDatasets]  = React.useState([]);
     const [logicTableData, setLogicTableData]  = React.useState([[]]);
@@ -70,6 +72,12 @@ const ABTestInformation = (props) => {
         }
         setLogicTableData(logicTableData)
 
+        //const strr = allData.algorithms[0]
+        //const length = data[strr].length
+            for(let alg in allData.algorithms){
+                const l = data[alg].length
+                console.log(l)
+            }
 
         setLoading(false);
     }
@@ -83,12 +91,24 @@ const ABTestInformation = (props) => {
             <div>
                 {props.slider}
 
+                <input type="number"
+                       onKeyPress={
+                           (e) => {
+                               let nummer = Number(e.key);
+                               setItemsAmount(nummer);
+                               console.log(" r evt is: " + nummer);
+                               console.log(" r ia is: " + itemsAmount);
+                               processData(props.begin,props.end);}
+                       }
+                       id="numberInput" name="numberName" min={0} max={50} size={1} value={itemsAmount} title="Amount of top items to show"/>
 
-                <input type="number" onChange={(event) => {
-                    changeItemsAmount(event.target.valueAsNumber);
-                }
-                }
-                       min={0} max={50} size={1}  title="Amount of top items to show"/>
+                <Form>
+                  <Form.Label>Range</Form.Label>
+                  <Form.Range min={3} max={10} tooltip='on' tooltipPlacement='top'/>
+                </Form>
+
+                <input type="range" title={"test titel"} min={3} max={10} tooltip='on' tooltipPlacement='top'/>
+
             </div>
             }
                 loading={loading} title={"Most recommended items"} tooltip={"The products that are the most recommended over the x days"}>
