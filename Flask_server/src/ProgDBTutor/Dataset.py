@@ -412,7 +412,6 @@ class Dataset():
                 self.cursor.execute(sql.SQL('SELECT timestamp FROM  {table}_purchases ORDER BY timestamp DESC LIMIT 1'.format(table=dataset)))
                 toDate = self.cursor.fetchone()[0]
 
-            print("oki")
             delta = toDate - fromDate  # as timedelta
             print(delta)
             returnList = [(fromDate + timedelta(days=i)).strftime("%d/%m/%Y %H:%M:%S") for i in range(delta.days + 1)]

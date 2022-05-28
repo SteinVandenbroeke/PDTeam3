@@ -12,7 +12,7 @@ import TabelSkeleton from "../../../components/loadingSkeletons/tabelSkeleton";
 const ABTestPersons = (props) => {
     const [loading, setLoading] = useState(false);
     const [datasetId, setDatasetId] = useState(null)
-    const [data1,setData1] = useState([["User Id","Purchase Amount", "Total Purchases", "Purchases In Range", "Total CTR", "CTR In Range"]])
+    const [data1,setData1] = useState([["User Id", "Purchase Amount", "Total Purchases", "Purchases In Range"]])
     let {abTestId, startDate, endDate} = useParams()
     const navigation = useNavigate();
     // const [modal, setModal] = useState(false);
@@ -59,7 +59,7 @@ const ABTestPersons = (props) => {
             "endDate": abTestData.points[end],
         };
         let request = new ServerRequest();
-        request.sendGet("getUsersFromABTest",getData).then(requestData => {setData1(oldData=>[...oldData,...requestData[0]]); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+        request.sendGet("getUsersFromABTest",getData).then(requestData => {console.log(requestData); setData1(requestData); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
     }
 
     useEffect(()=> {
