@@ -161,7 +161,7 @@ def uploadDataset():
 def create():
     user = User(app)
     abtest = ABTest()
-    abtest.initialize("1", [[2, 1, 1]], "small", "2019-01-01", "2021-01-01",
+    abtest.initialize("1", [[2, [1], 1]], "small", "2019-01-01", "2021-01-01",
                       1, 1)
     abtest.create()
 

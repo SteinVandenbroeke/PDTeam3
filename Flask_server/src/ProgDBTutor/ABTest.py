@@ -133,6 +133,7 @@ class ABTest():
 
         self.connection.commit()
         self.sendTimeEstimation(loadingSocket, None, "Done")
+        self.updateStatus(1)
         print("nice")
 
     def sendTimeEstimation(self,loadingSocket, estTimeMicroSec, totalMicroSecDone):
@@ -286,7 +287,7 @@ class ABTest():
             else:
                 NotAlgDependentList.append({"Purchases": 0, "Revenue": 0, "activeUsersAmount": 0})
 
-        returnDict = {"NotAlgDependent":NotAlgDependentList, "parameters":parameters, "algorithms": algoritmsList, "points": allPoints}
+        returnDict = {"dataSet": self.dataset,"NotAlgDependent":NotAlgDependentList, "parameters":parameters, "algorithms": algoritmsList, "points": allPoints}
 
         return (returnDict, 200)
 
@@ -434,6 +435,12 @@ class ABTest():
         self.cursor.execute(sql.SQL('SELECT dataset FROM "abtest" WHERE test_name=%s'), [abTestId])
         setId = self.cursor.fetchall()[0][0]
         return (json.dumps(setId), 200)
+
+    def updateStatus(self, statusCode):
+        if statusCode in range(3):
+            self.cursor.execute(sql.SQL('UPDATE "abtest" SET "abtest".status=%s WHERE "abtest".test_name=%s'), [statusCode, self.abTestId])
+            return True
+        return False
 
     def initialize(self, abTestId=None, algorithms=None, dataset=None, beginTs=None, endTs=None, stepSize=None,
                    topK=None):

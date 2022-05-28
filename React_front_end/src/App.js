@@ -57,6 +57,14 @@ function App() {
           <ErrorBoundary>
               <BrowserRouter>
                   <Routes>
+                      <Route path="full">
+                          <Route path="dataSets">
+                              <Route path="overview/:setid" element={<DataSetOverview />}/>
+                              <Route path="overview/:setid/item/:itemid" element={<ItemOverview />}/>
+                              <Route path="overview/:setid/person/:personid" element={<PersonOverview />}/>
+                              <Route path="overview/:setid/edit/" element={<DatasetEdit />}/>
+                          </Route>
+                      </Route>
                       <Route path="/" element={<NavbarComp />}>
                           <Route index element={<Welcome />} />
 

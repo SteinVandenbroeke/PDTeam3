@@ -53,6 +53,7 @@ const ABTestOverview = () => {
     const [totalUsers, setTotalUsers] = React.useState([0, 1]);
     const [serverError, setServerError] = useState(false);
     const [abTestData, setAbTestData] = React.useState({
+            "dataSet": null,
             "algorithms": [],
             "points": [0,0,0],
             "parameters": {
@@ -124,11 +125,13 @@ const ABTestOverview = () => {
     }
 
     function openUser(id){
-        //navigation("/dashboard/dataSets/overview/"+ datasetId + "/person/"+ id);
+        window.open("/full/dataSets/overview/"+ abTestData.dataSet + "/person/"+ id, '_blank', 'resizable=yes,scrollbars=yes,status=yes')
+        //navigation("/dashboard/dataSets/overview/"+ abTestData.dataSet + "/person/"+ id);
     }
 
     function openItem(id){
-        //navigation("/dashboard/dataSets/overview/"+ datasetId + "/item/"+ id);
+        window.open("/full/dataSets/overview/"+ abTestData.dataSet + "/item/"+ id, '_blank', 'resizable=yes,scrollbars=yes,status=yes')
+        //navigation("/dashboard/dataSets/overview/"+ abTestData.dataSet + "/item/"+ id);
     }
 
     async function loadItems(){

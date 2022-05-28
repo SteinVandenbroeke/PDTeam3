@@ -30,7 +30,8 @@ CREATE TABLE abtest(
   "begin_ts" TIMESTAMP,
   "end_ts" TIMESTAMP,
   "topK" int,
-  "stepsize" int
+  "stepsize" int,
+  "status" smallint NOT NULL DEFAULT 2
 );
 
 CREATE TABLE abtest_algorithms(
