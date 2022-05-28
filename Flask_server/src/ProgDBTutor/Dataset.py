@@ -460,7 +460,7 @@ class Dataset():
         return (json.dumps(amounts[0]), 200)
 
     def setAllABTestsOutdated(self, dataset):
-        self.cursor.execute(sql.SQL('UPDATE "abtest" SET "abtest".status=0 WHERE "abtest".test_name=%s'), [dataset])
+        self.cursor.execute(sql.SQL('UPDATE abtest SET status=0 WHERE test_name=%s'), [dataset])
         self.connection.commit()
 
     def addapt_numpy_float64(numpy_float64):
