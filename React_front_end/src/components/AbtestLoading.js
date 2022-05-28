@@ -3,6 +3,7 @@ import {Button, Card, Col, ProgressBar, Row, Spinner} from "react-bootstrap";
 import io from 'socket.io-client';
 import {toast} from "react-toastify";
 import TabelSkeleton from "./loadingSkeletons/tabelSkeleton";
+import {ServerRequest} from "../logic/ServerCommunication";
 
 class AbtestLoading extends React.Component {
     state = {
@@ -31,7 +32,7 @@ class AbtestLoading extends React.Component {
       return `${this.padTo2Digits(hours)}:${this.padTo2Digits(minutes)}:${this.padTo2Digits(seconds)}`;
     }
 
-    componentDidMount() {
+    loadSocket(){
         var websocket = "http://localhost:8000"
             this.socket = io.connect(websocket, {
             reconnection: true,
@@ -39,7 +40,8 @@ class AbtestLoading extends React.Component {
         });
         console.log("socket ok");
         let temploading = false;
-        this.setState({times: {}, loading:temploading})
+        let tempDict = this.state.times;
+        this.setState({times: tempDict, loading:temploading})
         this.socket.on("newData", message => {
             console.log("responseMessage", message)
             let tempDict = this.state.times;
@@ -60,6 +62,24 @@ class AbtestLoading extends React.Component {
             }
             this.setState({times: tempDict, loading:temploading})
         })
+    }
+
+    loadCurrentTestAndStartSocket(){
+        let request = new ServerRequest();
+        request.sendGet("getPendingAbTests").then(requestData => {
+            console.log("print items")
+            let tempDict = [];
+            requestData.map((item) => {
+                tempDict[item] = [null, "Time undefined"];
+            });
+            this.setState({times: tempDict, loading:true})
+            this.loadSocket();
+        }
+        ).catch(error => {toast.error(error.message);});
+    }
+
+    componentDidMount() {
+        this.loadCurrentTestAndStartSocket()
     }
 
      render() {

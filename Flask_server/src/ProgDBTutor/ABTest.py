@@ -484,3 +484,11 @@ class ABTest():
         self.endTs = data[3]
         self.topK = data[4]
         self.stepSize = data[5]
+
+    def getAllPendingAbTests(self):
+        self.cursor.execute(sql.SQL('SELECT test_name FROM "abtest" WHERE status=2'))
+        data = self.cursor.fetchall()
+        returnData = []
+        for row in data:
+            returnData.append(row[0])
+        return (json.dumps(returnData), 200)

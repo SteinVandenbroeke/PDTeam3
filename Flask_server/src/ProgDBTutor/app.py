@@ -484,12 +484,12 @@ def getDatasetIdFromABTest():
     returnValue = abtest.getDatasetIdFromABTest(request.args.get("abTestId"))
     return make_response(returnValue[0], returnValue[1])
 
-@app.route('/api/testSocket', methods=['GET'])
-def testSocket():
-    test = ABTest(None,socketio)
-    test.sendTimeEstimation("lallala")
-    #socketio.emit('newData', "test")
-    return make_response("ok", 200)
+@app.route('/api/getPendingAbTests', methods=['GET'])
+def getPendingAbTests():
+    abtest = ABTest()
+    returnValue = abtest.getAllPendingAbTests()
+    return make_response(returnValue[0], returnValue[1])
+
 
 
 # RUN DEV SERVER
