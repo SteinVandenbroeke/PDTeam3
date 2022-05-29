@@ -26,7 +26,7 @@ from User import User
 
 from Dataset import Dataset
 from ABTest import *
-from flask_socketio import SocketIO, send, emit
+#from flask_socketio import SocketIO, send, emit
 
 # INITIALIZE SINGLETON SERVICES
 app = Flask('Tutorial ', static_url_path="/stop/", static_folder="react_build/")
@@ -35,7 +35,7 @@ app.config['SECRET_KEY'] = '*^*(*&)(*)(*afafafaSDD47j\3yX R~X@H!jmM]Lwf/,?KT'
 app.config['SQLALCHEMY_DATABASE_URI'] = config_data['uri']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
-socketio = SocketIO(app)
+#socketio = SocketIO(app)
 
 DEBUG = False
 HOST = "127.0.0.1" if DEBUG else "0.0.0.0"
@@ -180,7 +180,7 @@ def createAbTest():
     abtest = ABTest()
     abtest.initialize(request.form.get("abTestName"), algorithms,request.form.get("dataSetId"), period[0], period[1], request.form.get("stepSizeValue"), request.form.get("topKValues"))
 
-    thread = Thread(target=abtest.create, kwargs={'loadingSocket': socketio})
+    thread = Thread(target=abtest.create, kwargs={'loadingSocket': None})
     thread.start()
 
     return make_response('{"message": "ABTest word aangemaakt, ik kan de pagina verlaten."}', 201)
@@ -494,5 +494,5 @@ def getPendingAbTests():
 
 # RUN DEV SERVER
 if __name__ == "__main__":
-    #app.run(HOST, debug=DEBUG, port=8000)
-    socketio.run(app,  debug=DEBUG, port=8000)
+    app.run(HOST, debug=DEBUG, port=8000)
+    #socketio.run(app,  debug=DEBUG, port=8000)

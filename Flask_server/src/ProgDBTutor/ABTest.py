@@ -14,7 +14,6 @@ from typing import List
 from psycopg2 import sql
 from Dataset import Dataset
 import json
-from app import socketio
 
 
 class ABTest():
@@ -158,7 +157,7 @@ class ABTest():
         #print(str(datetime.timedelta(microseconds=estTimeMicroSec)))
         if self.lastSendTime != None and estTimeMicroSec != None and (datetime.datetime.now() - self.lastSendTime).total_seconds() <= 1:
             return
-        loadingSocket.emit('newData', [self.abTestId, estTimeMicroSec, totalMicroSecDone])
+        #loadingSocket.emit('newData', [self.abTestId, estTimeMicroSec, totalMicroSecDone])
         self.lastSendTime = datetime.datetime.now()
 
     def delete(self):
