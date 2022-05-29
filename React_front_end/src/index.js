@@ -1,3 +1,6 @@
+// Short Description: Javascript index file
+// @author : PPDB Team 3
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';

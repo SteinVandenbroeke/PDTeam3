@@ -1,8 +1,10 @@
+// Short Description: Main javascript head file
+// @author : PPDB Team 3
+
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {React, createContext , useState} from 'react';
 import NavbarComp from "./components/Navbar";
-import Home from "./pages/Home"
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Welcome from "./pages/Welcome";
 import Login from "./pages/Login"
@@ -29,11 +31,9 @@ import AddUsers from "./pages/Users/AddUser";
 import UserList from "./pages/Users/UserList";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import ABTestInformation from "./components/overviewABTestCards/ABTestInformation";
 import DatasetEdit from "./pages/DashboardInnerPages/Datasets/DatasetEdit";
 import ErrorBoundary from "./components/ErrorBoundary"
 import AbTestUploadsPage from "./pages/DashboardInnerPages/abTestUploadsPage";
-
 
 let userSession = createContext();
 function App() {
