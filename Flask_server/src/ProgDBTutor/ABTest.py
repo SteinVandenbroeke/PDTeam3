@@ -224,8 +224,8 @@ class ABTest():
         """
         # print(self.abTestId)
         # print(self.dataset)
-        dataSet = Dataset()
-        allPoints = dataSet.getTimeStampList(self.dataset, list)
+        dataSet = Dataset(self.dataset)
+        allPoints = dataSet.getTimeStampList(list)
 
         query = 'SELECT abrecmetric.abtest_algorithms_id,timestamp,ctr,atr7,atr30, revenuectr,revenue7, revenue30, purchases, "interval", "K",name FROM abrecmetric, abtest_algorithms, algorithms WHERE abtest_algorithms.id=abrecmetric.abtest_algorithms_id and algorithms.id=abtest_algorithms.algorithmid and test_name=%s'
         self.cursor.execute(sql.SQL(query), [self.abTestId])
@@ -270,7 +270,7 @@ class ABTest():
         parameters["datasetId"] = itemsql[0]
         parameters["stepSize"] = itemsql[1]
         parameters["topK"] = itemsql[2]
-        parameters["userCount"] = Dataset().getCustomerCount(self.dataset, False)
+        parameters["userCount"] = Dataset(self.dataset).getCustomerCount(False)
 
         query = 'SELECT abtest_algorithms.id, algorithms.name FROM abtest_algorithms, algorithms WHERE abtest_algorithms.algorithmid=algorithms.id and abtest_algorithms.test_name=%s;'
         self.cursor.execute(sql.SQL(query), [self.abTestId])
@@ -304,7 +304,7 @@ class ABTest():
             else:
                 NotAlgDependentList.append({"Purchases": 0, "Revenue": 0, "activeUsersAmount": 0})
 
-        returnDict = {"dataSet": self.dataset,"NotAlgDependent":NotAlgDependentList, "parameters":parameters, "algorithms": algoritmsList, "points": allPoints}
+        returnDict = {"dataSet": self.dataset, "NotAlgDependent": NotAlgDependentList, "parameters": parameters, "algorithms": algoritmsList, "points": allPoints}
 
         return (returnDict, 200)
 
@@ -378,7 +378,7 @@ class ABTest():
         users = self.cursor.fetchall()
         usersOnId = {}
         for row in users:
-            if row[0] not in  usersOnId:
+            if row[0] not in usersOnId:
                 usersOnId[row[0]] = {"info": row[0:4]}
             if row[5] is not None:
                 div1 = row[6]
@@ -387,7 +387,7 @@ class ABTest():
                     div1 = 0
                 if div2 is None:
                     div2 = 0
-                usersOnId[row[0]][row[5]] = [int(div1),int(div2)]
+                usersOnId[row[0]][row[5]] = [int(div1), int(div2)]
         returnList = []
         header = ["User Id", "Purchase Amount", "Total Purchases", "Purchases In Range"]
         for algo in algorithms:
@@ -444,12 +444,12 @@ class ABTest():
             returnList.append(fullRow)
         return (json.dumps(returnList), 200)
 
-    def getDatasetIdFromABTest(self, abTestId):
+    def getDatasetIdFromABTest(self):
         """
         getDatasetIdFromABTest: Returns a json format containing the identifier for the dataset used by this AB test.
         @param abTestId The ID of this AB test
         """
-        self.cursor.execute(sql.SQL('SELECT dataset FROM "abtest" WHERE test_name=%s'), [abTestId])
+        self.cursor.execute(sql.SQL('SELECT dataset FROM "abtest" WHERE test_name=%s'), [self.abTestId])
         setId = self.cursor.fetchall()[0][0]
         return (json.dumps(setId), 200)
 

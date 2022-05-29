@@ -11,7 +11,7 @@ import numpy
 from psycopg2.extensions import register_adapter, AsIs
 
 class Dataset():
-    def __init__(self, datasetId = None):
+    def __init__(self, datasetId=None):
         # connect to self.database
         database = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'],
                                 userPassword=config_data['password'], dbhost=config_data['host'],
@@ -20,7 +20,7 @@ class Dataset():
         self.cursor = self.connection.cursor()
         self.datasetId = datasetId
 
-    def add(self, datasetName, customerCSV, articleCSV, purchasesCSV, customerConnections, articleConnections,
+    def add(self, customerCSV, articleCSV, purchasesCSV, customerConnections, articleConnections,
             purchaseConnections, userName):
         """
         add: Adds a dataset with the given parameters to the database
@@ -36,7 +36,7 @@ class Dataset():
 
         # customer table:
         print("customers toevoegen")
-        customerTableName = datasetName.lower() + '_customers'
+        customerTableName = self.datasetId.lower() + '_customers'
         customerData = pd.read_csv(customerCSV)
         customerDf = pd.DataFrame(customerData)
         customerConnections = json.loads(customerConnections)
@@ -81,7 +81,7 @@ class Dataset():
 
         # article table:
         print("articles toevoegen")
-        articleTableName = datasetName + '_articles'
+        articleTableName = self.datasetId + '_articles'
         articleData = pd.read_csv(articleCSV)
         articleDf = pd.DataFrame(articleData)
         articleConnections = json.loads(articleConnections)
@@ -131,7 +131,7 @@ class Dataset():
 
         # purchase table:
         print("purchases toevoegen")
-        purchaseTableName = datasetName + '_purchases'
+        purchaseTableName = self.datasetId + '_purchases'
         purchaseData = pd.read_csv(purchasesCSV)
         purchaseDf = pd.DataFrame(purchaseData)
         purchaseConnections = json.loads(purchaseConnections)
@@ -155,19 +155,19 @@ class Dataset():
         purchaseAmount = len(purchaseDf.values)
         # finalData.append(tuple(sortedData))
         psycopg2.extras.execute_batch(self.cursor,createPurchaseInsert, purchaseDf.values)
-        self.cursor.execute(sql.SQL('insert into "datasets" ("name","customerAmount","itemAmount","purchaseAmount","createdBy") values (%s,%s,%s,%s,%s)'),[datasetName.lower(), customerAmpunt, articleAmount,purchaseAmount, userName])
+        self.cursor.execute(sql.SQL('insert into "datasets" ("name","customerAmount","itemAmount","purchaseAmount","createdBy") values (%s,%s,%s,%s,%s)'),[self.datasetId.lower(), customerAmpunt, articleAmount,purchaseAmount, userName])
         print("purchases toegevoegd")
 
         self.connection.commit()
 
-        dataSetStats = 'INSERT INTO "dataSetStat" ("dataSetName", timestamp, "Purchases", "Revenue", "activeUsersAmount") SELECT \'{table1}\' AS datasetname, {table1}_purchases.timestamp AS timestamp, COUNT({table1}_purchases.item_id) AS purchases, SUM({table1}_purchases.parameter) AS Revenue, COUNT(DISTINCT {table1}_purchases.user_id) AS activeusersamount FROM {table1}_purchases GROUP BY {table1}_purchases.timestamp;'.format(table1=datasetName.lower())
+        dataSetStats = 'INSERT INTO "dataSetStat" ("dataSetName", timestamp, "Purchases", "Revenue", "activeUsersAmount") SELECT \'{table1}\' AS datasetname, {table1}_purchases.timestamp AS timestamp, COUNT({table1}_purchases.item_id) AS purchases, SUM({table1}_purchases.parameter) AS Revenue, COUNT(DISTINCT {table1}_purchases.user_id) AS activeusersamount FROM {table1}_purchases GROUP BY {table1}_purchases.timestamp;'.format(table1=self.datasetId.lower())
         self.cursor.execute(sql.SQL(dataSetStats))
 
         self.connection.commit()
         self.connection.close()
         self.cursor.close()
 
-    def change(self, datasetName, table, colm, value, id):
+    def change(self, table, colm, value, id):
         """
         Edits a record in the dataset.
         The value of the given column of the row with the given id in the given table of the dataset is changed to the given value.
@@ -181,11 +181,11 @@ class Dataset():
         if not table in ["articles", "customers"]:
             return ('{"message": "Worng table type"}', 500)
 
-        table = datasetName + "_" + table
-        self.cursor.execute(sql.SQL("UPDATE {table} SET {col}=%s WHERE id=%s").format(table=sql.Identifier(table), col=sql.Identifier(colm)),[value, id])
+        table = self.datasetId + "_" + table
+        self.cursor.execute(sql.SQL("UPDATE {table} SET {col}=%s WHERE id=%s").format(table=sql.Identifier(table), col=sql.Identifier(colm)), [value, id])
         self.connection.commit()
-        if(colm == "id"):
-            self.setAllABTestsOutdated(datasetName)
+        if colm == "id":
+            self.setAllABTestsOutdated()
         self.connection.close()
         self.cursor.close()
         return ('{"message": "Record succesfully edit"}', 201)
@@ -201,20 +201,19 @@ class Dataset():
             colmName = request.form.get('colmName')
             value = request.form.get('value')
             itemId = request.form.get('id')
-            dataSet = request.form.get('dataSet')
 
-            returnValue = self.change(dataSet, table, colmName, value, itemId)
+            returnValue = self.change(table, colmName, value, itemId)
             return (returnValue[0], returnValue[1])
         else:
             return ('"message":{"Wrong request"}', 400)
 
-    def getRecordById(self, datasetName, table, id):
+    def getRecordById(self, table, id):
         """
 
         """
         if not table in ["articles", "customers", "purchases"]:
             return ('Worng table type', 500)
-        table = datasetName + "_" + table
+        table = self.datasetId + "_" + table
         columnNames = self.getColumnNames(table)
         columnString = ''
         for column in columnNames:
@@ -222,7 +221,7 @@ class Dataset():
             columnString += ', '
         columnString = columnString[:-2]
 
-        if table == datasetName + "_purchases":
+        if table == self.datasetId + "_purchases":
             select = 'SELECT '+columnString+' FROM {table} WHERE user_id=%s; '
         else:
             select = 'SELECT '+columnString+' FROM {table} WHERE id=%s; '
@@ -272,120 +271,114 @@ class Dataset():
             returnList.append(item)
         return (json.dumps(returnList), 200)
 
-    def deleteDataset(self, datasetName):
+    def deleteDataset(self):
         """
         Deletes the dataset with the given name
-        @param datasetName: Name of the dataset
         """
         message = '{"message": "Dataset succesfully Deleted"}'
         errorCode = 201
         try:
-            query = 'DROP TABLE ' + datasetName + '_articles CASCADE'
+            query = 'DROP TABLE ' + self.datasetId + '_articles CASCADE'
             self.cursor.execute(sql.SQL(query))
             self.connection.commit()
         except:
-            message = '{"message": "Dataset Table '+datasetName+'_articles was not found."}'
+            message = '{"message": "Dataset Table ' + self.datasetId + '_articles was not found."}'
             errorCode = 500
         try:
-            query = 'DROP TABLE ' + datasetName + '_customers CASCADE'
+            query = 'DROP TABLE ' + self.datasetId + '_customers CASCADE'
             self.cursor.execute(sql.SQL(query))
             self.connection.commit()
         except:
-            message = '{"message": "Dataset Table ' + datasetName + '_customers was not found."}'
+            message = '{"message": "Dataset Table ' + self.datasetId + '_customers was not found."}'
             errorCode = 500
         try:
-            query = 'DROP TABLE ' + datasetName + '_purchases CASCADE'
+            query = 'DROP TABLE ' + self.datasetId + '_purchases CASCADE'
             self.cursor.execute(sql.SQL(query))
             self.connection.commit()
         except:
-            message = '{"message": "Dataset Table ' + datasetName + '_purchases was not found."}'
+            message = '{"message": "Dataset Table ' + self.datasetId + '_purchases was not found."}'
             errorCode = 500
         try:
-            self.cursor.execute(sql.SQL('DELETE FROM datasets WHERE name=%s'), [datasetName])
+            self.cursor.execute(sql.SQL('DELETE FROM datasets WHERE name=%s'), [self.datasetId])
             self.connection.commit()
         except:
-            message = '{"message": "Dataset ' + datasetName + ' was not found"}'
+            message = '{"message": "Dataset ' + self.datasetId + ' was not found"}'
             errorCode = 500
 
         self.connection.close()
         self.cursor.close()
         return (message, errorCode)
 
-    def deletePerson(self, personId, setId):
+    def deletePerson(self, personId):
         """
         Deletes a person from the given dataset
         @param personId: Identifier for the person
-        @param setId: Identifier for the dataset (name)
         """
-        query = 'DELETE FROM '+setId+'_customers WHERE id='+ personId
+        query = 'DELETE FROM ' + self.datasetId + '_customers WHERE id=' + personId
         try:
             self.cursor.execute(sql.SQL(query))
             self.connection.commit()
         except:
             return ('{"message": "Could not delete user: "'+personId+'}', 500)
         finally:
-            self.setAllABTestsOutdated(setId)
+            self.setAllABTestsOutdated()
             self.connection.close()
             self.cursor.close()
         return ('{"message": "User succesfully deleted"}', 201)
 
-    def deleteItem(self, itemId, setId):
+    def deleteItem(self, itemId):
         """
         Deletes an item from the given dataset
         @param itemId: Identifier for the item
-        @param setId: Identifier for the dataset (name)
         """
-        query = 'DELETE FROM '+setId+'_articles WHERE id='+ itemId
+        query = 'DELETE FROM ' + self.datasetId + '_articles WHERE id=' + itemId
         try:
             self.cursor.execute(sql.SQL(query))
             self.connection.commit()
         except:
             return ('{"message": "Could not delete item: "'+itemId+'}', 500)
         finally:
-            self.setAllABTestsOutdated(setId)
+            self.setAllABTestsOutdated()
             self.connection.close()
             self.cursor.close()
         return ('{"message": "User succesfully deleted"}', 201)
 
 
-    def getItemList(self, datasetName, offset):
+    def getItemList(self, offset):
         """
         Gets a list of items in the given dataset, limited to 40 from the given offset
-        @param datasetName: Name of the dataset
         @param offset: Given offset to start list from
         """
-        query = 'SELECT id,title,description FROM '+ datasetName +'_articles LIMIT 40 OFFSET '+offset
+        query = 'SELECT id,title,description FROM ' + self.datasetId + '_articles LIMIT 40 OFFSET ' + offset
         self.cursor.execute(sql.SQL(query))
         data = self.cursor.fetchall()
         returnList = []
         for row in data:
-            item = {"itemid":row[0], "name":row[1], "desc":row[2]}
+            item = {"itemid": row[0], "name": row[1], "desc": row[2]}
             returnList.append(item)
         return (json.dumps(returnList), 200)
 
-    def getPeopleList(self, datasetName, offset):
+    def getPeopleList(self, offset):
         """
         Gets a list of people in the given dataset, limited to 40 from the given offset
-        @param datasetName: Name of the dataset
         @param offset: Given offset to start list from
         """
-        query = 'SELECT id FROM '+ datasetName +'_customers LIMIT 40 OFFSET '+offset
+        query = 'SELECT id FROM ' + self.datasetId + '_customers LIMIT 40 OFFSET ' + offset
         self.cursor.execute(sql.SQL(query))
         data = self.cursor.fetchall()
         returnList = []
         for row in data:
-            item = {"personid":row[0]}
+            item = {"personid": row[0]}
             returnList.append(item)
         return (json.dumps(returnList), 200)
 
-    def getPurchases(self, userName, dataset):
+    def getPurchases(self, userName):
         """
-        Gets a list of interactions (purchases) in the given dataset, limited to 40 from the given offset
-        @param datasetName: Name of the dataset
-        @param offset: Given offset to start list from
+        Gets a list of interactions (purchases) in the given dataset for the given user.
+        @param userName: customer in the dataset to return purchases for
         """
-        columnNames = self.getColumnNames(dataset+'_purchases')
-        query = 'SELECT * FROM ' + dataset + '_purchases WHERE user_id='+userName
+        columnNames = self.getColumnNames(self.datasetId + '_purchases')
+        query = 'SELECT * FROM ' + self.datasetId + '_purchases WHERE user_id=' + userName
         self.cursor.execute(sql.SQL(query))
         data = self.cursor.fetchall()
         returnList = []
@@ -399,11 +392,10 @@ class Dataset():
             returnList.append(returnItem)
         return (json.dumps(returnList), 200)
 
-    def getTimeStampList(self, dataset, format=list, fromDate = None, toDate = None):
+    def getTimeStampList(self, format=list, fromDate = None, toDate = None):
         """
         Returns an ordered list of the different timestamps that are present in the dataset between the given starting
         and ending dates.
-        @param dataset: Name of the dataset
         @param format: format to return list in (json or python list)
         @param fromDate: starting date
         @param toDate: ending date
@@ -414,10 +406,10 @@ class Dataset():
 
         try:
             if fromDate == None:
-                self.cursor.execute(sql.SQL('SELECT timestamp FROM  {table}_purchases ORDER BY timestamp ASC LIMIT 1'.format(table=dataset)))
+                self.cursor.execute(sql.SQL('SELECT timestamp FROM  {table}_purchases ORDER BY timestamp ASC LIMIT 1'.format(table=self.datasetId)))
                 fromDate = self.cursor.fetchone()[0]
             if toDate == None:
-                self.cursor.execute(sql.SQL('SELECT timestamp FROM  {table}_purchases ORDER BY timestamp DESC LIMIT 1'.format(table=dataset)))
+                self.cursor.execute(sql.SQL('SELECT timestamp FROM  {table}_purchases ORDER BY timestamp DESC LIMIT 1'.format(table=self.datasetId)))
                 toDate = self.cursor.fetchone()[0]
 
             delta = toDate - fromDate  # as timedelta
@@ -431,39 +423,36 @@ class Dataset():
         except:
             return ('"message":{"Wrong dataset name"}', 412)
 
-    def getArticleCount(self, datasetId):
+    def getArticleCount(self):
         """
         Returns total amount of articles in the given dataset
-        @param datasetId: Identifier for the dataset (name)
         """
-        self.cursor.execute(sql.SQL('SELECT "itemAmount" FROM datasets WHERE name=%s'),[datasetId])
+        self.cursor.execute(sql.SQL('SELECT "itemAmount" FROM datasets WHERE name=%s'), [self.datasetId])
         count = self.cursor.fetchall()[0][0]
         return (json.dumps(count), 200)
 
-    def getCustomerCount(self, datasetId, webReturn=True):
+    def getCustomerCount(self, webReturn=True):
         """
         Returns total amount of customers in the given dataset
-        @param datasetId: Identifier for the dataset (name)
         """
-        self.cursor.execute(sql.SQL('SELECT "customerAmount" FROM datasets WHERE name=%s'),[datasetId])
+        self.cursor.execute(sql.SQL('SELECT "customerAmount" FROM datasets WHERE name=%s'),[self.datasetId])
         count = self.cursor.fetchall()[0][0]
         if not webReturn:
             return count
         return (json.dumps(count), 200)
 
-    def getAmounts(self, datasetId):
+    def getAmounts(self):
         """
         Returns total amount of articles, customers and purchases in the given dataset
-        @param datasetId: Identifier for the dataset (name)
         """
-        print(datasetId)
-        self.cursor.execute(sql.SQL('SELECT "customerAmount", "itemAmount", "purchaseAmount" FROM datasets WHERE name=%s'),[datasetId])
+        print(self.datasetId)
+        self.cursor.execute(sql.SQL('SELECT "customerAmount", "itemAmount", "purchaseAmount" FROM datasets WHERE name=%s'),[self.datasetId])
         amounts = self.cursor.fetchall()
         print(amounts[0])
         return (json.dumps(amounts[0]), 200)
 
-    def setAllABTestsOutdated(self, dataset):
-        self.cursor.execute(sql.SQL('UPDATE abtest SET status=0 WHERE dataset=%s'), [dataset])
+    def setAllABTestsOutdated(self):
+        self.cursor.execute(sql.SQL('UPDATE abtest SET status=0 WHERE dataset=%s'), [self.datasetId])
         self.connection.commit()
 
     def addapt_numpy_float64(numpy_float64):

@@ -151,8 +151,8 @@ def uploadDataset():
 
         datasetName = request.form.get('datasetName')
     userName = user.username
-    dataset = Dataset()
-    dataset.add(datasetName, userCsv, itemCsv, interactionCsv, usersConnections, itemConnections, interactionConnections, userName)
+    dataset = Dataset(datasetName)
+    dataset.add(userCsv, itemCsv, interactionCsv, usersConnections, itemConnections, interactionConnections, userName)
 
     return make_response('{"message": "File successfully uploaded."}', 201)
 
@@ -222,7 +222,7 @@ def changeDataset():
     elif not user.admin:
         return make_response('you must be admin to perform this action', 500)
 
-    dataset = Dataset()
+    dataset = Dataset(request.form.get("dataSet"))
     returnValue = dataset.changeApiWrapper(request)
     return make_response(returnValue[0], returnValue[1])
 
@@ -233,9 +233,9 @@ def getRecordById():
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
 
-    dataset = Dataset()
-    returnValue = dataset.getRecordById(request.args.get("dataSet"), request.args.get("table"), request.args.get("id"))
-    return make_response(returnValue[0],returnValue[1])
+    dataset = Dataset(request.args.get("dataSet"))
+    returnValue = dataset.getRecordById(request.args.get("table"), request.args.get("id"))
+    return make_response(returnValue[0], returnValue[1])
 
 @app.route('/api/getDatasets', methods=['GET'])
 def getDatasets():
@@ -246,7 +246,7 @@ def getDatasets():
 
     dataset = Dataset()
     returnValue = dataset.getDatasets()
-    return make_response(returnValue[0],returnValue[1])
+    return make_response(returnValue[0], returnValue[1])
 
 @app.route('/api/deleteABTest', methods=['GET'])
 def deleteABTest():
@@ -259,7 +259,7 @@ def deleteABTest():
 
     abtest = ABTest(request.args.get("abTestName"))
     returnValue = abtest.delete()
-    return make_response(returnValue[0],returnValue[1])
+    return make_response(returnValue[0], returnValue[1])
 
 
 @app.route('/api/deleteDataset', methods=['GET'])
@@ -271,9 +271,9 @@ def deleteDataset():
     elif not user.admin:
         return make_response('you must be admin to perform this action', 500)
 
-    dataset = Dataset()
-    returnValue = dataset.deleteDataset(request.args.get("dataSet"))
-    return make_response(returnValue[0],returnValue[1])
+    dataset = Dataset(request.args.get("dataSet"))
+    returnValue = dataset.deleteDataset()
+    return make_response(returnValue[0], returnValue[1])
 
 @app.route('/api/deletePerson', methods=['GET'])
 def deletePerson():
@@ -284,9 +284,9 @@ def deletePerson():
     elif not user.admin:
         return make_response('you must be admin to perform this action', 500)
 
-    dataset = Dataset()
-    returnValue = dataset.deletePerson(request.args.get("personId"), request.args.get("setId"))
-    return make_response(returnValue[0],returnValue[1])
+    dataset = Dataset(request.args.get("setId"))
+    returnValue = dataset.deletePerson(request.args.get("personId"))
+    return make_response(returnValue[0], returnValue[1])
 
 
 @app.route('/api/deleteItem', methods=['GET'])
@@ -298,9 +298,9 @@ def deleteItem():
     elif not user.admin:
         return make_response('you must be admin to perform this action', 500)
 
-    dataset = Dataset()
-    returnValue = dataset.deleteItem(request.args.get("itemId"), request.args.get("setId"))
-    return make_response(returnValue[0],returnValue[1])
+    dataset = Dataset(request.args.get("setId"))
+    returnValue = dataset.deleteItem(request.args.get("itemId"))
+    return make_response(returnValue[0], returnValue[1])
 
 @app.route('/api/getItemList', methods=['GET'])
 def getItemList():
@@ -309,9 +309,9 @@ def getItemList():
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
 
-    dataset = Dataset()
-    returnValue = dataset.getItemList(request.args.get("dataSet"), request.args.get("offset"))
-    return make_response(returnValue[0],returnValue[1])
+    dataset = Dataset(request.args.get("dataSet"))
+    returnValue = dataset.getItemList(request.args.get("offset"))
+    return make_response(returnValue[0], returnValue[1])
 
 @app.route('/api/getPeopleList', methods=['GET'])
 def getPeopleList():
@@ -320,9 +320,9 @@ def getPeopleList():
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
 
-    dataset = Dataset()
-    returnValue = dataset.getPeopleList(request.args.get("dataSet"), request.args.get("offset"))
-    return make_response(returnValue[0],returnValue[1])
+    dataset = Dataset(request.args.get("dataSet"))
+    returnValue = dataset.getPeopleList(request.args.get("offset"))
+    return make_response(returnValue[0], returnValue[1])
 
 @app.route('/api/getDatasetAmounts', methods=['GET'])
 def getDatasetAmounts():
@@ -331,8 +331,8 @@ def getDatasetAmounts():
     back = user.checkTokenAndLoadData(request)
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
-    dataset = Dataset()
-    returnValue = dataset.getAmounts(request.args.get("dataSet"))
+    dataset = Dataset(request.args.get("dataSet"))
+    returnValue = dataset.getAmounts()
     return make_response(returnValue[0], returnValue[1])
 
 @app.route('/api/getABtests', methods=['GET'])
@@ -354,9 +354,10 @@ def getPurchases():
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
 
-    dataset = Dataset()
-    returnValue = dataset.getPurchases(request.args.get("id"), request.args.get("dataSet"))
-    return make_response(returnValue[0],returnValue[1])
+    dataset = Dataset(request.args.get("dataSet"))
+    returnValue = dataset.getPurchases(request.args.get("id"))
+    return make_response(returnValue[0], returnValue[1])
+
 
 @app.route('/api/getTimeStampList', methods=['GET'])
 def getTimeStampList():
@@ -365,9 +366,10 @@ def getTimeStampList():
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
 
-    dataset = Dataset()
-    returnValue = dataset.getTimeStampList(request.args.get("id"), json)
-    return make_response(returnValue[0],returnValue[1])
+    dataset = Dataset(request.args.get("id"))
+    returnValue = dataset.getTimeStampList(json)
+    return make_response(returnValue[0], returnValue[1])
+
 
 @app.route('/api/getArticleCount', methods=['GET'])
 def getArticleCount():
@@ -376,9 +378,10 @@ def getArticleCount():
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
 
-    dataset = Dataset()
-    returnValue = dataset.getArticleCount(request.args.get("id"))
-    return make_response(returnValue[0],returnValue[1])
+    dataset = Dataset(request.args.get("id"))
+    returnValue = dataset.getArticleCount()
+    return make_response(returnValue[0], returnValue[1])
+
 
 @app.route('/api/getCustomerCount', methods=['GET'])
 def getCustomerCount():
@@ -387,9 +390,9 @@ def getCustomerCount():
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
 
-    dataset = Dataset()
-    returnValue = dataset.getCustomerCount(request.args.get("id"))
-    return make_response(returnValue[0],returnValue[1])
+    dataset = Dataset(request.args.get("id"))
+    returnValue = dataset.getCustomerCount()
+    return make_response(returnValue[0], returnValue[1])
 
 
 @app.route('/api/getUsers', methods=['GET'])
@@ -403,7 +406,7 @@ def getUsers():
 
     user = User(app)
     returnValue = user.getUsers()
-    return make_response(returnValue[0],returnValue[1])
+    return make_response(returnValue[0], returnValue[1])
 
 
 # React interface, alle niet verwezen app.route's worden doorverwezen naar react interface in de react_build folder
@@ -414,6 +417,7 @@ def reactApp(path):
         path = "index.html"
 
     return app.send_static_file(path)
+
 
 @app.route('/api/changeAdminPermission', methods=['GET'])
 def changeAdminPermission():
@@ -451,6 +455,7 @@ def deleteUser():
     returnValue = user.deleteUser(request.args.get("userName"))
     return make_response(returnValue[0],returnValue[1])
 
+
 @app.route('/api/getUsersFromABTest', methods=['GET'])
 def getUsersFromABTest():
     user = User(app)
@@ -470,9 +475,10 @@ def getItemsFromABTest():
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
 
-    abtest = ABTest(request.args.get("abTestId"),)
+    abtest = ABTest(request.args.get("abTestId"))
     returnValue = abtest.getItemsFromABTest(request.args.get("startDate"), request.args.get("endDate"))
     return make_response(returnValue[0], returnValue[1])
+
 
 @app.route('/api/getDatasetIdFromABTest', methods=['GET'])
 def getDatasetIdFromABTest():
@@ -480,9 +486,10 @@ def getDatasetIdFromABTest():
     back = user.checkTokenAndLoadData(request)
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
-    abtest = ABTest()
-    returnValue = abtest.getDatasetIdFromABTest(request.args.get("abTestId"))
+    abtest = ABTest(request.args.get("abTestId"))
+    returnValue = abtest.getDatasetIdFromABTest()
     return make_response(returnValue[0], returnValue[1])
+
 
 @app.route('/api/getPendingAbTests', methods=['GET'])
 def getPendingAbTests():
@@ -491,8 +498,7 @@ def getPendingAbTests():
     return make_response(returnValue[0], returnValue[1])
 
 
-
 # RUN DEV SERVER
 if __name__ == "__main__":
-    #app.run(HOST, debug=DEBUG, port=8000)
+    # app.run(HOST, debug=DEBUG, port=8000)
     socketio.run(app,  debug=DEBUG, port=8000)
