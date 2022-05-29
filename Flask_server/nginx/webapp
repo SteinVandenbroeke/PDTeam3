@@ -12,6 +12,6 @@ server {
         #proxy_buffering off;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
-        proxy_pass http://unix:/home/app/PDTeam3/Flask_server/src/ProgDBTutor/webapp.sock/socket.io/sss;
+        proxy_pass http://unix:/home/app/PDTeam3/Flask_server/src/ProgDBTutor/webapp.sock/socket.io;
     }
 }
