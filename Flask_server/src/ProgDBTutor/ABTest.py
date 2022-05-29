@@ -39,7 +39,6 @@ class ABTest():
         user_histories = dict()
         
         for user_id, item_id in interactions:
-            print("mhhh")
             if len(user_histories) < amt_users and user_id not in user_histories:
                 user_histories[user_id] = list()
 
@@ -117,25 +116,17 @@ class ABTest():
                 elif algo[0] == 2:
                     for customer, recommendations in results.items():
                         if len(recommendations) > 0:
-                            print("sqleingg")
-                            print(customer)
-                            print(recommendations)
                             self.cursor.execute(
                                 sql.SQL(
                                     'insert into "abrec" ("abtest_algorithms_id","timestamp") values (%s,%s) RETURNING "idAbRec"'),
                                 [algo[3], time + datetime.timedelta(days=algo[1])])
                             idAbRec = self.cursor.fetchone()[0]
 
-                            print("abrec")
 
                             query = 'insert into abrecid_personrecid("idAbRec", personid, test_name) VALUES(%s, %s, %s)'.format(
                             table=self.dataset)
                             items = [idAbRec, customer, self.abTestId]
                             psycopg2.extras.execute_batch(self.cursor, query, [items])
-
-                            print("abrecid_personrecid")
-                            print(items)
-                            print(recommendations)
 
                             for rec in recommendations:
                                 self.cursor.execute(sql.SQL(
@@ -250,43 +241,27 @@ class ABTest():
             # This one is faster, but requires more memory
             #alg = ItemKNN(k=k, normalize=normalize)
 
-            print("Parsing data")
-
             query = 'SELECT user_id, item_id FROM {table}_purchases WHERE "timestamp" >= %s AND "timestamp" <= %s'.format(
                 table=self.dataset)
             self.cursor.execute(sql.SQL(query), [startDate, endDate])
             interactions = self.cursor.fetchall()
 
             if len(interactions) > 0:
-                print("test")
-
                 user_ids, item_ids = zip(*interactions)
                 unique_item_ids = list(set(item_ids))
-
-                print(unique_item_ids)
-
-                print("fitting model")
                 alg.train(interactions, unique_item_ids)
-
                 query = 'SELECT COUNT(*) FROM {table}_customers'.format(
                     table=self.dataset)
                 self.cursor.execute(sql.SQL(query), [])
                 amt_users = self.cursor.fetchone()[0]
 
-                print(f"fetching history for {amt_users} users")
-                print(interactions)
                 histories_keys, histories_values = self.history_from_subset_interactions(interactions, amt_users)
-                #print(histories)
-                print("computing recommendations")
                 recommendations = alg.recommend_all(histories_values, k)
 
                 recommendations_dict = dict()
                 for count, value in enumerate(histories_keys):
                     if len(recommendations[count]) > 0:
                         recommendations_dict[value] = recommendations[count]
-
-                print("recommendations:")
-                print(recommendations)
                 return recommendations_dict
             
             return dict()

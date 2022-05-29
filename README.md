@@ -86,5 +86,8 @@ git pull:
 ga naar eigen user:
 ```exit```
 
+to start te gunicorn server:
+gunicorn --bind 0.0.0.0:8000 -k eventlet -w 1 wsgi:app
+
 Restart webapp:
 ```sudo systemctl restart webapp```
