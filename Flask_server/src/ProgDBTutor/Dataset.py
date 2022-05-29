@@ -1,4 +1,5 @@
 import json
+import math
 from datetime import datetime,timedelta
 import pandas as pd
 from quote_data_access import DBConnection
@@ -220,14 +221,13 @@ class Dataset():
             columnString += column
             columnString += ', '
         columnString = columnString[:-2]
-        print(columnString)
+
         if table == datasetName + "_purchases":
             select = 'SELECT '+columnString+' FROM {table} WHERE user_id=%s; '
         else:
             select = 'SELECT '+columnString+' FROM {table} WHERE id=%s; '
         self.cursor.execute(sql.SQL(select).format(table=sql.Identifier(table)), [id])
         allrows = self.cursor.fetchall()
-        print(allrows)
 
         if len(allrows) <= 0:
             return ("Id {id} not found in {table}".format(id=id, table=table), 400)
@@ -235,10 +235,13 @@ class Dataset():
 
         returnObject = []
         for i in range (len(allrows[0])):
+            value = allrows[0][i]
+            if type(value) is not str:
+                if math.isnan(value):
+                    value = "NONE"
             if type(allrows[0][i]) is datetime:
-                returnObject.append({"dbName": columnNames[i], "dbValue": allrows[0][i].strftime("%m/%d/%Y %H:%M:%S")})
-            else:
-                returnObject.append({"dbName": columnNames[i], "dbValue": allrows[0][i]})
+                value = value.strftime("%m/%d/%Y %H:%M:%S")
+            returnObject.append({"dbName": columnNames[i], "dbValue": value})
         self.cursor.close()
         self.connection.close()
         return (json.dumps(returnObject), 200)
