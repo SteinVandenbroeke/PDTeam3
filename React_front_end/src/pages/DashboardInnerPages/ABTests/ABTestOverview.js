@@ -240,18 +240,17 @@ const ABTestOverview = () => {
                                                                          slider={sliders} abTestData={abTestData}
                                                                          startDate={values[0]}
                                                                          endDate={values[1]}/></CharSkeleton>
+
                     </Col>
-                    <Col xs={12} md={6} lg={4}>
-                        <TabelSkeleton loading={loading}><MostRecomendedItems
-                                                                              showFullList={openFullItemList}
-                                                                              slider={sliders}
-                                                                              abTestData={abTestData}
-                                                                              startDate={values[0]}
-                                                                              endDate={values[1]}/></TabelSkeleton>
+                    <Col xs={6} md={3} lg={4}>
+                        <SmallInformationCard title={"Most recommended items"} value={
+                            <Button onClick={()=>{setCurrentPage("items")}}>Show list</Button>
+                        } tooltip={"Item recommend rate list from day x to day y"}/>
+
                     </Col>
-                    <Col xs={6} md={3} lg={2}>
+                    <Col xs={6} md={3} lg={4}>
                         <SmallInformationCard title={"Most active users"} value={
-                            <Button onClick={()=>{setCurrentPage("persons")}}>Full list</Button>
+                            <Button onClick={()=>{setCurrentPage("persons")}}>Show list</Button>
                         } tooltip={"Purchases from day x to day y"}/>
                     </Col>
                 </Row>

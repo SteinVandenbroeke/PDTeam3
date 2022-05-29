@@ -494,5 +494,5 @@ def getPendingAbTests():
 
 # RUN DEV SERVER
 if __name__ == "__main__":
-    app.run(HOST, debug=DEBUG, port=8000)
-    #socketio.run(app,  debug=DEBUG, port=8000)
+    #app.run(HOST, debug=DEBUG, port=8000)
+    socketio.run(app,  debug=DEBUG, port=8000)
