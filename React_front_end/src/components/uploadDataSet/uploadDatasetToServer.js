@@ -12,7 +12,6 @@ const UploadDatasetToServer = (props) => {
         setUploading(1);
         let request = new ServerRequest();
         var formData = new FormData();
-        console.log(interactionConnections)
         formData.append("interactionConnections", JSON.stringify(interactionConnections));
         formData.append("usersConnections",  JSON.stringify(usersConnections));
         formData.append("itemConnections",  JSON.stringify(itemConnections));

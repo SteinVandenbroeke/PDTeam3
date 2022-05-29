@@ -43,13 +43,10 @@ const AddAlgoritms = (props) => {
             return
         }
         props.setCurrentStep(props.currentStep + 1)
-        console.log(algorithms);
-        console.log(algorithms.slice(1));
         props.setAlgorithms(algorithms.slice(1))
     }
     function checkExistingCombination(tempK){
         for (var i = 1; i < algorithms.length; i++) {
-            console.log(algorithms[i][0]  , valueSelect , parseInt(algorithms[i][1]) , parseInt(trainingIntervalvalue) , parseInt(algorithms[i][2]) ,  tempK)
             if(algorithms[i][0] === valueSelect && parseInt(algorithms[i][1]) === parseInt(trainingIntervalvalue) && parseInt(algorithms[i][2]) ===  tempK){
                 return true;
             }

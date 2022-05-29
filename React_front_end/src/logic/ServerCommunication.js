@@ -57,7 +57,6 @@ export class ServerRequest{
 		let myHeaders = new Headers();
 		if(loginRequired){
 			myHeaders.append("x-access-token", this.authToken);
-			console.log(this.authToken);
 		}
 
 		let getString = "?"

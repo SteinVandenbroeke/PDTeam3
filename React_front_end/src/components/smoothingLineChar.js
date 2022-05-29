@@ -10,15 +10,12 @@ const SmoothingLineCard = (props) => {
     const [labels, setLabels] = React.useState([]);
 
     async function smoothing(){
-        console.log("smoothing")
         let windowSmootingSize = parseInt(props.smoothingWindow)
         if(windowSmootingSize <= 0){
             return
         }
         let newLabels = []
-        console.log("object to json to object");
         let dataCp = JSON.parse(JSON.stringify(props.data));
-        console.log("object to json to object klaar");
         for(let i = 0; i < dataCp.length; i++){
             dataCp[i].data = [];
         }
@@ -37,7 +34,6 @@ const SmoothingLineCard = (props) => {
                 dataCp[a].data.push(total/totalCount);
             }
         }
-        console.log("done")
         setLabels(newLabels);
         setData(dataCp);
     }
@@ -45,10 +41,8 @@ const SmoothingLineCard = (props) => {
     useEffect(() => {
         setData(props.data);
         setLabels(props.labels);
-        console.log(props.smoothingWindow)
         if(props.data !== null && props.data !== undefined && props.data !== [] && props.smoothingWindow !== 0 && props.smoothingWindow != "0"){
-            console.log("smooting" + props.smoothingWindow)
-            smoothing().then(r => console.log("jeeej"));
+            smoothing()
         }
     }, [props.smoothingWindow,props.data]);
 

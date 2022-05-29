@@ -35,7 +35,7 @@ class Dataset():
         """
 
         # customer table:
-        print("customers toevoegen")
+        print("add Customers")
         customerTableName = self.datasetId.lower() + '_customers'
         customerData = pd.read_csv(customerCSV)
         customerDf = pd.DataFrame(customerData)
@@ -77,10 +77,10 @@ class Dataset():
             procentString = procentString[:-1]
             createCustomerInsert = 'insert into ' + customerTableName + ' values (' + procentString + ' )'
             self.cursor.execute(createCustomerInsert, tuple(sortedData))
-        print("customers toegevoegd")
+        print("customers added")
 
         # article table:
-        print("articles toevoegen")
+        print("add articles")
         articleTableName = self.datasetId + '_articles'
         articleData = pd.read_csv(articleCSV)
         articleDf = pd.DataFrame(articleData)
@@ -127,10 +127,10 @@ class Dataset():
             procentString = procentString[:-1]
             createArticleInsert = 'insert into ' + articleTableName + ' values (' + procentString + ' )'
             self.cursor.execute(createArticleInsert, tuple(sortedData))
-        print("articles toegevoegd")
+        print("articles added")
 
         # purchase table:
-        print("purchases toevoegen")
+        print("add purchases")
         purchaseTableName = self.datasetId + '_purchases'
         purchaseData = pd.read_csv(purchasesCSV)
         purchaseDf = pd.DataFrame(purchaseData)
@@ -156,7 +156,7 @@ class Dataset():
         # finalData.append(tuple(sortedData))
         psycopg2.extras.execute_batch(self.cursor,createPurchaseInsert, purchaseDf.values)
         self.cursor.execute(sql.SQL('insert into "datasets" ("name","customerAmount","itemAmount","purchaseAmount","createdBy") values (%s,%s,%s,%s,%s)'),[self.datasetId.lower(), customerAmpunt, articleAmount,purchaseAmount, userName])
-        print("purchases toegevoegd")
+        print("purchases added")
 
         self.connection.commit()
 
@@ -253,7 +253,6 @@ class Dataset():
         select = 'SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = N%s;'
         self.cursor.execute(sql.SQL(select).format(), [table])
         allrows = self.cursor.fetchall()
-        print(allrows)
         returnList = []
         for row in allrows:
             returnList.append(row[0])
@@ -314,9 +313,9 @@ class Dataset():
         Deletes a person from the given dataset
         @param personId: Identifier for the person
         """
-        query = 'DELETE FROM ' + self.datasetId + '_customers WHERE id=' + personId
         try:
-            self.cursor.execute(sql.SQL(query))
+            self.cursor.execute(sql.SQL('DELETE FROM {table}_customers WHERE id=%s'.format(table=self.datasetId)), [personId])
+            self.cursor.execute(sql.SQL('UPDATE datasets SET "customerAmount"="customerAmount"-1 WHERE name=%s'),[self.datasetId])
             self.connection.commit()
         except:
             return ('{"message": "Could not delete user: "'+personId+'}', 500)
@@ -333,7 +332,8 @@ class Dataset():
         """
         query = 'DELETE FROM ' + self.datasetId + '_articles WHERE id=' + itemId
         try:
-            self.cursor.execute(sql.SQL(query))
+            self.cursor.execute(sql.SQL('DELETE FROM {table}_articles WHERE id=%s'.format(table=self.datasetId)), [itemId])
+            self.cursor.execute(sql.SQL('UPDATE datasets SET "itemAmount"="itemAmount"-1 WHERE name=%s'), [self.datasetId])
             self.connection.commit()
         except:
             return ('{"message": "Could not delete item: "'+itemId+'}', 500)
@@ -413,9 +413,7 @@ class Dataset():
                 toDate = self.cursor.fetchone()[0]
 
             delta = toDate - fromDate  # as timedelta
-            print(delta)
             returnList = [(fromDate + timedelta(days=i)).strftime("%d/%m/%Y %H:%M:%S") for i in range(delta.days + 1)]
-            print(returnList)
             if format == json:
                 return (json.dumps(returnList), 200)
             elif format == list:
@@ -445,10 +443,9 @@ class Dataset():
         """
         Returns total amount of articles, customers and purchases in the given dataset
         """
-        print(self.datasetId)
+
         self.cursor.execute(sql.SQL('SELECT "customerAmount", "itemAmount", "purchaseAmount" FROM datasets WHERE name=%s'),[self.datasetId])
         amounts = self.cursor.fetchall()
-        print(amounts[0])
         return (json.dumps(amounts[0]), 200)
 
     def setAllABTestsOutdated(self):

@@ -13,7 +13,6 @@ class AbtestLoading extends React.Component {
 
     componentWillUnmount() {
         this.socket.close()
-        console.log("component unmounted")
     }
 
     padTo2Digits(num) {
@@ -38,7 +37,6 @@ class AbtestLoading extends React.Component {
             reconnection: true,
             // transports: ['websocket']
         });
-        console.log("socket ok");
 
         let temploading = false;
         setTimeout(function() {
@@ -48,7 +46,6 @@ class AbtestLoading extends React.Component {
         }.bind(this), 2000);
 
         this.socket.on("newData", message => {
-            console.log("responseMessage", message)
             let tempDict = this.state.times;
             if(message[1] !== null){
                 let miliSecondsEstimation = (message[1] / 1000);
@@ -75,7 +72,6 @@ class AbtestLoading extends React.Component {
     loadCurrentTestAndStartSocket(){
         let request = new ServerRequest();
         request.sendGet("getPendingAbTests").then(requestData => {
-            console.log("print items")
             let tempDict = {};
             requestData.map((item) => {
                 if(item[1] == 2){
@@ -86,7 +82,6 @@ class AbtestLoading extends React.Component {
                 }
 
             });
-            console.log(tempDict)
             this.setState({times: tempDict, loading:true})
             this.loadSocket();
         }

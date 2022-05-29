@@ -20,7 +20,6 @@ class TestQuoteDataAccess(unittest.TestCase):
         connection = self._connect()
         quote_dao = QuoteDataAccess(dbconnect=connection)
         quote_obj=quote_dao.get_quote(iden=1)
-        print(quote_obj.to_dct())
         self.assertEqual('If people do not believe that mathematics is simple, it is only because they do not realize how complicated life is.'.upper(), 
                          quote_obj.text.upper())
         connection.close()
@@ -29,7 +28,6 @@ class TestQuoteDataAccess(unittest.TestCase):
         connection = self._connect()
         quote_dao = QuoteDataAccess(dbconnect=connection)
         quote_objects = quote_dao.get_quotes()
-        print(quote_objects[1].to_dct())
         self.assertEqual('If people do not believe that mathematics is simple, it is only because they do not realize how complicated life is.'.upper(), 
                          quote_objects[0].text.upper())
         connection.close()
@@ -42,7 +40,6 @@ class TestQuoteDataAccess(unittest.TestCase):
         quote_obj = Quote(iden=None, text='If Len can do it, anyone can ;-)', author='Len')
         quote_dao.add_quote(quote_obj)
         quote_objects = quote_dao.get_quotes()
-        print(quote_objects[-1].to_dct())
         self.assertEqual('If Len can do it, anyone can ;-)'.upper(), 
                          quote_objects[-1].text.upper())
         self.assertEqual('Len', quote_objects[-1].author)

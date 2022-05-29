@@ -65,7 +65,6 @@ export class User{
      * @returns {boolean}
      */
     isAdmin(){
-        console.log("is admin: " + this.admin)
         return this.admin;
     }
 

@@ -37,7 +37,7 @@ class ABTest():
     def history_from_subset_interactions(self, interactions, amt_users=5) -> List[List]:
         """ Take the history of the first users in the dataset and return as list of lists"""
         user_histories = dict()
-        
+
         for user_id, item_id in interactions:
             if len(user_histories) < amt_users and user_id not in user_histories:
                 user_histories[user_id] = list()
@@ -74,8 +74,6 @@ class ABTest():
         algoritmCounter = 0
         for algo in self.algorithms:
             time = self.beginTs
-            print("algo id" + str(algo))
-            print(self.topK)
             algoritmCounter += 1
 
             startTime = datetime.datetime.now()
@@ -180,7 +178,6 @@ class ABTest():
         pass
 
     def sendTimeEstimation(self,loadingSocket, estTimeMicroSec, totalMicroSecDone):
-        #print(str(datetime.timedelta(microseconds=estTimeMicroSec)))
         if self.lastSendTime != None and estTimeMicroSec != None and (datetime.datetime.now() - self.lastSendTime).total_seconds() <= 1:
             return
         loadingSocket.emit('newData', [self.abTestId, estTimeMicroSec, totalMicroSecDone])
@@ -237,7 +234,7 @@ class ABTest():
             print("start")
             print(k)
             alg = ItemKNNIterative(k=k)
-            
+
             # This one is faster, but requires more memory
             #alg = ItemKNN(k=k, normalize=normalize)
 
@@ -263,7 +260,7 @@ class ABTest():
                     if len(recommendations[count]) > 0:
                         recommendations_dict[value] = recommendations[count]
                 return recommendations_dict
-            
+
             return dict()
 
     def overviewPageData(self):
@@ -367,24 +364,6 @@ class ABTest():
         itemsql = self.cursor.fetchone()
         return (json.dumps(itemsql[0]), 200)
 
-    def userOverviewData(self, min=None, max=None):
-        """
-        userOverviewData: gives a json format for the user page from AB test
-        @param min: from where (used to limit the user list)
-        @param max: to where (used to limit the user list)
-        @return: json for all users in ABTest
-        """
-        print("User data in ABtest")
-
-    def itemOverviewData(self, min, max):
-        """
-        vitemOverviewData: gives a json format for the item page from AB test
-        @param min:from where (used to limit the user list)
-        @param max:to where (used to limit the user list)
-        @return:json for all items in ABTest
-        """
-        print("item data in ABtest")
-
     def getABtests(self):
         self.cursor.execute(sql.SQL('SELECT * FROM "abtest"'))
         data = self.cursor.fetchall()
@@ -422,7 +401,7 @@ class ABTest():
         stepSize = self.cursor.fetchone()[0]
         self.cursor.execute(sql.SQL('SELECT algId.id, algName.name, algId.interval FROM abtest_algorithms as algId, algorithms as algName WHERE test_name=%s AND algId.algorithmid=algName.id'),[self.abTestId])
         algorithms = self.cursor.fetchall()
-        self.cursor.execute(sql.SQL('SELECT * FROM (SELECT id, SUM(p.parameter),COUNT(p.user_id),SUM(case when p.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND p.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) FROM {table}_customers, {table}_purchases AS p WHERE id = user_id GROUP BY id) AS Info LEFT OUTER JOIN (SELECT Succes.id, Succes.algId, DIV(Succes.TotalSuccesRecommend*100, Recommend.TotalRecommend), DIV(Succes.IntervalSuccesRecommend*100, Recommend.IntervalRecommend) FROM(SELECT c.id, r.algId, r.TotalSuccesRecommend, r.IntervalSuccesRecommend FROM {table}_customers AS c LEFT OUTER JOIN (SELECT p.user_id AS userId, algs.id AS algId, COUNT(i."itemId") AS TotalSuccesRecommend, SUM(case when p.timestamp>=to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND p.timestamp<=to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) as IntervalSuccesRecommend FROM abreclist AS i, abrec AS ab, abtest_algorithms AS algs, abtest AS test, {table}_purchases AS p  WHERE test.test_name=%s AND algs.test_name=test.test_name AND algs.id=ab.abtest_algorithms_id AND ab."idAbRec"=i."idAbRec" AND i."itemId"=p.item_id AND ab.timestamp<=p.timestamp AND ab.timestamp + INTERVAL \'%s days\' >p.timestamp GROUP BY p.user_id, algs.id) as r ON c.id=r.userId) AS Succes LEFT OUTER JOIN (SELECT algs.id, NULLIF(count(i."idAbRec"),0) AS TotalRecommend, NULLIF(SUM(case when ab.timestamp>=to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND ab.timestamp<=to_date(%s, \'dd/mm/yyyy HH24:MI:SS\')  then 1 else 0 end),0) AS IntervalRecommend FROM abrec AS ab, abreclist AS i, abtest_algorithms AS algs, abtest AS test WHERE test.test_name=%s AND algs.test_name=test.test_name AND algs.id=ab.abtest_algorithms_id AND ab."idAbRec"=i."idAbRec" group by algs.id) AS Recommend ON Succes.algId=Recommend.id) AS CTR ON Info.id=CTR.id'.format(table=self.dataset)),[startDate, endDate,startDate,endDate, self.abTestId, stepSize, startDate,endDate,self.abTestId])
+        self.cursor.execute(sql.SQL('SELECT * FROM (SELECT id, SUM(p.parameter),COUNT(p.user_id),SUM(case when p.timestamp >= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND p.timestamp <= to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) FROM {table}_customers, {table}_purchases AS p WHERE id = user_id GROUP BY id) AS Info LEFT OUTER JOIN (SELECT Succes.id, Succes.algId, CAST((Succes.TotalSuccesRecommend*100) AS float) / CAST(Recommend.TotalRecommend AS float), CAST((Succes.IntervalSuccesRecommend*100) AS float) / CAST(Recommend.IntervalRecommend AS float) FROM(SELECT c.id, r.algId, r.TotalSuccesRecommend, r.IntervalSuccesRecommend FROM {table}_customers AS c LEFT OUTER JOIN (SELECT p.user_id AS userId, algs.id AS algId, COUNT(i."itemId") AS TotalSuccesRecommend, SUM(case when p.timestamp>=to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND p.timestamp<=to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') then 1 else 0 end) as IntervalSuccesRecommend FROM abreclist AS i, abrec AS ab, abtest_algorithms AS algs, abtest AS test, {table}_purchases AS p  WHERE test.test_name=%s AND algs.test_name=test.test_name AND algs.id=ab.abtest_algorithms_id AND ab."idAbRec"=i."idAbRec" AND i."itemId"=p.item_id AND ab.timestamp<=p.timestamp AND ab.timestamp + INTERVAL \'%s days\' >p.timestamp GROUP BY p.user_id, algs.id) as r ON c.id=r.userId) AS Succes LEFT OUTER JOIN (SELECT algs.id, NULLIF(count(i."idAbRec"),0) AS TotalRecommend, NULLIF(SUM(case when ab.timestamp>=to_date(%s, \'dd/mm/yyyy HH24:MI:SS\') AND ab.timestamp<=to_date(%s, \'dd/mm/yyyy HH24:MI:SS\')  then 1 else 0 end),0) AS IntervalRecommend FROM abrec AS ab, abreclist AS i, abtest_algorithms AS algs, abtest AS test WHERE test.test_name=%s AND algs.test_name=test.test_name AND algs.id=ab.abtest_algorithms_id AND ab."idAbRec"=i."idAbRec" group by algs.id) AS Recommend ON Succes.algId=Recommend.id) AS CTR ON Info.id=CTR.id'.format(table=self.dataset)),[startDate, endDate,startDate,endDate, self.abTestId, stepSize, startDate,endDate,self.abTestId])
         users = self.cursor.fetchall()
         usersOnId = {}
         for row in users:
@@ -435,7 +414,7 @@ class ABTest():
                     div1 = 0
                 if div2 is None:
                     div2 = 0
-                usersOnId[row[0]][row[5]] = [int(div1), int(div2)]
+                usersOnId[row[0]][row[5]] = [div1,div2]
         returnList = []
         header = ["User Id", "Purchase Amount", "Total Purchases", "Purchases In Range"]
         for algo in algorithms:

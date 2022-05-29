@@ -22,8 +22,6 @@ const CSVUploadSettings = (props) => {
     }
 
     function nexStep(){
-
-        console.log(props.csvDbConnections)
         if( Object.values(props.csvDbConnections.connections).includes("timestamp") &&
             Object.values(props.csvDbConnections.connections).includes("item_id") &&
             Object.values(props.csvDbConnections.connections).includes("user_id") &&
