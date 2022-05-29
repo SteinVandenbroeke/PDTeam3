@@ -12,7 +12,6 @@ const Welcome = () => {
             <header>
                 <h1>Welcome to this great site!</h1>
             </header>
-            <AbtestLoading></AbtestLoading>
             <img src={image} alt={"AB Test image"} width={"450"}/>
 
         </div>

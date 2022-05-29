@@ -39,9 +39,14 @@ class AbtestLoading extends React.Component {
             // transports: ['websocket']
         });
         console.log("socket ok");
+
         let temploading = false;
-        let tempDict = this.state.times;
-        this.setState({times: tempDict, loading:temploading})
+        setTimeout(function() {
+            //Wait for sure if there are no tests running (every 1 sec response from server)
+            let tempDict = this.state.times;
+            this.setState({times: tempDict, loading:false})
+        }.bind(this), 2000);
+
         this.socket.on("newData", message => {
             console.log("responseMessage", message)
             let tempDict = this.state.times;
@@ -57,6 +62,9 @@ class AbtestLoading extends React.Component {
                 delete tempDict[message[0]];
                 toast.success(`ABTest ${message[0]} is toegevoegd`);
             }
+            else if(message[2] == "Failed"){
+                tempDict[message[0]] = [null, "<div>A/B test Failed<br/><Button>Retry</Button></div>"];
+            }
             else{
                 tempDict[message[0]] = [0, message[2]];
             }
@@ -68,10 +76,17 @@ class AbtestLoading extends React.Component {
         let request = new ServerRequest();
         request.sendGet("getPendingAbTests").then(requestData => {
             console.log("print items")
-            let tempDict = [];
+            let tempDict = {};
             requestData.map((item) => {
-                tempDict[item] = [null, "Time undefined"];
+                if(item[1] == 2){
+                    tempDict[item[0]] = [null, "Almost done, calculating metrics"];
+                }
+                else if (item[1] == 3){
+                    tempDict[item[0]] = [null, (<div>A/B test Failed<br/><Button>Retry</Button></div>)];
+                }
+
             });
+            console.log(tempDict)
             this.setState({times: tempDict, loading:true})
             this.loadSocket();
         }

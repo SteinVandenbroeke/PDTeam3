@@ -47,16 +47,29 @@ class ABTest():
 
         return list(user_histories.values())
 
-    def createItems(self):
-        print("nu aan het doen!")
-
     def create(self, loadingSocket = None):
         """
         Create and runs the AB test. After running the algorithms, calculated information is inserted into the database.
         """
+        try:
+            self.calculateAndInsertRecomended(loadingSocket)
+            self.sendTimeEstimation(loadingSocket, None, "Almost")
+            self.calculateMetrics()
+            self.sendTimeEstimation(loadingSocket, None, "Done")
+            self.updateStatus(1)
+        except:
+            self.sendTimeEstimation(loadingSocket, None, "Failed")
+            self.updateStatus(3)
+
+    def calculateAndInsertRecomended(self, loadingSocket):
+        """
+        Runs all recomendation algoritms for the ab test, and insert them into teh DB
+        @param loadingSocket:
+        @return:
+        """
         totalDurationMicroSec = 0
         lastXDurationsMicroSec = []
-        xDurations = ((self.endTs - self.beginTs)/self.stepSize).days
+        xDurations = ((self.endTs - self.beginTs) / self.stepSize).days
         loopCounter = 0
         algoritmCounter = 0
         for algo in self.algorithms:
@@ -71,21 +84,22 @@ class ABTest():
 
                 results = self.execute(self.topK, time, time + datetime.timedelta(days=algo[1]), algo[0])
                 if (algo[0] == 0 or algo[0] == 1) and len(results) != 0:
-                    #niet knn
+                    # niet knn
                     self.cursor.execute(
-                        sql.SQL('insert into "abrec" ("abtest_algorithms_id","timestamp") values (%s,%s) RETURNING "idAbRec"'),
+                        sql.SQL(
+                            'insert into "abrec" ("abtest_algorithms_id","timestamp") values (%s,%s) RETURNING "idAbRec"'),
                         [algo[3], time + datetime.timedelta(days=algo[1])])
                     idAbRec = self.cursor.fetchone()[0]
                     '''self.cursor.execute(sql.SQL(
                         'insert into abrecid_personrecid("idAbRec", personid, test_name) SELECT abrec."idAbRec" ,id AS userId, test_name FROM {table}_customers,abrec,abtest WHERE abrec."idAbRec"=%s AND abtest.test_name=%s'.format(table=self.dataset)),
                                         [idAbRec, self.abTestId])'''
 
-                    #niet nodig voor popularity en recency aangzien elke user hetzelfde is
-                    #query = 'insert into abrecid_personrecid("idAbRec", personid, test_name) SELECT %s ,id AS userId, %s FROM {table}_customers'.format(table=self.dataset)
-                    #items = [idAbRec, self.abTestId]
-                    #psycopg2.extras.execute_batch(self.cursor,query, [items])
+                    # niet nodig voor popularity en recency aangzien elke user hetzelfde is
+                    # query = 'insert into abrecid_personrecid("idAbRec", personid, test_name) SELECT %s ,id AS userId, %s FROM {table}_customers'.format(table=self.dataset)
+                    # items = [idAbRec, self.abTestId]
+                    # psycopg2.extras.execute_batch(self.cursor,query, [items])
 
-                    #zet person id op 0 aangezien dit voor elke user toch hetzelfde is
+                    # zet person id op 0 aangezien dit voor elke user toch hetzelfde is
                     query = 'insert into abrecid_personrecid("idAbRec", personid, test_name) VALUES(%s,0, %s)'.format(
                         table=self.dataset)
                     items = [idAbRec, self.abTestId]
@@ -94,15 +108,20 @@ class ABTest():
                     sqlInstert = []
                     for item in results:
                         sqlInstert.append([idAbRec, item])
-                    psycopg2.extras.execute_batch(self.cursor, 'insert into "abreclist" ("idAbRec","itemId") values (%s,%s)', sqlInstert)
+                    psycopg2.extras.execute_batch(self.cursor,
+                                                  'insert into "abreclist" ("idAbRec","itemId") values (%s,%s)',
+                                                  sqlInstert)
 
                 elif algo[0] == 2:
                     for customer, result in enumerate(results):
-                        self.cursor.execute(sql.SQL('insert into "abrec" ("abtest_algorithms_id","timestamp") values (%s,%s) RETURNING "idAbRec"'), [
-                                            algo[3], time + datetime.timedelta(days=algo[1])])
+                        self.cursor.execute(sql.SQL(
+                            'insert into "abrec" ("abtest_algorithms_id","timestamp") values (%s,%s) RETURNING "idAbRec"'),
+                                            [
+                                                algo[3], time + datetime.timedelta(days=algo[1])])
                         idAbRec = self.cursor.fetchone()[0]
-                        self.cursor.execute(sql.SQL('insert into "abrecid_personrecid" ("idAbRec","personid","test_name") values (%s,%s,%s)'), [
-                                            idAbRec, customer, self.abTestId])
+                        self.cursor.execute(sql.SQL(
+                            'insert into "abrecid_personrecid" ("idAbRec","personid","test_name") values (%s,%s,%s)'), [
+                                                idAbRec, customer, self.abTestId])
                         for item in result:
                             self.cursor.execute(sql.SQL(
                                 'insert into "abreclist" ("idAbRec","itemId") values (%s,%s)'), [idAbRec, item])
@@ -112,29 +131,28 @@ class ABTest():
                 endTime = datetime.datetime.now()
                 difference = endTime - startTime
                 startTime = datetime.datetime.now()
-                totalDurationMicroSec += difference.total_seconds()*1000000
-                lastXDurationsMicroSec.insert(0, difference.total_seconds()*1000000)
+                totalDurationMicroSec += difference.total_seconds() * 1000000
+                lastXDurationsMicroSec.insert(0, difference.total_seconds() * 1000000)
                 if len(lastXDurationsMicroSec) >= xDurations:
                     lastXDurationsMicroSec.pop()
 
-                gemDurationMicroSecPerDay = sum(lastXDurationsMicroSec) / len(lastXDurationsMicroSec)  # totalDurationMicroSec/loopCounter
-                toGoDays = ((self.endTs - time)/self.stepSize).days + ((self.endTs - self.beginTs)/self.stepSize).days * (len(self.algorithms) - algoritmCounter)
+                gemDurationMicroSecPerDay = sum(lastXDurationsMicroSec) / len(
+                    lastXDurationsMicroSec)  # totalDurationMicroSec/loopCounter
+                toGoDays = ((self.endTs - time) / self.stepSize).days + (
+                            (self.endTs - self.beginTs) / self.stepSize).days * (len(self.algorithms) - algoritmCounter)
                 timeEstimation = gemDurationMicroSecPerDay * toGoDays
                 self.sendTimeEstimation(loadingSocket, timeEstimation, totalDurationMicroSec)
-
-
-        print("start")
         self.connection.commit()
-        self.sendTimeEstimation(loadingSocket, None, "Almost")
 
+    def calculateMetrics(self):
         query = 'insert into abrecmetric(abtest_algorithms_id, timestamp, ctr, atr7, atr30, revenuectr, revenue7, revenue30, purchases) SELECT CTRTable.abtest_algorithms_id, CTRTable.timeStamp, (CTRTable.CTR::float/totalRecomendationsTable.totalRecomendations) * 100 AS CTR, (AR7Table.AR7::float)/(totalRecomendationsTable.totalRecomendations*7) * 100 AS AR7, (AR30Table.AR30::float)/(totalRecomendationsTable.totalRecomendations*30) * 100 AS AR30, (AR0UTable.avaragePriceAR0) AS PriceAR0, (AR7UTable.avaragePriceAR7) AS PriceAR7, (AR30UTable.avaragePriceAR30) AS PriceAR30, CTRTable.CTR AS purchases FROM ( SELECT abrec."idAbRec", abrec.timestamp AS timeStamp, COUNT("itemId") as CTR, abtest_algorithms_id FROM abrec, abreclist, abrecid_personrecid, abtest, {table}_purchases, abtest_algorithms WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and abtest_algorithms.id = abrec.abtest_algorithms_id and ((abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) or (abtest_algorithms.algorithmid = 2 and abrecid_personrecid."idAbRec"=abreclist."idAbRec" and {table}_purchases.user_id=abrecid_personrecid.personid)) and abtest.test_name=abrecid_personrecid.test_name and {table}_purchases.timestamp>=abrec.timestamp and {table}_purchases.timestamp<abrec.timestamp + (abtest."stepsize" || \' days\')::interval GROUP BY abrec.timestamp, personid, abtest_algorithms.algorithmid, abrec."idAbRec") AS CTRTable, (SELECT abrec."idAbRec", abrec.timestamp, COUNT("itemId") as AR7 FROM abrec, abreclist, abrecid_personrecid, abtest, {table}_purchases, abtest_algorithms WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and abtest_algorithms.id = abrec.abtest_algorithms_id and ((abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) or (abtest_algorithms.algorithmid = 2 and abrecid_personrecid."idAbRec"=abreclist."idAbRec" and {table}_purchases.user_id=abrecid_personrecid.personid)) and abtest.test_name=abrecid_personrecid.test_name and {table}_purchases.timestamp>=abrec.timestamp and {table}_purchases.timestamp<abrec.timestamp + ((7 + abtest.stepsize) || \' days\')::interval GROUP BY abrec.timestamp, personid, abtest_algorithms.algorithmid, abrec."idAbRec") AS AR7Table, (SELECT abrec."idAbRec", abrec.timestamp, COUNT("itemId") as AR30 FROM abrec, abreclist, abrecid_personrecid, abtest,{table}_purchases, abtest_algorithms WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and abtest_algorithms.id = abrec.abtest_algorithms_id and ((abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) or (abtest_algorithms.algorithmid = 2 and abrecid_personrecid."idAbRec"=abreclist."idAbRec" and {table}_purchases.user_id=abrecid_personrecid.personid)) and abtest.test_name=abrecid_personrecid.test_name and {table}_purchases.timestamp>=abrec.timestamp and {table}_purchases.timestamp<abrec.timestamp + ((30 + abtest.stepsize) || \' days\')::interval GROUP BY abrec.timestamp, personid, abtest_algorithms.algorithmid, abrec."idAbRec") AS AR30Table, (SELECT abrec."idAbRec", abrec.timestamp, (SUM({table}_purchases."parameter")) as avaragePriceAR0 FROM abrec, abreclist, abrecid_personrecid, abtest,{table}_purchases, abtest_algorithms WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and abtest_algorithms.id = abrec.abtest_algorithms_id and ((abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) or (abtest_algorithms.algorithmid = 2 and abrecid_personrecid."idAbRec"=abreclist."idAbRec" and {table}_purchases.user_id=abrecid_personrecid.personid)) and abtest.test_name=abrecid_personrecid.test_name and {table}_purchases.timestamp>=abrec.timestamp and {table}_purchases.timestamp<abrec.timestamp + (abtest.stepsize || \' days\')::interval GROUP BY abrec.timestamp, personid, abtest_algorithms.algorithmid, abrec."idAbRec") AS AR0UTable, (SELECT abrec."idAbRec", abrec.timestamp,(SUM({table}_purchases."parameter")) as avaragePriceAR7 FROM abrec, abreclist, abrecid_personrecid, abtest,{table}_purchases, abtest_algorithms WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and abtest_algorithms.id = abrec.abtest_algorithms_id and ((abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) or (abtest_algorithms.algorithmid = 2 and abrecid_personrecid."idAbRec"=abreclist."idAbRec" and {table}_purchases.user_id=abrecid_personrecid.personid)) and abtest.test_name=abrecid_personrecid.test_name and {table}_purchases.timestamp>=abrec.timestamp and {table}_purchases.timestamp<abrec.timestamp + ((7 + abtest.stepsize) || \' days\')::interval GROUP BY abrec.timestamp, personid, abtest_algorithms.algorithmid, abrec."idAbRec") AS AR7UTable, (SELECT abrec."idAbRec", abrec.timestamp, (SUM({table}_purchases."parameter")) as avaragePriceAR30 FROM abrec, abreclist, abrecid_personrecid, abtest, {table}_purchases, abtest_algorithms WHERE abrec."idAbRec" = abreclist."idAbRec" and abrec."idAbRec" = abrecid_personrecid."idAbRec" and abrecid_personrecid.test_name=%s and "itemId"={table}_purchases.item_id and abtest_algorithms.id = abrec.abtest_algorithms_id and ((abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) or (abtest_algorithms.algorithmid = 2 and abrecid_personrecid."idAbRec"=abreclist."idAbRec" and {table}_purchases.user_id=abrecid_personrecid.personid)) and abtest.test_name=abrecid_personrecid.test_name and {table}_purchases.timestamp>=abrec.timestamp and {table}_purchases.timestamp<abrec.timestamp + ((30 + abtest.stepsize) || \' days\')::interval GROUP BY abrec.timestamp, personid, abtest_algorithms.algorithmid, abrec."idAbRec") AS AR30UTable, (SELECT test."topK" * test1.totalUserCount AS totalRecomendations FROM (SELECT "topK" FROM abtest WHERE test_name=%s) as test, (SELECT COUNT("id") AS totalUserCount FROM {table}_customers) AS test1) AS totalRecomendationsTable WHERE CTRTable."idAbRec" = AR7Table."idAbRec" and AR7Table."idAbRec" = AR30Table."idAbRec" and AR30Table."idAbRec" = AR0UTable."idAbRec" and AR0UTable."idAbRec" = AR7UTable."idAbRec" and AR7UTable."idAbRec" = AR30UTable."idAbRec";'.format(
             table=self.dataset)
         self.cursor.execute(sql.SQL(query), [self.abTestId] * 7)
-
         self.connection.commit()
-        self.sendTimeEstimation(loadingSocket, None, "Done")
-        self.updateStatus(1)
-        print("nice")
+
+    def cleanup(self):
+        #vragen
+        pass
 
     def sendTimeEstimation(self,loadingSocket, estTimeMicroSec, totalMicroSecDone):
         #print(str(datetime.timedelta(microseconds=estTimeMicroSec)))
@@ -485,10 +503,10 @@ class ABTest():
         self.topK = data[4]
         self.stepSize = data[5]
 
-    def getAllPendingAbTests(self):
-        self.cursor.execute(sql.SQL('SELECT test_name FROM "abtest" WHERE status=2'))
+    def getAllPendingOrBrokenAbTests(self):
+        self.cursor.execute(sql.SQL('SELECT test_name, status FROM "abtest" WHERE status=2 or status=3'))
         data = self.cursor.fetchall()
         returnData = []
         for row in data:
-            returnData.append(row[0])
+            returnData.append([row[0], row[1]])
         return (json.dumps(returnData), 200)

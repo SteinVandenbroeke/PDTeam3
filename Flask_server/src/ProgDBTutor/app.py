@@ -487,7 +487,7 @@ def getDatasetIdFromABTest():
 @app.route('/api/getPendingAbTests', methods=['GET'])
 def getPendingAbTests():
     abtest = ABTest()
-    returnValue = abtest.getAllPendingAbTests()
+    returnValue = abtest.getAllPendingOrBrokenAbTests()
     return make_response(returnValue[0], returnValue[1])
 
 
