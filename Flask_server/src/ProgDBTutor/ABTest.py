@@ -33,6 +33,7 @@ class ABTest():
         self.topK = None
         self.lastSendTime = None
         self.userName = userName
+
         if self.userName != None and self.abTestId != None:
             self.checkUser()
 
@@ -74,6 +75,7 @@ class ABTest():
             algTemp.append([alg[0],[alg[1]],alg[2]])
         abTestId = self.abTestId
         self.abTestId = None
+        print(abTestId, algTemp, self.dataset, self.beginTs, self.endTs, self.stepSize, self.topK, self.userName)
         self.initialize(abTestId, algTemp, self.dataset, self.beginTs.strftime("%d/%m/%Y"), self.endTs.strftime("%d/%m/%Y"), self.stepSize, self.topK, self.userName)
         self.create(loadingSocket)
 
@@ -545,8 +547,8 @@ class ABTest():
         self.endTs = data[3]
         self.topK = data[4]
         self.stepSize = data[5]
-        print("ini", self.dataset, self.beginTs, self.endTs,self.topK,self.stepSize)
         self.userName = data[6]
+        print("ini", self.dataset, self.beginTs, self.endTs,self.topK,self.stepSize,self.userName)
 
     def getAllPendingOrBrokenAbTests(self):
         self.cursor.execute(sql.SQL('SELECT test_name, status FROM "abtest" WHERE status=2 or status=3'))

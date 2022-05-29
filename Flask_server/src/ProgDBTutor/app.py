@@ -488,8 +488,7 @@ def resetAbTests():
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
 
-    abtest = ABTest(request.args.get("abTestId"), user.username)
-    abtest.checkUser()#beacause thread starts to early
+    abtest = ABTest(request.args.get("abTestName"), user.username)
     thread = Thread(target=abtest.reset, kwargs={'loadingSocket': socketio})
     thread.start()
 
