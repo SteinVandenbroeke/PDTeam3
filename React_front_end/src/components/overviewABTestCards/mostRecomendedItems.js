@@ -4,15 +4,17 @@ import {useNavigate } from "react-router-dom";
 import React, {useEffect} from "react";
 import LargeInformationCard from "../largeInformationCard";
 import LogicTable from "../logicTable";
+import Slider from "../slider";
 
 
-
+console.log("beginV24")
 
 const ABTestInformation = (props) => {
-    console.log("beginV23")
+
     const navigation = useNavigate();
 
-    const [itemsAmount, setItemsAmount] = React.useState(3)
+    const [algoLength, setAlgoLength] = React.useState(5)
+    const [itemsAmount, setItemsAmount] = React.useState([3])
     const [labels, Letlabels] = React.useState([]);
     const [datasets, setDatasets]  = React.useState([]);
     const [logicTableData, setLogicTableData]  = React.useState([[]]);
@@ -29,6 +31,8 @@ const ABTestInformation = (props) => {
         setLoading(true);
         setLogicTableData([[]])
         let allData = props.abTestData;
+
+
 
         Letlabels(allData.points.slice(begin, end + 1));
 
@@ -59,6 +63,7 @@ const ABTestInformation = (props) => {
         let header = []
         for(let alg in allData.algorithms){
             header.push(alg)
+            setAlgoLength(data[alg].length)
         }
         logicTableData.push(header);
 
@@ -72,12 +77,7 @@ const ABTestInformation = (props) => {
         }
         setLogicTableData(logicTableData)
 
-        //const strr = allData.algorithms[0]
-        //const length = data[strr].length
-            for(let alg in allData.algorithms){
-                const l = data[alg].length
-                console.log(l)
-            }
+
 
         setLoading(false);
     }
@@ -91,23 +91,7 @@ const ABTestInformation = (props) => {
             <div>
                 {props.slider}
 
-                <input type="number"
-                       onKeyPress={
-                           (e) => {
-                               let nummer = Number(e.key);
-                               setItemsAmount(nummer);
-                               console.log(" r evt is: " + nummer);
-                               console.log(" r ia is: " + itemsAmount);
-                               processData(props.begin,props.end);}
-                       }
-                       id="numberInput" name="numberName" min={0} max={50} size={1} value={itemsAmount} title="Amount of top items to show"/>
-
-                <Form>
-                  <Form.Label>Range</Form.Label>
-                  <Form.Range min={3} max={10} tooltip='on' tooltipPlacement='top'/>
-                </Form>
-
-                <input type="range" title={"test titel"} min={3} max={10} tooltip='on' tooltipPlacement='top'/>
+                <Slider min={1} max={algoLength} step={1} values={itemsAmount} setValues={changeItemsAmount} />
 
             </div>
             }
