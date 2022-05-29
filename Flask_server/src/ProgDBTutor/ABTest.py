@@ -37,14 +37,16 @@ class ABTest():
     def history_from_subset_interactions(self, interactions, amt_users=5) -> List[List]:
         """ Take the history of the first users in the dataset and return as list of lists"""
         user_histories = dict()
+        
         for user_id, item_id in interactions:
-            if len(user_histories) < amt_users:
+            print("mhhh")
+            if len(user_histories) < amt_users and user_id not in user_histories:
                 user_histories[user_id] = list()
 
             if user_id in user_histories:
                 user_histories[user_id].append(item_id)
 
-        return list(user_histories.values())
+        return list(user_histories.keys()), list(user_histories.values())
 
     def create(self, loadingSocket = None):
         """
@@ -81,7 +83,8 @@ class ABTest():
             while (time + datetime.timedelta(days=algo[1]) <= self.endTs):
                 loopCounter += 1
 
-                results = self.execute(self.topK, time, time + datetime.timedelta(days=algo[1]), algo[0])
+                results = self.execute(self.topK, time, time + datetime.timedelta(days=algo[1]), algo[0], algo[2])
+                print(results)
                 if (algo[0] == 0 or algo[0] == 1) and len(results) != 0:
                     # niet knn
                     self.cursor.execute(
@@ -112,18 +115,50 @@ class ABTest():
                                                   sqlInstert)
 
                 elif algo[0] == 2:
-                    for customer, result in enumerate(results):
-                        self.cursor.execute(sql.SQL(
-                            'insert into "abrec" ("abtest_algorithms_id","timestamp") values (%s,%s) RETURNING "idAbRec"'),
-                                            [
-                                                algo[3], time + datetime.timedelta(days=algo[1])])
-                        idAbRec = self.cursor.fetchone()[0]
-                        self.cursor.execute(sql.SQL(
-                            'insert into "abrecid_personrecid" ("idAbRec","personid","test_name") values (%s,%s,%s)'), [
-                                                idAbRec, customer, self.abTestId])
-                        for item in result:
-                            self.cursor.execute(sql.SQL(
-                                'insert into "abreclist" ("idAbRec","itemId") values (%s,%s)'), [idAbRec, item])
+                    for customer, recommendations in results.items():
+                        if len(recommendations) > 0:
+                            print("sqleingg")
+                            print(customer)
+                            print(recommendations)
+                            self.cursor.execute(
+                                sql.SQL(
+                                    'insert into "abrec" ("abtest_algorithms_id","timestamp") values (%s,%s) RETURNING "idAbRec"'),
+                                [algo[3], time + datetime.timedelta(days=algo[1])])
+                            idAbRec = self.cursor.fetchone()[0]
+
+                            print("abrec")
+
+                            query = 'insert into abrecid_personrecid("idAbRec", personid, test_name) VALUES(%s, %s, %s)'.format(
+                            table=self.dataset)
+                            items = [idAbRec, customer, self.abTestId]
+                            psycopg2.extras.execute_batch(self.cursor, query, [items])
+
+                            print("abrecid_personrecid")
+                            print(items)
+                            print(recommendations)
+
+                            for rec in recommendations:
+                                self.cursor.execute(sql.SQL(
+                                'insert into "abreclist" ("idAbRec","itemId") values (%s,%s)'), [idAbRec, rec])
+
+                    #for customer, result in enumerate(results):
+                    #    print("customer")
+                    #    print(customer)
+                    #    self.cursor.execute(sql.SQL('insert into "abrec" ("abtest_algorithms_id","timestamp") values (%s,%s) RETURNING "idAbRec"'), [
+                    #                        algo[3], time + datetime.timedelta(days=algo[1])])
+                    #    idAbRec = self.cursor.fetchone()[0]
+#
+                    #    query = 'SELECT id FROM {table}_customers LIMIT 1 OFFSET %s;'.format(table=self.dataset)
+                    #    self.cursor.execute(sql.SQL(query), [customer])
+                    #    customer_id = self.cursor.fetchone()[0]
+#
+                    #    print(customer_id)
+#
+                    #    self.cursor.execute(sql.SQL('insert into "abrecid_personrecid" ("idAbRec","personid","test_name") values (%s,%s,%s)'), [
+                    #                        idAbRec, customer_id, self.abTestId])
+                    #    for item in result:
+                    #        self.cursor.execute(sql.SQL(
+                    #            'insert into "abreclist" ("idAbRec","itemId") values (%s,%s)'), [idAbRec, item])
                 print(time, "done")
 
                 time += datetime.timedelta(days=self.stepSize)
@@ -179,7 +214,7 @@ class ABTest():
         return (message, errorCode)
 
 
-    def execute(self, topKItemsCount, startDate, endDate, algorithm, users=1, k=1):
+    def execute(self, topKItemsCount, startDate, endDate, algorithm, k=1):
         """
         Create: function to create a new ABTest, and wil make the current ABTest te created ABTest
         @param topKItemsCount: top k items
@@ -208,15 +243,53 @@ class ABTest():
             result.reverse()
             return result[0:topKItemsCount]
         elif (algorithm == 2):
-            alg = ItemKNNIterative(k=k, normalize=False)
+            print("start")
+            print(k)
+            alg = ItemKNNIterative(k=k)
+            
+            # This one is faster, but requires more memory
+            #alg = ItemKNN(k=k, normalize=normalize)
+
+            print("Parsing data")
+
             query = 'SELECT user_id, item_id FROM {table}_purchases WHERE "timestamp" >= %s AND "timestamp" <= %s'.format(
                 table=self.dataset)
             self.cursor.execute(sql.SQL(query), [startDate, endDate])
-            items = self.cursor.fetchall()
-            alg.train(items)
-            histories = self.history_from_subset_interactions(items, amt_users=users)
-            recommendations = alg.recommend_all(histories, topKItemsCount)
-            return recommendations
+            interactions = self.cursor.fetchall()
+
+            if len(interactions) > 0:
+                print("test")
+
+                user_ids, item_ids = zip(*interactions)
+                unique_item_ids = list(set(item_ids))
+
+                print(unique_item_ids)
+
+                print("fitting model")
+                alg.train(interactions, unique_item_ids)
+
+                query = 'SELECT COUNT(*) FROM {table}_customers'.format(
+                    table=self.dataset)
+                self.cursor.execute(sql.SQL(query), [])
+                amt_users = self.cursor.fetchone()[0]
+
+                print(f"fetching history for {amt_users} users")
+                print(interactions)
+                histories_keys, histories_values = self.history_from_subset_interactions(interactions, amt_users)
+                #print(histories)
+                print("computing recommendations")
+                recommendations = alg.recommend_all(histories_values, k)
+
+                recommendations_dict = dict()
+                for count, value in enumerate(histories_keys):
+                    if len(recommendations[count]) > 0:
+                        recommendations_dict[value] = recommendations[count]
+
+                print("recommendations:")
+                print(recommendations)
+                return recommendations_dict
+            
+            return dict()
 
     def overviewPageData(self):
         """

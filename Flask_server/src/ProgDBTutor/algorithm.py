@@ -25,7 +25,7 @@ class Algorithm:
         """ The number of items """
         return self.index_to_item_id_mapping_.shape[0]
 
-    def _interaction_to_matrix(self, interactions):
+    def _interaction_to_matrix(self, interactions, unique_item_ids=None):
         """ Convert interaction list to sparse matrix format and store item id mappings. """
         user_ids, item_ids = zip(*interactions)
         user_ids = np.array(user_ids)
@@ -33,10 +33,24 @@ class Algorithm:
 
         # remap ids to prevent zero rows/columns
         _, user_indices = np.unique(user_ids, return_inverse=True)
-        item_id_mapping, item_indices = np.unique(item_ids, return_inverse=True)
+
+        item_indices = None
+        if unique_item_ids is None:
+            item_id_mapping, item_indices = np.unique(item_ids, return_inverse=True)
+        else:
+            item_id_mapping = np.array(unique_item_ids)
+
+        self.item_id_to_index_mapping_ = {item_id: index for index, item_id in enumerate(item_id_mapping)}
+
+        if item_indices is None:
+            item_indices = self._id_to_index(item_ids)
+
+        # to revert back to original ids
+        self.index_to_item_id_mapping_ = item_id_mapping
 
         max_user = user_indices.max() + 1
-        max_item = item_indices.max() + 1
+        max_item = len(item_id_mapping)
+
         values = np.ones(item_indices.shape[0], dtype=np.int8)
         X = scipy.sparse.csr_matrix((values, (user_indices, item_indices)), dtype=np.int32, shape=(max_user, max_item))
 
@@ -44,25 +58,21 @@ class Algorithm:
         X.sum_duplicates()
         X[X > 1] = 1
 
-        # to revert back to original ids
-        self.index_to_item_id_mapping_ = item_id_mapping
-        self.item_id_to_index_mapping_ = {item_id: index for index, item_id in enumerate(item_id_mapping)}
         return X
 
-    def train(self, interactions: List[Tuple]):
-        """ Trains the algorithm from pairs of (user, item) interactions. """
-        X = self._interaction_to_matrix(interactions)
+    def train(self, interactions: List[Tuple], unique_item_ids=None):
+        """ Trains the algorithm from pairs of (user, item) interactions.
+        Optionally can provide a global list of item ids to uniformly perform mapping. """
+        X = self._interaction_to_matrix(interactions, unique_item_ids=unique_item_ids)
         self.fit(X)
         return self
 
-    def recommend(self, history: List, top_k: int, retarget=False) -> List:
+    def recommend(self, history: List, top_k: int, retarget=True) -> List:
         """ Compute recommendations based on a list of historical item ids. """
         return self.recommend_all([history], top_k=top_k, retarget=retarget)[0]
 
-    def recommend_all(self, histories: List[List], top_k: int, retarget=False) -> List[List]:
+    def recommend_all(self, histories: List[List], top_k: int, retarget=True) -> List[List]:
         """ Compute recommendations based on a list of historical item ids for multiple users """
-        assert hasattr(self, "B_"), "train needs to be called before predict"
-
         # Build sparse matrix
         row_ind = list()
         col_ind = list()
@@ -92,7 +102,11 @@ class Algorithm:
             scores = predictions.data[start:end]
             indices = predictions.indices[start:end]
 
-            top_k_score_indices = np.argpartition(scores, -top_k)[-top_k:][::-1]
+            if len(scores) < top_k:
+                top_k_score_indices = np.arange(len(scores))
+            else:
+                top_k_score_indices = np.argpartition(scores, -top_k)[-top_k:][::-1]
+
             top_k_indices = indices[top_k_score_indices]
             top_k_ids = self._index_to_id(top_k_indices)
             recommendations.append(list(top_k_ids))
