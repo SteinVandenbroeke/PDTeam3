@@ -20,6 +20,13 @@ class Dataset():
         self.cursor = self.connection.cursor()
         self.datasetId = datasetId
 
+    def __del__(self):
+        """
+        Database connectie correct sluiten
+        """
+        self.cursor.close()
+        self.connection.close()
+
     def add(self, customerCSV, articleCSV, purchasesCSV, customerConnections, articleConnections,
             purchaseConnections, userName):
         """

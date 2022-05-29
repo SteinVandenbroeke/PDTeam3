@@ -34,6 +34,13 @@ class ABTest():
         if abTestId != None:
             self.initialize()
 
+    def __del__(self):
+        """
+        Database connectie correct sluiten
+        """
+        self.cursor.close()
+        self.connection.close()
+
     def history_from_subset_interactions(self, interactions, amt_users=5) -> List[List]:
         """ Take the history of the first users in the dataset and return as list of lists"""
         user_histories = dict()
