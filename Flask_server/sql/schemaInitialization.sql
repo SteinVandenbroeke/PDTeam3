@@ -31,7 +31,8 @@ CREATE TABLE abtest(
   "end_ts" TIMESTAMP,
   "topK" int,
   "stepsize" int,
-  "status" smallint NOT NULL DEFAULT 2
+  "status" smallint NOT NULL DEFAULT 2,
+  "username" VARCHAR REFERENCES users("username") NOT NULL
 );
 
 CREATE TABLE abtest_algorithms(

@@ -6,7 +6,7 @@
 import json
 from threading import Thread
 
-from flask import Flask, request, jsonify, make_response, session, flash, redirect, url_for
+from flask import Flask, request, jsonify, make_response, session, flash, redirect, url_for, abort
 from flask.templating import render_template
 import uuid # for public id
 
@@ -114,9 +114,6 @@ def signup_def():
 
 @app.route('/api/helloWorld')
 def helloWorld():
-    abtest = ABTest("hm")
-    abtest.initialize()
-    abtest.create()
     return "Hallo world"
 
 @app.route('/api/uploadDataset', methods=['GET', 'POST'])
@@ -155,14 +152,14 @@ def uploadDataset():
 
     return make_response('{"message": "File successfully uploaded."}', 201)
 
-
+"""
 @app.route('/api/create', methods=['GET', 'POST'])
 def create():
     user = User(app)
     abtest = ABTest()
     abtest.initialize("1", [[2, [1], 1]], "small", "2019-01-01", "2021-01-01",
-                      1, 1)
-    abtest.create()
+                      1, 1, user.username)
+    abtest.create()"""
 
 @app.route('/api/createAbTest', methods=['GET', 'POST'])
 def createAbTest():
@@ -170,19 +167,16 @@ def createAbTest():
     back = user.checkTokenAndLoadData(request)
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
-    elif not user.admin:
-        return make_response('you must be admin to perform this action', 500)
 
     period = json.loads(request.form.get("periodValues"))
     algorithms = json.loads(request.form.get("algorithms"))
     abtest = ABTest()
-    abtest.initialize(request.form.get("abTestName"), algorithms,request.form.get("dataSetId"), period[0], period[1], request.form.get("stepSizeValue"), request.form.get("topKValues"))
+    abtest.initialize(request.form.get("abTestName"), algorithms,request.form.get("dataSetId"), period[0], period[1], request.form.get("stepSizeValue"), request.form.get("topKValues"), user.username)
 
     thread = Thread(target=abtest.create, kwargs={'loadingSocket': socketio})
     thread.start()
 
-    return make_response('{"message": "ABTest word aangemaakt, ik kan de pagina verlaten."}', 201)
-
+    return make_response('{"message": "ABTest word aangemaakt, u kan de pagina verlaten."}', 201)
 
 @app.route('/api/ABTestOverview', methods=['GET', 'POST'])
 def overviewPageABTest():
@@ -190,10 +184,8 @@ def overviewPageABTest():
     back = user.checkTokenAndLoadData(request)
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
-    elif not user.admin:
-        return make_response('you must be admin to perform this action', 500)
 
-    abtest = ABTest(request.args.get("abTestName"))
+    abtest = ABTest(request.args.get("abTestName"), user.username)
     overviewPageData = abtest.overviewPageData()
 
     return make_response(overviewPageData[0], overviewPageData[1])
@@ -204,10 +196,8 @@ def totalActiveUserAmount():
     back = user.checkTokenAndLoadData(request)
     if not back:
         return make_response('User token wrong or missing', 401)
-    elif not user.admin:
-        return make_response('you must be admin to perform this action', 500)
 
-    abtest = ABTest(request.args.get("abTestName"))
+    abtest = ABTest(request.args.get("abTestName"), user.username)
     overviewPageData = abtest.getTotalActiveUsers(request.args.get("startDate"), request.args.get("endDate"))
     return make_response(overviewPageData[0], overviewPageData[1])
 
@@ -252,10 +242,8 @@ def deleteABTest():
     back = user.checkTokenAndLoadData(request)
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
-    elif not user.admin:
-        return make_response('you must be admin to perform this action', 500)
 
-    abtest = ABTest(request.args.get("abTestName"))
+    abtest = ABTest(request.args.get("abTestName"), user.username)
     returnValue = abtest.delete()
     return make_response(returnValue[0], returnValue[1])
 
@@ -339,10 +327,9 @@ def getABtests():
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
 
-    abtest = ABTest()
+    abtest = ABTest(None, user.username)
     returnValue = abtest.getABtests()
     return make_response(returnValue[0],returnValue[1])
-
 
 @app.route('/api/getPurchases', methods=['GET'])
 def getPurchases():
@@ -367,7 +354,6 @@ def getTimeStampList():
     returnValue = dataset.getTimeStampList(json)
     return make_response(returnValue[0], returnValue[1])
 
-
 @app.route('/api/getArticleCount', methods=['GET'])
 def getArticleCount():
     user = User(app)
@@ -379,7 +365,6 @@ def getArticleCount():
     returnValue = dataset.getArticleCount()
     return make_response(returnValue[0], returnValue[1])
 
-
 @app.route('/api/getCustomerCount', methods=['GET'])
 def getCustomerCount():
     user = User(app)
@@ -390,7 +375,6 @@ def getCustomerCount():
     dataset = Dataset(request.args.get("id"))
     returnValue = dataset.getCustomerCount()
     return make_response(returnValue[0], returnValue[1])
-
 
 @app.route('/api/getUsers', methods=['GET'])
 def getUsers():
@@ -405,7 +389,6 @@ def getUsers():
     returnValue = user.getUsers()
     return make_response(returnValue[0], returnValue[1])
 
-
 # React interface, alle niet verwezen app.route's worden doorverwezen naar react interface in de react_build folder
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
@@ -414,7 +397,6 @@ def reactApp(path):
         path = "index.html"
 
     return app.send_static_file(path)
-
 
 @app.route('/api/changeAdminPermission', methods=['GET'])
 def changeAdminPermission():
@@ -460,7 +442,7 @@ def getUsersFromABTest():
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
 
-    abtest = ABTest(request.args.get("abTestId"))
+    abtest = ABTest(request.args.get("abTestId"),user.username)
     returnValue = abtest.getUsersFromABTest(request.args.get("startDate"), request.args.get("endDate"))
     return make_response(returnValue[0], returnValue[1])
 
@@ -472,7 +454,7 @@ def getItemsFromABTest():
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
 
-    abtest = ABTest(request.args.get("abTestId"))
+    abtest = ABTest(request.args.get("abTestId"),user.username)
     returnValue = abtest.getItemsFromABTest(request.args.get("startDate"), request.args.get("endDate"))
     return make_response(returnValue[0], returnValue[1])
 
@@ -483,16 +465,35 @@ def getDatasetIdFromABTest():
     back = user.checkTokenAndLoadData(request)
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
-    abtest = ABTest(request.args.get("abTestId"))
+    abtest = ABTest(request.args.get("abTestId"), user.username)
     returnValue = abtest.getDatasetIdFromABTest()
     return make_response(returnValue[0], returnValue[1])
 
 
 @app.route('/api/getPendingAbTests', methods=['GET'])
 def getPendingAbTests():
-    abtest = ABTest()
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+    abtest = ABTest(None, user.username)
     returnValue = abtest.getAllPendingOrBrokenAbTests()
     return make_response(returnValue[0], returnValue[1])
+
+
+@app.route('/api/resetAbTests', methods=['GET'])
+def resetAbTests():
+    user = User(app)
+    back = user.checkTokenAndLoadData(request)
+    if not back:
+        return make_response('{"message": "User token wrong or missing"}', 401)
+
+    abtest = ABTest(request.args.get("abTestId"), user.username)
+    abtest.checkUser()#beacause thread starts to early
+    thread = Thread(target=abtest.reset, kwargs={'loadingSocket': socketio})
+    thread.start()
+
+    return make_response('{"message": "ABTest word gereset, u kan de pagina verlaten."}', 201)
 
 
 # RUN DEV SERVER

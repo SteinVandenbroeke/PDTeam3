@@ -30,7 +30,7 @@ const ABTestsList = () => {
         for(let i=0; i<data.length-1; i++) {
             let Status=(
                 <div style={{verticalAlign:"middle"}}>
-                    {data[i][0] === 0 && <Icon fill="#FFA212" name="alert-triangle-outline"/>}
+                    {data[i][0] === 0 && <Icon fill="#ED7E00" name="alert-triangle-outline"/>}
                     {data[i][0] === 1 && <Icon fill="#07AD19" name="checkmark-outline"/>}
                     {data[i][0] === 2 && <Icon fill="#FFA212" name="clock-outline"/>}
                     {data[i][0] === 3 && <Icon fill="#c40000" name="alert-circle-outline"/>}

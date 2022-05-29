@@ -124,6 +124,15 @@ const ABTestOverview = () => {
         request.sendGet("deleteABTest",getData).then(message => {toast.success(message.message); navigation('/dashboard/abTests', { replace: true }); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
     }
 
+    function resetABTest(){
+        setLoading(true);
+        let request = new ServerRequest();
+        let getData = {
+            "abTestName": abTestId
+        }
+        request.sendGet("resetAbTests",getData).then(message => {toast.success(message.message); navigation('/dashboard/abTestUploads', { replace: true }); setLoading(false)}).catch(error => {toast.error(error.message); setLoading(false)});
+    }
+
     function openUser(id){
         window.open("/full/dataSets/overview/"+ abTestData.dataSet + "/person/"+ id, '_blank', 'resizable=yes,scrollbars=yes,status=yes')
         //navigation("/dashboard/dataSets/overview/"+ abTestData.dataSet + "/person/"+ id);
@@ -171,6 +180,8 @@ const ABTestOverview = () => {
     return (
         <div>
             <div style={{width: "100%", textAlign: "right", paddingBottom: "10px"}}>
+                <Button onClick={()=>resetABTest()} variant="warning">Reset AB-Test</Button>
+                {" "}
                 <Button onClick={()=>deleteABTest()} variant="danger">Delete AB-Test</Button>
             </div>
             { !serverError &&

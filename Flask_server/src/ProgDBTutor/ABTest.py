@@ -14,10 +14,11 @@ from typing import List
 from psycopg2 import sql
 from Dataset import Dataset
 import json
+from flask import make_response, abort
 
 
 class ABTest():
-    def __init__(self, abTestId=None):
+    def __init__(self, abTestId=None, userName=None):
         database = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'],
                                 userPassword=config_data['password'], dbhost=config_data['host'],
                                 dbport=config_data['port'])
@@ -31,6 +32,10 @@ class ABTest():
         self.stepSize = None
         self.topK = None
         self.lastSendTime = None
+        self.userName = userName
+        if self.userName != None and self.abTestId != None:
+            self.checkUser()
+
         if abTestId != None:
             self.initialize()
 
@@ -40,6 +45,14 @@ class ABTest():
         """
         self.cursor.close()
         self.connection.close()
+
+    def checkUser(self):
+        select = 'SELECT COUNT(test_name) FROM abtest WHERE test_name = %s and username = %s;'
+        self.cursor.execute(sql.SQL(select).format(), [self.abTestId, self.userName])
+        data = self.cursor.fetchone()
+        print(self.abTestId, self.userName,data[0])
+        if data[0] != 1:
+            abort(make_response("No permission to this A/B test", 401))
 
     def history_from_subset_interactions(self, interactions, amt_users=5) -> List[List]:
         """ Take the history of the first users in the dataset and return as list of lists"""
@@ -54,17 +67,30 @@ class ABTest():
 
         return list(user_histories.keys()), list(user_histories.values())
 
+    def reset(self, loadingSocket = None):
+        self.delete()
+        algTemp = []
+        for alg in self.algorithms:
+            algTemp.append([alg[0],[alg[1]],alg[2]])
+        abTestId = self.abTestId
+        self.abTestId = None
+        self.initialize(abTestId, algTemp, self.dataset, self.beginTs.strftime("%d/%m/%Y"), self.endTs.strftime("%d/%m/%Y"), self.stepSize, self.topK, self.userName)
+        self.create(loadingSocket)
+
     def create(self, loadingSocket = None):
         """
         Create and runs the AB test. After running the algorithms, calculated information is inserted into the database.
         """
         try:
+            print("calculate insert recomended")
             self.calculateAndInsertRecomended(loadingSocket)
             self.sendTimeEstimation(loadingSocket, None, "Almost")
+            print("calculate metrics")
             self.calculateMetrics()
             self.sendTimeEstimation(loadingSocket, None, "Done")
             self.updateStatus(1)
         except:
+            print("failed")
             self.sendTimeEstimation(loadingSocket, None, "Failed")
             self.updateStatus(3)
 
@@ -88,7 +114,6 @@ class ABTest():
                 loopCounter += 1
 
                 results = self.execute(self.topK, time, time + datetime.timedelta(days=algo[1]), algo[0], algo[2])
-                print(results)
                 if (algo[0] == 0 or algo[0] == 1) and len(results) != 0:
                     # niet knn
                     self.cursor.execute(
@@ -96,14 +121,6 @@ class ABTest():
                             'insert into "abrec" ("abtest_algorithms_id","timestamp") values (%s,%s) RETURNING "idAbRec"'),
                         [algo[3], time + datetime.timedelta(days=algo[1])])
                     idAbRec = self.cursor.fetchone()[0]
-                    '''self.cursor.execute(sql.SQL(
-                        'insert into abrecid_personrecid("idAbRec", personid, test_name) SELECT abrec."idAbRec" ,id AS userId, test_name FROM {table}_customers,abrec,abtest WHERE abrec."idAbRec"=%s AND abtest.test_name=%s'.format(table=self.dataset)),
-                                        [idAbRec, self.abTestId])'''
-
-                    # niet nodig voor popularity en recency aangzien elke user hetzelfde is
-                    # query = 'insert into abrecid_personrecid("idAbRec", personid, test_name) SELECT %s ,id AS userId, %s FROM {table}_customers'.format(table=self.dataset)
-                    # items = [idAbRec, self.abTestId]
-                    # psycopg2.extras.execute_batch(self.cursor,query, [items])
 
                     # zet person id op 0 aangezien dit voor elke user toch hetzelfde is
                     query = 'insert into abrecid_personrecid("idAbRec", personid, test_name) VALUES(%s,0, %s)'.format(
@@ -180,10 +197,6 @@ class ABTest():
         self.cursor.execute(sql.SQL(query), [self.abTestId] * 7)
         self.connection.commit()
 
-    def cleanup(self):
-        #vragen
-        pass
-
     def sendTimeEstimation(self,loadingSocket, estTimeMicroSec, totalMicroSecDone):
         if self.lastSendTime != None and estTimeMicroSec != None and (datetime.datetime.now() - self.lastSendTime).total_seconds() <= 1:
             return
@@ -204,10 +217,7 @@ class ABTest():
             errorCode = 500
 
         self.connection.commit()
-        self.connection.close()
-        self.cursor.close()
         return (message, errorCode)
-
 
     def execute(self, topKItemsCount, startDate, endDate, algorithm, k=1):
         """
@@ -372,7 +382,7 @@ class ABTest():
         return (json.dumps(itemsql[0]), 200)
 
     def getABtests(self):
-        self.cursor.execute(sql.SQL('SELECT * FROM "abtest"'))
+        self.cursor.execute(sql.SQL('SELECT * FROM "abtest" WHERE username=%s'), [self.userName])
         data = self.cursor.fetchall()
         returnList = []
         max_alg_count = 0
@@ -495,7 +505,7 @@ class ABTest():
         return False
 
     def initialize(self, abTestId=None, algorithms=None, dataset=None, beginTs=None, endTs=None, stepSize=None,
-                   topK=None):
+                   topK=None, username=None):
         """
         initializes the ABTest information, by default it will load the date on abTestId from the database
         @param abTestId: the id (name) of the ABTest
@@ -509,8 +519,8 @@ class ABTest():
 
         if self.abTestId == None and abTestId != None:
             self.abTestId = abTestId
-            select = 'INSERT INTO abtest ("test_name", "dataset", "begin_ts", "end_ts", "topK", "stepsize") VALUES (%s,%s,to_date(%s, \'DD/MM/YYYY\'),to_date(%s, \'DD/MM/YYYY\'),%s,%s);';
-            self.cursor.execute(sql.SQL(select), [abTestId, dataset, beginTs, endTs, topK, stepSize])
+            select = 'INSERT INTO abtest ("test_name", "dataset", "begin_ts", "end_ts", "topK", "stepsize", "username") VALUES (%s,%s,to_date(%s, \'DD/MM/YYYY\'),to_date(%s, \'DD/MM/YYYY\'),%s,%s, %s);';
+            self.cursor.execute(sql.SQL(select), [abTestId, dataset, beginTs, endTs, topK, stepSize, username])
 
             for algorithm in algorithms:
                 select = 'INSERT INTO abtest_algorithms ("test_name", "algorithmid", "interval", "K") VALUES (%s,%s,%s,%s);'
@@ -519,7 +529,7 @@ class ABTest():
         elif self.abTestId == None and abTestId == None:
             exit("No data to initialize")
 
-        select = 'SELECT "test_name", "dataset", "begin_ts", "end_ts", "topK", "stepsize" FROM abtest WHERE test_name = %s;'
+        select = 'SELECT "test_name", "dataset", "begin_ts", "end_ts", "topK", "stepsize", "username" FROM abtest WHERE test_name = %s;'
         self.cursor.execute(sql.SQL(select).format(), [self.abTestId])
         data = self.cursor.fetchone()
 
@@ -535,6 +545,8 @@ class ABTest():
         self.endTs = data[3]
         self.topK = data[4]
         self.stepSize = data[5]
+        print("ini", self.dataset, self.beginTs, self.endTs,self.topK,self.stepSize)
+        self.userName = data[6]
 
     def getAllPendingOrBrokenAbTests(self):
         self.cursor.execute(sql.SQL('SELECT test_name, status FROM "abtest" WHERE status=2 or status=3'))
