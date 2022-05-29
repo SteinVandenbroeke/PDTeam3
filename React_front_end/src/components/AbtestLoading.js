@@ -33,7 +33,7 @@ class AbtestLoading extends React.Component {
     }
 
     loadSocket(){
-        var websocket = "http://localhost:8000"
+        var websocket = ""
             this.socket = io.connect(websocket, {
             reconnection: true,
             // transports: ['websocket']
