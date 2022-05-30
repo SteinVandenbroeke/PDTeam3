@@ -83,18 +83,18 @@ class ABTest():
         """
         Create and runs the AB test. After running the algorithms, calculated information is inserted into the database.
         """
-        #try:
-        print("calculate insert recomended")
-        self.calculateAndInsertRecomended(loadingSocket)
-        self.sendTimeEstimation(loadingSocket, None, "Almost")
-        print("calculate metrics")
-        self.calculateMetrics()
-        self.sendTimeEstimation(loadingSocket, None, "Done")
-        self.updateStatus(1)
-        # except:
-        #     print("failed")
-        #     self.sendTimeEstimation(loadingSocket, None, "Failed")
-        #     self.updateStatus(3)
+        try:
+            print("calculate insert recomended")
+            self.calculateAndInsertRecomended(loadingSocket)
+            self.sendTimeEstimation(loadingSocket, None, "Almost")
+            print("calculate metrics")
+            self.calculateMetrics()
+            self.sendTimeEstimation(loadingSocket, None, "Done")
+            self.updateStatus(1)
+        except:
+            print("failed")
+            self.sendTimeEstimation(loadingSocket, None, "Failed")
+            self.updateStatus(3)
 
     def calculateAndInsertRecomended(self, loadingSocket):
         """
