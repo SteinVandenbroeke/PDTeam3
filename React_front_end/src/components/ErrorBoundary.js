@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
-import {Button, Card, Col, Container, ListGroup, Row} from "react-bootstrap";
-import Icon from "react-eva-icons";
-import {Link, Outlet} from "react-router-dom";
-import Slider from "./slider";
-import BackButton from "./backButton";
+// Short Description: File to define errors
+// @author : PPDB Team 3
+
+import React from 'react';
+import {Card, Container} from "react-bootstrap";
+
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);

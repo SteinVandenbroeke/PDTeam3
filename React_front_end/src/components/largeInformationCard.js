@@ -1,8 +1,7 @@
-import {Button, Modal, Spinner} from "react-bootstrap";
+import {Modal, Spinner} from "react-bootstrap";
 import Icon from 'react-eva-icons';
 import {useNavigate} from "react-router-dom";
 import React from "react";
-import {Link} from "react-router-dom";
 import {Card, OverlayTrigger, Tooltip} from "react-bootstrap"
 
 const LargeInformationCard = (props) => {

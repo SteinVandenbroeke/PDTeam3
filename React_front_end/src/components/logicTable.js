@@ -1,8 +1,5 @@
-import {Outlet, Link} from "react-router-dom";
-import {Navbar, Container, Nav, Card, Image, ListGroup, Table, Button, Modal, Spinner} from "react-bootstrap";
-import {useContext, useState, useEffect} from "react";
-import {userSession} from "../App";
-import User from "../logic/User";
+import {Table, Button} from "react-bootstrap";
+import {useState, useEffect} from "react";
 import Icon from "react-eva-icons";
 
 /**
@@ -84,7 +81,9 @@ const LogicTable = (props) => {
                 {displayData.map((valueRow) => {
                     let idForFunction = valueRow[tableIndex];
                     return (
-                        <tr onClick={() => action(idForFunction)} style={{cursor: "pointer"}}>
+                        <tr
+                            // defining what happens when this component gets clicked
+                            onClick={() => action(idForFunction)} style={{cursor: "pointer"}}>
                             {valueRow.map((value, index) => {
                                 return <td>{value}</td>
                             })}
