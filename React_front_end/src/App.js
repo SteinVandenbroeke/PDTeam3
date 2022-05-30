@@ -66,7 +66,7 @@ function App() {
                           </Route>
                       </Route>
                       <Route path="/" element={<NavbarComp />}>
-                          <Route index element={<Welcome />} />
+                          <Route index element={<div style={{paddingTop: 50}}><HomeDashboardPage /></div>} />
 
                           <Route path="dashboard" element={<Dashboard />}>
                               <Route index element={<HomeDashboardPage />} />

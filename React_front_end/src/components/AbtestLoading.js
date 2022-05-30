@@ -78,7 +78,7 @@ class AbtestLoading extends React.Component {
                     tempDict[item[0]] = [null, "Almost done, calculating metrics"];
                 }
                 else if (item[1] == 3){
-                    tempDict[item[0]] = [null, (<div>A/B test Failed<br/><Button>Retry</Button></div>)];
+                    tempDict[item[0]] = [null, (<div>A/B test Failed (reset needed)</div>)];
                 }
 
             });

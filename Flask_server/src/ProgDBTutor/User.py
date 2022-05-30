@@ -5,8 +5,9 @@ import json
 import uuid # for public id
 from  werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+
+from quote_data_access import DBConnection
 from config import config_data
-from quote_data_access import Quote, DBConnection, QuoteDataAccess
 import os
 from psycopg2 import sql
 from Dataset import Dataset
