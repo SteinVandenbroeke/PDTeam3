@@ -27,7 +27,6 @@ const NavbarComp = () => {
                                 <ProfileImageMenu/>
                             </div>
                             <div className={"d-lg-none"}>
-                                <Nav.Link to="/settings"><Link to="/settings" class={"btn"}>Settings</Link></Nav.Link>
                                 <Nav.Link><div onClick={()=>logout()} class={"btn"}>Logout</div></Nav.Link>
                             </div>
                         </Nav>

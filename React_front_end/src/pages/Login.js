@@ -48,10 +48,6 @@ const Login = () => {
                                             aria-hidden="true"
                                         />
                                 </Button>
-                                <br/><br/>
-                                <Button variant="link" onClick={()=>usersession.user.login("", true).then(() => window.location.reload())}>
-                                    skip login (temp)
-                                </Button>
                             </Form>
                         </Col>
                         <Col xs={0} sm={0} md={7}>
