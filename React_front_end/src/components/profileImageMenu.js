@@ -43,7 +43,6 @@ const ProfileImageMenu = () => {
                                         fill="#000000"
                                         name="settings-outline"
                                     />
-                                    Settings
                                 </ListGroup.Item>
                                 */}
                                 <ListGroup.Item action onClick={() => { logout(); }}>
