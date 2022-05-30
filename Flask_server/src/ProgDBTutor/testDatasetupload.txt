@@ -1,3 +1,0 @@
-   customer_id  age  postal_code
-0            1   45         2580
-1           97   32         2570

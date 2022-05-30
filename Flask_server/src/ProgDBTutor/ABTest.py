@@ -42,12 +42,15 @@ class ABTest():
 
     def __del__(self):
         """
-        Database connectie correct sluiten
+        Closes the Database connection
         """
         self.cursor.close()
         self.connection.close()
 
     def checkUser(self):
+        """
+        checkUser: checks and returns if the user has no permissions to watch te AB-test
+        """
         select = 'SELECT COUNT(test_name) FROM abtest WHERE test_name = %s and username = %s;'
         self.cursor.execute(sql.SQL(select).format(), [self.abTestId, self.userName])
         data = self.cursor.fetchone()
@@ -55,7 +58,11 @@ class ABTest():
             abort(make_response("No permission to this A/B test", 401))
 
     def history_from_subset_interactions(self, interactions, amt_users=5) -> List[List]:
-        """ Take the history of the first users in the dataset and return as list of lists"""
+        """
+        history_from_subset_interactions: Take the history of the first users in the dataset and return as list of lists
+        @param interactions: all previous interaction of users
+        @param amt_users: How many users that have to be checked
+        """
         user_histories = dict()
 
         for user_id, item_id in interactions:
@@ -68,6 +75,10 @@ class ABTest():
         return list(user_histories.keys()), list(user_histories.values())
 
     def reset(self, loadingSocket = None):
+        """
+        reset: Re-runs the AB-Test
+        @param loadingSocket: WebSocket for sending the time estimation about the AB-test creation
+        """
         self.delete()
         algTemp = []
         for alg in self.algorithms:
@@ -80,6 +91,7 @@ class ABTest():
     def create(self, loadingSocket = None):
         """
         Create and runs the AB test. After running the algorithms, calculated information is inserted into the database.
+        @param loadingSocket: WebSocket for sending the time estimation about the AB-test creation
         """
         try:
             print("calculate insert recomended")
@@ -96,9 +108,8 @@ class ABTest():
 
     def calculateAndInsertRecomended(self, loadingSocket):
         """
-        Runs all recomendation algoritms for the ab test, and insert them into teh DB
-        @param loadingSocket:
-        @return:
+        Runs all recomendation algoritms for the ab test, and insert them into the DB
+        @param loadingSocket: WebSocket for sending the time estimation about the AB-test creation
         """
         totalDurationMicroSec = 0
         lastXDurationsMicroSec = []
@@ -174,12 +185,21 @@ class ABTest():
         self.connection.commit()
 
     def calculateMetrics(self):
+        """
+        calculateMetrics: Inserts calculations of information about the recommendations of this AB-Test into the database
+        """
         query = 'insert into abrecmetric(abtest_algorithms_id, timestamp, ctr, atr7, atr30, revenuectr, revenue7, revenue30, purchases) SELECT CTRTable.abtest_algorithms_id, CTRTable.timeStamp, (CTRTable.CTR::float/totalRecomendationsTable.totalRecomendations) * 100 AS CTR,        (AR7Table.AR7::float)/(totalRecomendationsTable.totalRecomendations*7) * 100 AS AR7,        (AR30Table.AR30::float)/(totalRecomendationsTable.totalRecomendations*30) * 100 AS AR30,        (AR0UTable.avaragePriceAR0) AS PriceAR0, (AR7UTable.avaragePriceAR7) AS PriceAR7,        (AR30UTable.avaragePriceAR30) AS PriceAR30, CTRTable.CTR AS purchases FROM      (SELECT test."topK" * test1.totalUserCount AS totalRecomendations FROM (SELECT "topK" FROM abtest WHERE test_name=%s) as test,                                                                             (SELECT COUNT("id") AS totalUserCount FROM  {table}_customers) AS test1) AS totalRecomendationsTable,      (SELECT abrec."abtest_algorithms_id", abrec.timestamp AS timeStamp, COUNT("itemId") as CTR      FROM abrec,abreclist,abrecid_personrecid,abtest, {table}_purchases,abtest_algorithms      WHERE abrec."idAbRec" = abreclist."idAbRec" and        abrec."idAbRec" = abrecid_personrecid."idAbRec" and        abrecid_personrecid.test_name=%s and        "itemId"= {table}_purchases.item_id and        abtest_algorithms.id = abrec.abtest_algorithms_id and        ((abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) or (abtest_algorithms.algorithmid = 2 and abrecid_personrecid."idAbRec"=abreclist."idAbRec" and  {table}_purchases.user_id=abrecid_personrecid.personid)) and        abtest.test_name=abrecid_personrecid.test_name and         {table}_purchases.timestamp>=abrec.timestamp and         {table}_purchases.timestamp<abrec.timestamp + (abtest."stepsize" || \' days\')::interval      GROUP BY abrec.timestamp, abtest_algorithms.algorithmid, abrec.abtest_algorithms_id) AS CTRTable      FULL JOIN       (SELECT abrec."abtest_algorithms_id", abrec.timestamp, COUNT("itemId") as AR7      FROM abrec, abreclist, abrecid_personrecid, abtest,  {table}_purchases, abtest_algorithms      WHERE abrec."idAbRec" = abreclist."idAbRec" and        abrec."idAbRec" = abrecid_personrecid."idAbRec" and        abrecid_personrecid.test_name=%s and        "itemId"= {table}_purchases.item_id and        abtest_algorithms.id = abrec.abtest_algorithms_id and        ((abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) or (abtest_algorithms.algorithmid = 2 and abrecid_personrecid."idAbRec"=abreclist."idAbRec" and  {table}_purchases.user_id=abrecid_personrecid.personid)) and        abtest.test_name=abrecid_personrecid.test_name and         {table}_purchases.timestamp>=abrec.timestamp and         {table}_purchases.timestamp<abrec.timestamp + ((7 + abtest.stepsize) || \' days\')::interval      GROUP BY abrec.timestamp, abtest_algorithms.algorithmid, abrec."abtest_algorithms_id") AS AR7Table           ON CTRTable."abtest_algorithms_id"=AR7Table."abtest_algorithms_id" and CTRTable."timestamp"= AR7Table."timestamp"      FULL JOIN       (SELECT abrec."abtest_algorithms_id", abrec.timestamp, COUNT("itemId") as AR30      FROM abrec, abreclist, abrecid_personrecid, abtest, {table}_purchases, abtest_algorithms      WHERE abrec."idAbRec" = abreclist."idAbRec" and        abrec."idAbRec" = abrecid_personrecid."idAbRec" and        abrecid_personrecid.test_name=%s and        "itemId"= {table}_purchases.item_id and        abtest_algorithms.id = abrec.abtest_algorithms_id and        ((abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) or (abtest_algorithms.algorithmid = 2 and abrecid_personrecid."idAbRec"=abreclist."idAbRec" and  {table}_purchases.user_id=abrecid_personrecid.personid)) and        abtest.test_name=abrecid_personrecid.test_name and         {table}_purchases.timestamp>=abrec.timestamp and         {table}_purchases.timestamp<abrec.timestamp + ((30 + abtest.stepsize) || \' days\')::interval      GROUP BY abrec.timestamp, abtest_algorithms.algorithmid, abrec."abtest_algorithms_id") AS AR30Table           ON AR7Table."abtest_algorithms_id"=AR30Table."abtest_algorithms_id" and AR7Table."timestamp"= AR30Table."timestamp"      FULL JOIN       (SELECT abrec."abtest_algorithms_id", abrec.timestamp, (SUM( {table}_purchases."parameter")) as avaragePriceAR0      FROM abrec, abreclist, abrecid_personrecid, abtest, {table}_purchases, abtest_algorithms      WHERE abrec."idAbRec" = abreclist."idAbRec" and        abrec."idAbRec" = abrecid_personrecid."idAbRec" and        abrecid_personrecid.test_name=%s and        "itemId"= {table}_purchases.item_id and        abtest_algorithms.id = abrec.abtest_algorithms_id and        ((abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) or (abtest_algorithms.algorithmid = 2 and abrecid_personrecid."idAbRec"=abreclist."idAbRec" and  {table}_purchases.user_id=abrecid_personrecid.personid)) and        abtest.test_name=abrecid_personrecid.test_name and         {table}_purchases.timestamp>=abrec.timestamp and         {table}_purchases.timestamp<abrec.timestamp + (abtest.stepsize || \' days\')::interval      GROUP BY abrec.timestamp, abtest_algorithms.algorithmid, abrec."abtest_algorithms_id") AS AR0UTable           ON AR30Table."abtest_algorithms_id"=AR0UTable."abtest_algorithms_id" and AR30Table."timestamp"= AR0UTable."timestamp"      FULL JOIN       (SELECT abrec."abtest_algorithms_id", abrec.timestamp,(SUM( {table}_purchases."parameter")) as avaragePriceAR7      FROM abrec, abreclist, abrecid_personrecid, abtest, {table}_purchases, abtest_algorithms      WHERE abrec."idAbRec" = abreclist."idAbRec" and        abrec."idAbRec" = abrecid_personrecid."idAbRec" and        abrecid_personrecid.test_name=%s and        "itemId"= {table}_purchases.item_id and        abtest_algorithms.id = abrec.abtest_algorithms_id and        ((abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) or (abtest_algorithms.algorithmid = 2 and abrecid_personrecid."idAbRec"=abreclist."idAbRec" and  {table}_purchases.user_id=abrecid_personrecid.personid)) and        abtest.test_name=abrecid_personrecid.test_name and         {table}_purchases.timestamp>=abrec.timestamp and         {table}_purchases.timestamp<abrec.timestamp + ((7 + abtest.stepsize) || \' days\')::interval      GROUP BY abrec.timestamp, abtest_algorithms.algorithmid, abrec."abtest_algorithms_id") AS AR7UTable           ON AR0UTable."abtest_algorithms_id"=AR7UTable."abtest_algorithms_id" and AR0UTable."timestamp"= AR7UTable."timestamp"      FULL JOIN       (SELECT abrec."abtest_algorithms_id", abrec.timestamp, (SUM( {table}_purchases."parameter")) as avaragePriceAR30      FROM abrec, abreclist, abrecid_personrecid, abtest,  {table}_purchases, abtest_algorithms      WHERE abrec."idAbRec" = abreclist."idAbRec" and        abrec."idAbRec" = abrecid_personrecid."idAbRec" and        abrecid_personrecid.test_name=%s and        "itemId"= {table}_purchases.item_id and        abtest_algorithms.id = abrec.abtest_algorithms_id and        ((abtest_algorithms.algorithmid = 0 or abtest_algorithms.algorithmid = 1) or (abtest_algorithms.algorithmid = 2 and abrecid_personrecid."idAbRec"=abreclist."idAbRec" and  {table}_purchases.user_id=abrecid_personrecid.personid)) and        abtest.test_name=abrecid_personrecid.test_name and         {table}_purchases.timestamp>=abrec.timestamp and         {table}_purchases.timestamp<abrec.timestamp + ((30 + abtest.stepsize) || \' days\')::interval      GROUP BY abrec.timestamp, abtest_algorithms.algorithmid, abrec."abtest_algorithms_id") AS AR30UTable          ON AR7UTable."abtest_algorithms_id"=AR30UTable."abtest_algorithms_id" and AR7UTable."timestamp"= AR30UTable."timestamp"  WHERE CTRTable.abtest_algorithms_id is not null  and CTRTable.timeStamp is not null;'.format(
             table=self.dataset)
         self.cursor.execute(sql.SQL(query), [self.abTestId] * 7)
         self.connection.commit()
 
     def sendTimeEstimation(self,loadingSocket, estTimeMicroSec, totalMicroSecDone):
+        """
+        sendTimeEstimation: Sends an estimation of how long the AB-test has left to create
+        @param loadingSocket:
+        @param estTimeMicroSec:
+        @param totalMicroSecDone:
+        """
         if self.lastSendTime != None and estTimeMicroSec != None and (datetime.datetime.now() - self.lastSendTime).total_seconds() <= 1:
             return
         loadingSocket.emit('newData', [self.abTestId, estTimeMicroSec, totalMicroSecDone])
@@ -187,7 +207,8 @@ class ABTest():
 
     def delete(self):
         """
-        Deletes the AB test.
+        delete: Deletes the AB test.
+        @return: a message whether the deletion failed or succeeded
         """
         message = '{"message": "ABTest succesfully Deleted"}'
         errorCode = 201
@@ -264,7 +285,7 @@ class ABTest():
 
     def overviewPageData(self):
         """
-        overviewPageData: gives a json format for the overview page in the interface
+        overviewPageData: returns a json format of data for the overview page in the interface
         """
         dataSet = Dataset(self.dataset)
         allPoints = dataSet.getTimeStampList(list, self.beginTs, self.endTs)
@@ -363,6 +384,9 @@ class ABTest():
         return (json.dumps(itemsql[0]), 200)
 
     def getABtests(self):
+        """
+        getABtests: Returns a json format containing a list of information about all the AB-tests
+        """
         self.cursor.execute(sql.SQL('SELECT * FROM "abtest" WHERE username=%s'), [self.userName])
         data = self.cursor.fetchall()
         returnList = []
@@ -435,14 +459,6 @@ class ABTest():
                             Certain data is calculated within the given time interval
         @param startDate The starting date of the time interval
         @param endDate  The ending date of the time interval
-
-
-        SELECT id, SUM(p.parameter),COUNT(p.user_id),SUM(case when p.timestamp >= '2022-05-26' AND p.timestamp <= '2022-06-19' then 1 else 0 end) FROM hmtest_customers, hmtest_purchases AS p WHERE id = user_id GROUP BY id;
-
-        SELECT c.id, r.id, r.count FROM hmtest_customers AS c LEFT OUTER JOIN (SELECT p.user_id, algs.id, COUNT(i."itemId") FROM abreclist AS i, abrec AS ab, abtest_algorithms AS algs, abtest AS test, hmtest_purchases AS p  WHERE test.test_name='HMTestOfficiall' AND algs.test_name=test.test_name AND algs.id=ab.abtest_algorithms_id AND ab."idAbRec"=i."idAbRec" AND i."itemId"=p.item_id AND ab.timestamp<=p.timestamp AND ab.timestamp + INTERVAL '1 days' >p.timestamp GROUP BY p.user_id, algs.id) as r ON c.id=r.user_id;
-
-        SELECT ab.timestamp, algs.id, count(i."itemId")FROM abrec AS ab, abreclist AS i, abtest_algorithms AS algs, abtest AS test WHERE test.test_name='TestABGameStore' AND algs.test_name=test.test_name AND algs.id=ab.abtest_algorithms_id AND ab."idAbRec"=i."idAbRec" group by ab.timestamp, algs.id
-
         """
         self.cursor.execute(sql.SQL('SELECT algId.id, algName.name, algId.interval FROM abtest_algorithms as algId, algorithms as algName WHERE test_name=%s AND algId.algorithmid=algName.id'),[self.abTestId])
         algorithms = self.cursor.fetchall()
@@ -479,7 +495,12 @@ class ABTest():
         return (json.dumps(setId), 200)
 
     def updateStatus(self, statusCode):
-        if statusCode in range(3):
+        """
+        Updates the status of the AbTest.
+        @param statusCode Determines in which status the Abtest will be
+        @return: False if the param statusCode is not a valid state, True if it is valid (between 0 and 4)
+        """
+        if statusCode in range(4):
             self.cursor.execute(sql.SQL('UPDATE abtest SET status=%s WHERE abtest.test_name=%s'), [statusCode, self.abTestId])
             self.connection.commit()
             return True
@@ -495,7 +516,6 @@ class ABTest():
         @param beginTs: startdate
         @param endTs: endDate
         @param stepSize: the stepsize
-        @return:
         """
 
         if self.abTestId == None and abTestId != None:
@@ -529,6 +549,9 @@ class ABTest():
         self.userName = data[6]
 
     def getAllPendingOrBrokenAbTests(self):
+        """
+        Returns Returns a json format of a list of all AbTests that are currently inactive.
+        """
         self.cursor.execute(sql.SQL('SELECT test_name, status FROM "abtest" WHERE status=2 or status=3'))
         data = self.cursor.fetchall()
         returnData = []
