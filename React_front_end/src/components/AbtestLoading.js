@@ -97,7 +97,7 @@ class AbtestLoading extends React.Component {
              <div>
                  <TabelSkeleton loading={this.state.loading}>
                      <Row style={{paddingTop: 20}}>
-                        {(Object.keys(this.state.times).length === 0) && <div><img src={"/svg/allDone.svg"} style={{width: "100%"}}/><h2 style={{paddingTop: 30}}>All A/B Test are added</h2></div>}
+                        {(Object.keys(this.state.times).length === 0) && <div><img src={"/svg/allDone.svg"} style={{width: "40%"}}/><h2 style={{paddingTop: 30}}>All A/B Test are added</h2></div>}
                         {Object.keys(this.state.times).map((key, index) => {
                             {return <Col sm={12} md={6}>
                                          <div style={{ paddingBottom: 20 }}>
