@@ -199,7 +199,9 @@ class Dataset():
 
     def changeApiWrapper(self, request):
         """
-
+        Function to change data of the dataset with a request: with form data: table, colmName, value, id
+        @param request:
+        @return:
         """
         if request.method == 'POST':
             if 'dataSet' not in request.form or 'id' not in request.form or 'table' not in request.form or 'colmName' not in request.form or 'value' not in request.form:
@@ -216,7 +218,10 @@ class Dataset():
 
     def getRecordById(self, table, id):
         """
-
+        Get an dataset item of table by id
+        @param table: table of the item (articles, customers, purchases)
+        @param id: id of thr record
+        @return: (json info, html code)
         """
         if not table in ["articles", "customers", "purchases"]:
             return ('Worng table type', 500)
@@ -456,6 +461,10 @@ class Dataset():
         return (json.dumps(amounts[0]), 200)
 
     def setAllABTestsOutdated(self):
+        """
+        Set all abTests linked to current datasetId to outdated
+        @return:
+        """
         self.cursor.execute(sql.SQL('UPDATE abtest SET status=0 WHERE dataset=%s'), [self.datasetId])
         self.connection.commit()
 
