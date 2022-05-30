@@ -44,7 +44,7 @@ HOST = "127.0.0.1" if DEBUG else "0.0.0.0"
 def getUserInformation():
     """
     Admin privileges: Not needed
-    Get user information of loggdin user
+    Description: Get user information of loggdin user
     @return: json of user information
     """
     user = User(app)

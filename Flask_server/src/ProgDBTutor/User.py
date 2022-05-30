@@ -16,6 +16,7 @@ import jwt
 from datetime import datetime, timedelta
 from functools import wraps
 
+# General Website User Class
 class User():
     def __init__(self, app):
         database = DBConnection(dbname=config_data['dbname'], dbuser=config_data['dbuser'],
@@ -33,6 +34,7 @@ class User():
         self.lastName = None
         self.isLoggedIn = False
 
+    # Function to retrieve all relevant user information
     def getUserInformationAsReturnRequest(self):
         return (jsonify({'loggedIn': self.isLoggedIn,
                          'username': self.username,
@@ -71,6 +73,7 @@ class User():
             print("invalid token")
             return False
 
+    # Function that retrieves all the website users in the database
     def getUsers(self):
         self.cursor.execute(sql.SQL('SELECT * FROM "users"'))
         data = self.cursor.fetchall()
@@ -80,6 +83,7 @@ class User():
             returnList.append(item)
         return (json.dumps(returnList), 200)
 
+    # Function to change the Admin property of a website user
     def changeAdminPermission(self, userName, permission):
         self.cursor.execute(sql.SQL('UPDATE Users SET admin=%s WHERE username=%s'),[permission,userName])
         self.connection.commit()

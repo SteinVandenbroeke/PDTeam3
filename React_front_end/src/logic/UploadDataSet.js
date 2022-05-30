@@ -1,5 +1,6 @@
 import {React} from "react";
 
+// Javascript file that defines the front end functions to upload a dataset to the database
 export class UploadDataSet{
     fileReader = new FileReader();
     file = null;
