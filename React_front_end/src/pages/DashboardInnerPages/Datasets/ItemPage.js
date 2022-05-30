@@ -72,7 +72,7 @@ const ItemOverview = () => {
             </div>
             <div style={{padding: 10, textAlign:"left"}}>
                 <Col>
-                    <img src={image} alt={itemTitle} />
+                    <img style={{maxHeight: 200, maxWidth: 200}} src={image} alt={itemTitle} />
                 </Col>
                 <Col>
                     <Row>

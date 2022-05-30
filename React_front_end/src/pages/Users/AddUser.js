@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React, {useEffect, useState} from 'react';
 import {Card, Container, ListGroup, Form, Button, Col, Row, Image, Spinner} from "react-bootstrap";
 import LogicTable from "../../components/logicTable";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import Icon from "react-eva-icons";
 import ProfileImageMenu from "../../components/profileImageMenu";
 
@@ -12,6 +12,7 @@ import {ServerRequest} from "../../logic/ServerCommunication";
 
 
 const AddUsers = () => {
+    const navigation = useNavigate();
     const [formData, setFormData] = useState({firstName: "", image: null});
     const [loading, setLoading] = useState(false);
 
@@ -24,6 +25,7 @@ const AddUsers = () => {
             let request = new ServerRequest();
             let response = await request.sendPost("signup", formData);
             toast.success("User created");
+            navigation('/users', { replace: true });
             return true;
         }
         catch(err) {

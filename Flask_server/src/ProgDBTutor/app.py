@@ -184,7 +184,6 @@ def overviewPageABTest():
     back = user.checkTokenAndLoadData(request)
     if not back:
         return make_response('{"message": "User token wrong or missing"}', 401)
-
     abtest = ABTest(request.args.get("abTestName"), user.username)
     overviewPageData = abtest.overviewPageData()
 

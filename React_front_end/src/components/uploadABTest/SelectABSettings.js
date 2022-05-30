@@ -60,26 +60,33 @@ const SelectABSettings = (props) => {
                 <Col xs={12} sm={12} md={5} style={{padding: 40}}>
                     <Form.Label>Enter a name for your AB-test.</Form.Label>
                     <Form.Control placeholder="AB-test name" onChange={(e)=>setAbTestname(e.target.value) } />
-                    <Form.Label style={{paddingBottom:20, paddingTop:20}}>Select the amount of top-K items. These items will be shown to the users as recommended items.</Form.Label>
-                    <Slider max={maxTopK} min={0} step={1} setValues={setTopKValue} values={topKValue}/>
-                    <Form.Label style={{paddingBottom:20}}>Select the start and end date of this ABTest. </Form.Label>
-                    <Spinner
-                        className={!loading? "visually-hidden": ""}
-                        as="span"
-                        animation="border"
-                        size="sm"
-                        role="status"
-                        aria-hidden="true"
-                    />
-                    <Slider max={periodSlider.length - 1} labels={periodSlider} min={0} step={1} setValues={setPeriodValues} values={periodValues}/>
-                    <Form.Label style={{paddingBottom:20}}>Select the step size. This will determine when to update the top-K items</Form.Label>
-                    <Slider max={periodSlider.length - 1} min={1} step={1} setValues={setStepSizeValue}  values={stepSizeValue}/>
-
-                    <Button variant="secondary" onClick={()=>props.setCurrentStep(props.currentStep - 1)}>Previous </Button>{' '}
-                    <Button variant="primary" onClick={()=>confirmDayInterval()}>Next</Button>
+                    <div>
+                        <Form.Label style={{paddingTop:50}}>Select the amount of top-K items. These items will be shown to the users as recommended items.</Form.Label>
+                        <Slider max={maxTopK} min={0} step={1} setValues={setTopKValue} values={topKValue}/>
+                    </div>
+                    <div>
+                        <Form.Label style={{paddingTop:50}}>Select the start and end date of this ABTest. </Form.Label>
+                        <Spinner
+                            className={!loading? "visually-hidden": ""}
+                            as="span"
+                            animation="border"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                        />
+                        <Slider max={periodSlider.length - 1}  style={{paddingBottom:20}} labels={periodSlider} min={0} step={1} setValues={setPeriodValues} values={periodValues}/>
+                    </div>
+                    <div>
+                        <Form.Label style={{paddingTop:50}}>Select the step size. This will determine when to update the top-K items</Form.Label>
+                        <Slider max={periodSlider.length - 1} style={{paddingBottom:20}} min={1} step={1} setValues={setStepSizeValue}  values={stepSizeValue}/>
+                    </div>
+                    <div style={{paddingTop:50}}>
+                        <Button  variant="secondary" onClick={()=>props.setCurrentStep(props.currentStep - 1)}>Previous </Button>{' '}
+                        <Button variant="primary" onClick={()=>confirmDayInterval()}>Next</Button>
+                    </div>
                 </Col>
-                <Col xs={0} sm={0} md={7}>
-                    <img src={"/svg/Steps.svg"} style={{width: "90%"}} xs={0}/>
+                <Col xs={0} sm={0} md={7} style={{textAlign: "center"}}>
+                    <img src={"/svg/Steps.svg"} style={{width: "80%"}} xs={0}/>
                 </Col>
             </Row>
 

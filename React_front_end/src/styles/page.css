@@ -12,11 +12,6 @@ figure {
     margin: auto;
 }
 
-img {
-    max-width: 220px;
-    max-height: 220px;
-}
-
 figcaption {
     background-color: #222;
     color: #fff;

@@ -24,7 +24,7 @@ class ErrorBoundary extends React.Component {
                 <Container style={{paddingTop: 20, paddingBottom: 30}}>
                     <Card className={"shadow-lg"} style={{padding: 30}}>
                         <div style={{textAlign: "center", paddingTop: 40, zIndex: 1}}>
-                            <img src={"/svg/renderError.svg"}/>
+                            <img  style={{width: "60%"}} src={"/svg/renderError.svg"}/>
                             <h1 style={{paddingTop: 40}}>Render fout</h1>
                             <h3>Open een andere pagina of probeer opnieuw</h3>
                             <br/>

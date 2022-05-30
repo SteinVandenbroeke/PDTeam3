@@ -12,7 +12,7 @@ const ServerError = (props) => {
         window.location.reload();
     }
 
-    return (<>{props.error && <div><img src={"/svg/serverDown.svg"} style={{width: "100%"}}/><h2 style={{paddingTop: 30}}>Failed server request or wrong data</h2><Button variant="primary" onClick={()=>reload()}>Reload</Button></div>}</>)
+    return (<>{props.error && <div><img src={"/svg/serverDown.svg"} style={{width: "40%"}}/><h2 style={{paddingTop: 30}}>Failed server request or wrong data</h2><Button variant="primary" onClick={()=>reload()}>Reload</Button></div>}</>)
 
 };
 
