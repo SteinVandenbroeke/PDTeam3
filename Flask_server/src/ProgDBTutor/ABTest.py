@@ -154,24 +154,6 @@ class ABTest():
                                 self.cursor.execute(sql.SQL(
                                 'insert into "abreclist" ("idAbRec","itemId") values (%s,%s)'), [idAbRec, rec])
 
-                    #for customer, result in enumerate(results):
-                    #    print("customer")
-                    #    print(customer)
-                    #    self.cursor.execute(sql.SQL('insert into "abrec" ("abtest_algorithms_id","timestamp") values (%s,%s) RETURNING "idAbRec"'), [
-                    #                        algo[3], time + datetime.timedelta(days=algo[1])])
-                    #    idAbRec = self.cursor.fetchone()[0]
-#
-                    #    query = 'SELECT id FROM {table}_customers LIMIT 1 OFFSET %s;'.format(table=self.dataset)
-                    #    self.cursor.execute(sql.SQL(query), [customer])
-                    #    customer_id = self.cursor.fetchone()[0]
-#
-                    #    print(customer_id)
-#
-                    #    self.cursor.execute(sql.SQL('insert into "abrecid_personrecid" ("idAbRec","personid","test_name") values (%s,%s,%s)'), [
-                    #                        idAbRec, customer_id, self.abTestId])
-                    #    for item in result:
-                    #        self.cursor.execute(sql.SQL(
-                    #            'insert into "abreclist" ("idAbRec","itemId") values (%s,%s)'), [idAbRec, item])
                 print(time, "done")
 
                 time += datetime.timedelta(days=self.stepSize)
