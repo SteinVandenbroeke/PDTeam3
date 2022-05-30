@@ -51,7 +51,6 @@ class ABTest():
         select = 'SELECT COUNT(test_name) FROM abtest WHERE test_name = %s and username = %s;'
         self.cursor.execute(sql.SQL(select).format(), [self.abTestId, self.userName])
         data = self.cursor.fetchone()
-        print(self.abTestId, self.userName,data[0])
         if data[0] != 1:
             abort(make_response("No permission to this A/B test", 401))
 
@@ -75,7 +74,6 @@ class ABTest():
             algTemp.append([alg[0],[alg[1]],alg[2]])
         abTestId = self.abTestId
         self.abTestId = None
-        print(abTestId, algTemp, self.dataset, self.beginTs, self.endTs, self.stepSize, self.topK, self.userName)
         self.initialize(abTestId, algTemp, self.dataset, self.beginTs.strftime("%d/%m/%Y"), self.endTs.strftime("%d/%m/%Y"), self.stepSize, self.topK, self.userName)
         self.create(loadingSocket)
 
@@ -313,7 +311,6 @@ class ABTest():
             if itemsql[1] != None:
                 algoritms[itemsql[0]]["points"][itemsql[1].strftime("%d/%m/%Y %H:%M:%S")] = timeItem
 
-        print(algoritms)
         query = 'SELECT abtest_algorithms.id, abrec.timestamp, {dataset}_articles.title FROM abrec, abreclist, {dataset}_articles, abtest_algorithms WHERE {dataset}_articles.id=abreclist."itemId" and  abreclist."idAbRec"=abrec."idAbRec" and abrec.abtest_algorithms_id=abtest_algorithms.id and abtest_algorithms.test_name=%s;'.format(dataset=self.dataset.lower())
         self.cursor.execute(sql.SQL(query), [self.abTestId])
         itemssql = self.cursor.fetchall()
