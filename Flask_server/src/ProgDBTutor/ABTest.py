@@ -286,11 +286,8 @@ class ABTest():
         """
         overviewPageData: gives a json format for the overview page in the interface
         """
-        # print(self.abTestId)
-        # print(self.dataset)
         dataSet = Dataset(self.dataset)
-        allPoints = dataSet.getTimeStampList(list)
-
+        allPoints = dataSet.getTimeStampList(list, self.beginTs, self.endTs)
         query = 'SELECT abrecmetric.abtest_algorithms_id,timestamp,ctr,atr7,atr30, revenuectr,revenue7, revenue30, purchases, "interval", "K",name FROM abrecmetric, abtest_algorithms, algorithms WHERE abtest_algorithms.id=abrecmetric.abtest_algorithms_id and algorithms.id=abtest_algorithms.algorithmid and test_name=%s'
         self.cursor.execute(sql.SQL(query), [self.abTestId])
         itemssql = self.cursor.fetchall()
