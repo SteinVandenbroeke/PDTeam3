@@ -21,7 +21,7 @@ const ABTestsList = () => {
     }
 
     function handleRequestData(data){
-        let list = ["Status","Name", "Dataset", "Stepsize"]
+        let list = ["Status","Name", "Dataset", "TopK", "Stepsize"]
         let count = data.at(-1)
         for (let i=1; i < count + 1; i++) {
             list.push("algorithm" + i)
