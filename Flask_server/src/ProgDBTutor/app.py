@@ -40,14 +40,13 @@ socketio = SocketIO(app)
 DEBUG = False
 HOST = "127.0.0.1" if DEBUG else "0.0.0.0"
 
-"""
-Functions within this file link a GET request to the correct python function.
-These functions also check if the user, that sends the GET request, is logged in. 
-Where necessary, the admin status of the user is also checked.
-"""
-
 @app.route('/api/getCurrentUserInformation', methods =['GET'])
 def getUserInformation():
+    """
+    Admin privileges: Not needed
+    Get user information of loggdin user
+    @return: json of user information
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -58,6 +57,11 @@ def getUserInformation():
 # this route sends back list of users users
 @app.route('/api/user', methods =['GET'])
 def get_all_users_def():
+    """
+    Admin privileges: Needed
+    Returns a list of all users
+    @return:
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -71,6 +75,11 @@ def get_all_users_def():
 # route for logging user in
 @app.route('/api/login', methods =['POST'])
 def login_def():
+    """
+    Admin privileges: Not needed
+    User login
+    @return: auth token
+    """
     auth = request.form
     email = auth.get('email')
     password = auth.get('password')
@@ -86,9 +95,13 @@ def login_def():
     returnValue = user.login(email, password)
     return make_response(*returnValue)
 
-# signup route
 @app.route('/api/signup', methods =['POST'])
 def signup_def():
+    """
+    Admin privileges: Needed
+    Creates a new user
+    @return: auth token
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -114,10 +127,20 @@ def signup_def():
 
 @app.route('/api/helloWorld')
 def helloWorld():
+    """
+    Admin privileges: Not needed
+    To easly test the server
+    @return:
+    """
     return "Hallo world"
 
 @app.route('/api/uploadDataset', methods=['GET', 'POST'])
 def uploadDataset():
+    """
+    Admin privileges: Needed
+    Create a new dataset, with post request containing the csv and connection data
+    @return: succes/fail message
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -152,17 +175,13 @@ def uploadDataset():
 
     return make_response('{"message": "File successfully uploaded."}', 201)
 
-"""
-@app.route('/api/create', methods=['GET', 'POST'])
-def create():
-    user = User(app)
-    abtest = ABTest()
-    abtest.initialize("1", [[2, [1], 1]], "small", "2019-01-01", "2021-01-01",
-                      1, 1, user.username)
-    abtest.create()"""
-
 @app.route('/api/createAbTest', methods=['GET', 'POST'])
 def createAbTest():
+    """
+    Admin privileges: Not needed
+    Creates a A/B Test in another thread so the user can leave te page
+    @return: succes/fail message
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -180,6 +199,11 @@ def createAbTest():
 
 @app.route('/api/ABTestOverview', methods=['GET', 'POST'])
 def overviewPageABTest():
+    """
+    Admin privileges: Not needed
+    Only for owner of AB Test
+    @return: the overview information of the A/B Test
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -191,6 +215,11 @@ def overviewPageABTest():
 
 @app.route('/api/totalActiveUserAmount', methods=['GET', 'POST'])
 def totalActiveUserAmount():
+    """
+    Admin privileges: Not needed
+    Only for owner of AB Test
+    @return: the total active user amount in a certain period (Get: startDate and endDate) for a A/B Test
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -202,6 +231,11 @@ def totalActiveUserAmount():
 
 @app.route('/api/changeDataset', methods=['POST'])
 def changeDataset():
+    """
+    Admin privileges: Needed
+    Updates a record of a A/B test
+    @return: succes/fail message
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -215,6 +249,11 @@ def changeDataset():
 
 @app.route('/api/getRecordById', methods=['GET'])
 def getRecordById():
+    """
+    Admin privileges: Not Needed
+    Returns a record of a dataset
+    @return: record information as json
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -226,6 +265,11 @@ def getRecordById():
 
 @app.route('/api/getDatasets', methods=['GET'])
 def getDatasets():
+    """
+    Admin privileges: Not Needed
+    returns a list of datasets
+    @return: json list of datasets
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -237,6 +281,12 @@ def getDatasets():
 
 @app.route('/api/deleteABTest', methods=['GET'])
 def deleteABTest():
+    """
+    Admin privileges: Not Needed
+    Only for owner of AB Test
+    deletes a A/B test
+    @return: succes/fail message
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -246,9 +296,13 @@ def deleteABTest():
     returnValue = abtest.delete()
     return make_response(returnValue[0], returnValue[1])
 
-
 @app.route('/api/deleteDataset', methods=['GET'])
 def deleteDataset():
+    """
+    Admin privileges: Needed
+    delete a dataset
+    @return: succes/fail message
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -262,6 +316,11 @@ def deleteDataset():
 
 @app.route('/api/deletePerson', methods=['GET'])
 def deletePerson():
+    """
+    Admin privileges: Needed
+    Deletes a person from a dataset by it's id given in get: personId (id of person) and setId (id of dataset)
+    @return: succes/fail message
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -273,9 +332,13 @@ def deletePerson():
     returnValue = dataset.deletePerson(request.args.get("personId"))
     return make_response(returnValue[0], returnValue[1])
 
-
 @app.route('/api/deleteItem', methods=['GET'])
 def deleteItem():
+    """
+    Admin privileges: Needed
+    Deletes a item from a dataset by it's id given in get: itemId (id of item) and setId (id of dataset)
+    @return: succes/fail message
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -289,6 +352,11 @@ def deleteItem():
 
 @app.route('/api/getItemList', methods=['GET'])
 def getItemList():
+    """
+    Admin privileges: Not needed
+    Return a item list of a dataset with the id given in a get: dataSet
+    @return: json list of items
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -300,6 +368,11 @@ def getItemList():
 
 @app.route('/api/getPeopleList', methods=['GET'])
 def getPeopleList():
+    """
+    Admin privileges: Not needed
+    Returns a peaple list of a dataset with the id given in a get: dataSet
+    @return: json list of peaple
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -311,6 +384,11 @@ def getPeopleList():
 
 @app.route('/api/getDatasetAmounts', methods=['GET'])
 def getDatasetAmounts():
+    """
+    Admin privileges: Not needed
+    Returns the "customerAmount", "itemAmount", "purchaseAmount" of a dataset
+    @return: json list of the amounts
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -321,6 +399,12 @@ def getDatasetAmounts():
 
 @app.route('/api/getABtests', methods=['GET'])
 def getABtests():
+    """
+    Admin privileges: Not Needed
+    Only for owner of AB Test
+    Returns all AB test for current logged in user
+    @return: list of AB tests
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -332,6 +416,11 @@ def getABtests():
 
 @app.route('/api/getPurchases', methods=['GET'])
 def getPurchases():
+    """
+    Admin privileges: Not Needed
+    Returns a list of all purches in a dataset
+    @return: json purches list
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -341,9 +430,13 @@ def getPurchases():
     returnValue = dataset.getPurchases(request.args.get("id"))
     return make_response(returnValue[0], returnValue[1])
 
-
 @app.route('/api/getTimeStampList', methods=['GET'])
 def getTimeStampList():
+    """
+    Admin privileges: Not Needed
+    Returns a list of all timeStamps in a dataset (from start data to end date of purcheses)
+    @return: json list of timeStamps
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -355,6 +448,11 @@ def getTimeStampList():
 
 @app.route('/api/getArticleCount', methods=['GET'])
 def getArticleCount():
+    """
+    Admin privileges: Not Needed
+    Returns the count of all aricles in a dataset
+    @return: json int
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -366,6 +464,11 @@ def getArticleCount():
 
 @app.route('/api/getCustomerCount', methods=['GET'])
 def getCustomerCount():
+    """
+    Admin privileges: Not Needed
+    Returns the count of all customers in a dataset
+    @return: json int
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -377,6 +480,11 @@ def getCustomerCount():
 
 @app.route('/api/getUsers', methods=['GET'])
 def getUsers():
+    """
+    Admin privileges: Needed
+    Returns all user account
+    @return: json list of users
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -388,17 +496,13 @@ def getUsers():
     returnValue = user.getUsers()
     return make_response(returnValue[0], returnValue[1])
 
-# React interface, alle niet verwezen app.route's worden doorverwezen naar react interface in de react_build folder
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def reactApp(path):
-    if not os.path.exists("react_build/" + path) or path == "":
-        path = "index.html"
-
-    return app.send_static_file(path)
-
 @app.route('/api/changeAdminPermission', methods=['GET'])
 def changeAdminPermission():
+    """
+    Admin privileges: Needed
+    Change the permission of a user account
+    @return: succes/fail message
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -414,9 +518,13 @@ def changeAdminPermission():
     returnValue = user.changeAdminPermission(request.args.get("userName"), request.args.get("permission"))
     return make_response(returnValue[0], returnValue[1])
 
-
 @app.route('/api/deleteUser', methods=['GET'])
 def deleteUser():
+    """
+    Admin privileges: Needed
+    Deletes a user account
+    @return: succes/fail message
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -433,9 +541,14 @@ def deleteUser():
     returnValue = user.deleteUser(request.args.get("userName"))
     return make_response(returnValue[0],returnValue[1])
 
-
 @app.route('/api/getUsersFromABTest', methods=['GET'])
 def getUsersFromABTest():
+    """
+    Admin privileges: Not Needed
+    Only for owner of AB Test
+    Returns persons information in AB Test like CTR, Total clicks,...
+    @return: list of person information
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -448,6 +561,12 @@ def getUsersFromABTest():
 
 @app.route('/api/getItemsFromABTest', methods=['GET'])
 def getItemsFromABTest():
+    """
+    Admin privileges: Not Needed
+    Only for owner of AB Test
+    Returns item information in AB Test like CTR, Total clicks,...
+    @return: list of items information
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -460,6 +579,11 @@ def getItemsFromABTest():
 
 @app.route('/api/getDatasetIdFromABTest', methods=['GET'])
 def getDatasetIdFromABTest():
+    """
+    Admin privileges: Not Needed
+    Returns the dataset id for a certain AB test with id given in Get: abTestId
+    @return: json int
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -471,6 +595,11 @@ def getDatasetIdFromABTest():
 
 @app.route('/api/getPendingAbTests', methods=['GET'])
 def getPendingAbTests():
+    """
+    Admin privileges: Not Needed
+    Returns a list of all pending or broken AB tests
+    @return: json int
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -482,6 +611,11 @@ def getPendingAbTests():
 
 @app.route('/api/resetAbTests', methods=['GET'])
 def resetAbTests():
+    """
+    Admin privileges: Not Needed
+    Function to reset an AB Test with id: Get (abTestName)
+    @return: success/fail message
+    """
     user = User(app)
     back = user.checkTokenAndLoadData(request)
     if not back:
@@ -493,6 +627,19 @@ def resetAbTests():
 
     return make_response('{"message": "ABTest word gereset, u kan de pagina verlaten."}', 201)
 
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def reactApp(path):
+    """
+    the react application.
+    returns the html, js, css, ... files
+    @param path: path of item
+    @return:
+    """
+    if not os.path.exists("react_build/" + path) or path == "":
+        path = "index.html"
+
+    return app.send_static_file(path)
 
 # RUN DEV SERVER
 if __name__ == "__main__":

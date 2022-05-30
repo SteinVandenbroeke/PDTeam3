@@ -60,7 +60,7 @@ class AbtestLoading extends React.Component {
                 toast.success(`ABTest ${message[0]} is toegevoegd`);
             }
             else if(message[2] == "Failed"){
-                tempDict[message[0]] = [null, "<div>A/B test Failed<br/><Button>Retry</Button></div>"];
+                tempDict[message[0]] = [null, (<div>A/B test Failed (reset needed)</div>)];
             }
             else{
                 tempDict[message[0]] = [0, message[2]];
