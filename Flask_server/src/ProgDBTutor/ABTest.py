@@ -44,6 +44,7 @@ class ABTest():
         """
         Closes the Database connection
         """
+        print("close db connection")
         self.cursor.close()
         self.connection.close()
 
@@ -314,6 +315,7 @@ class ABTest():
             if itemsql[1] != None:
                 algoritms[itemsql[0]]["points"][itemsql[1].strftime("%d/%m/%Y %H:%M:%S")] = timeItem
 
+        """
         query = 'SELECT abtest_algorithms.id, abrec.timestamp, {dataset}_articles.title FROM abrec, abreclist, {dataset}_articles, abtest_algorithms WHERE {dataset}_articles.id=abreclist."itemId" and  abreclist."idAbRec"=abrec."idAbRec" and abrec.abtest_algorithms_id=abtest_algorithms.id and abtest_algorithms.test_name=%s;'.format(dataset=self.dataset.lower())
         self.cursor.execute(sql.SQL(query), [self.abTestId])
         itemssql = self.cursor.fetchall()
@@ -325,7 +327,7 @@ class ABTest():
                 algoritms[itemsql[0]]["points"][itemsql[1].strftime("%d/%m/%Y %H:%M:%S")]["mostRecomendedItems"] = []
             algoritms[itemsql[0]]["points"][itemsql[1].strftime("%d/%m/%Y %H:%M:%S")]["mostRecomendedItems"].append(itemsql[2])
             counter += 1
-
+"""
 
         query = 'SELECT dataset, stepsize, "topK" FROM abtest WHERE test_name=%s'
         self.cursor.execute(sql.SQL(query), [self.abTestId])
