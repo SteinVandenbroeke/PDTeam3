@@ -1,12 +1,9 @@
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 
-import {Button, Col, Modal, Row, Spinner} from "react-bootstrap";
-import Icon from 'react-eva-icons';
-import {useNavigate} from "react-router-dom";
+import {Col,Row} from "react-bootstrap";
 import React from "react";
-import {Link} from "react-router-dom";
-import {Card, OverlayTrigger, Tooltip} from "react-bootstrap"
+
 
 const CharSkeleton = (props) => {
     return (
